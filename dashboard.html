@@ -1265,6 +1265,15 @@
         </div>
 
         <div class="nav-section">Config.</div>
+        <div class="nav-item" id="nav-usuarios" onclick="showPage('usuarios',this)" style="display:none;">
+            <svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Usuarios
+        </div>
         <div class="nav-item" onclick="alert('Configuración — próximamente')">
             <svg viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="3" />
@@ -1700,6 +1709,34 @@
                 </div>
             </div>
 
+            <!-- ── USUARIOS (solo Admin) ── -->
+            <div class="page" id="page-usuarios">
+                <div class="card">
+                    <div class="table-toolbar" style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--border);">
+                        <span style="font-weight:600;font-size:14px;">Gestión de Usuarios</span>
+                        <span style="font-size:12px;color:var(--text-secondary);background:var(--warning-bg);padding:3px 9px;border-radius:20px;">Solo Administradores</span>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Nombre</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                    <th>Contraseña</th>
+                                    <th style="text-align:right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usuariosTbody">
+                                <tr><td colspan="6" class="empty-cell">Cargando usuarios…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-foot" id="usrFoot"></div>
+                </div>
+            </div>
+
         </div><!-- /content -->
     </div><!-- /main -->
 
@@ -1732,55 +1769,61 @@
          (GitHub Pages, Netlify, etc.). Debe ir ANTES del script principal.
     ═════════════════════════════════════════════════════════════ -->
     <script>
+        /* ════════════════════════════════════════════════════════════
+           AZYVION · PUENTE API v4 — Sesiones reales con token seguro
+           ⚠️  REEMPLAZA ESTA URL CON LA URL DE TU WEB APP ACTUAL
+        ════════════════════════════════════════════════════════════ */
         (function () {
-            const API_URL = 'https://script.google.com/macros/s/AKfycbzCN391z3L1ijeemGTlnFWlhDlDWDnurUHKF42tZnRArKkHk17x0zhyoORZEE69312e/exec';
+            const API_URL = 'https://script.google.com/macros/s/AKfycbxDuKJuK_xsHm1v8ftCv-t1NeohLg62Topu13a-Z_pxDqDN0qznvjKUOd5-hVksuFaA/exec';
             const SESSION_KEY = 'azyvion_session';
 
-            // Traduce cada método del backend a los parámetros que espera _dispatch()
             const MAP = {
-                login: (u, p) => ({action: 'login', usuario: u, contrasena: p}),
-                logout: () => ({action: 'logout'}),
-                getResumen: () => ({action: 'getResumen'}),
-                getActividad: (n) => ({action: 'getActividad', limit: n || 10}),
-                getClientes:      () => ({action: 'getClientes'}),
-                getProspectos:      ()      => ({action: 'getProspectos'}),
-                addProspecto:       (d)     => Object.assign({action: 'addProspecto'}, d),
-                updateProspecto:    (id, d) => Object.assign({action: 'updateProspecto', id: id}, d),
-                deleteProspecto:    (id)    => ({action: 'deleteProspecto', id: id}),
-                convertirProspecto: (id, d) => Object.assign({action: 'convertirProspecto', id: id}, d || {}),
-                addCliente: (d) => Object.assign({action: 'addCliente'}, d),
-                updateCliente: (id, d) => Object.assign({action: 'updateCliente', id: id}, d),
-                deleteCliente: (id) => ({action: 'deleteCliente', id: id}),
-                getInventario: () => ({action: 'getInventario'}),
-                addInventario: (d) => Object.assign({action: 'addInventario'}, d),
-                updateInventario: (id, d) => Object.assign({action: 'updateInventario', id: id}, d),
-                deleteInventario: (id) => ({action: 'deleteInventario', id: id}),
-                getEncuestas: () => ({action: 'getEncuestas'}),
-                addEncuesta: (d) => Object.assign({action: 'addEncuesta'}, d),
-                updateEncuesta: (id, d) => Object.assign({action: 'updateEncuesta', id: id}, d),
-                deleteEncuesta: (id) => ({action: 'deleteEncuesta', id: id})
+                login:             (u, p, r) => ({action: 'login', usuario: u, contrasena: p, remember: r ? 'true' : 'false'}),
+                logout:            ()        => ({action: 'logout'}),
+                checkSession:      ()        => ({action: 'checkSession'}),
+                getResumen:        ()        => ({action: 'getResumen'}),
+                getActividad:      (n)       => ({action: 'getActividad', limit: n || 10}),
+                getClientes:       ()        => ({action: 'getClientes'}),
+                addCliente:        (d)       => Object.assign({action: 'addCliente'}, d),
+                updateCliente:     (id, d)   => Object.assign({action: 'updateCliente', id: id}, d),
+                deleteCliente:     (id)      => ({action: 'deleteCliente', id: id}),
+                getProspectos:     ()        => ({action: 'getProspectos'}),
+                addProspecto:      (d)       => Object.assign({action: 'addProspecto'}, d),
+                updateProspecto:   (id, d)   => Object.assign({action: 'updateProspecto', id: id}, d),
+                deleteProspecto:   (id)      => ({action: 'deleteProspecto', id: id}),
+                convertirProspecto:(id, d)   => Object.assign({action: 'convertirProspecto', id: id}, d || {}),
+                getInventario:     ()        => ({action: 'getInventario'}),
+                addInventario:     (d)       => Object.assign({action: 'addInventario'}, d),
+                updateInventario:  (id, d)   => Object.assign({action: 'updateInventario', id: id}, d),
+                deleteInventario:  (id)      => ({action: 'deleteInventario', id: id}),
+                getEncuestas:      ()        => ({action: 'getEncuestas'}),
+                addEncuesta:       (d)       => Object.assign({action: 'addEncuesta'}, d),
+                updateEncuesta:    (id, d)   => Object.assign({action: 'updateEncuesta', id: id}, d),
+                deleteEncuesta:    (id)      => ({action: 'deleteEncuesta', id: id}),
+                getUsuarios:       ()        => ({action: 'getUsuarios'}),
+                addUsuario:        (d)       => Object.assign({action: 'addUsuario'}, d),
+                updateUsuario:     (id, d)   => Object.assign({action: 'updateUsuario', id: id}, d),
+                deleteUsuario:     (id)      => ({action: 'deleteUsuario', id: id})
             };
 
             function readSession() {
                 try {return JSON.parse(localStorage.getItem(SESSION_KEY));} catch (e) {return null;}
             }
 
+            function getToken() {
+                const s = readSession();
+                return s ? s.token : null;
+            }
+
             function call(name, args, onSuccess, onFailure) {
-                // checkSession se resuelve en el navegador: el backend ya no guarda sesión
-                if (name === 'checkSession') {
-                    const s = readSession();
-                    setTimeout(function () {
-                        if (onSuccess) onSuccess(s && s.token
-                            ? {ok: true, nombre: s.nombre, rol: s.rol}
-                            : {ok: false});
-                    }, 0);
-                    return;
+                const params = MAP[name].apply(null, args);
+
+                // Adjuntar token real en toda petición que no sea login
+                if (name !== 'login') {
+                    const token = getToken();
+                    if (token) params.token = token;
                 }
 
-                const params = MAP[name].apply(null, args);
-                // Identidad del usuario en sesión: el backend la usa para permisos
-                const ses = readSession();
-                if (ses && ses.nombre && name !== 'login') params.authUser = ses.nombre;
                 const qs = new URLSearchParams();
                 Object.keys(params).forEach(function (k) {
                     const val = params[k];
@@ -1797,15 +1840,26 @@
                         try {
                             data = JSON.parse(txt);
                         } catch (e) {
-                            // Si llega HTML, el Web App no está publicado como "Cualquier persona"
-                            throw new Error('El Web App no devolvió JSON. Revisa la implementación.');
+                            throw new Error('El Web App no devolvió JSON. Verifica que esté publicado como "Cualquier persona".');
                         }
+
                         if (name === 'login' && data.ok) {
                             localStorage.setItem(SESSION_KEY, JSON.stringify({
-                                token: data.token, nombre: data.nombre, rol: data.rol
+                                token: data.token, nombre: data.nombre, rol: data.rol, expira: data.expira
                             }));
                         }
-                        if (name === 'logout') localStorage.removeItem(SESSION_KEY);
+                        if (name === 'logout') {
+                            localStorage.removeItem(SESSION_KEY);
+                        }
+
+                        // Sesión inválida: limpiar y redirigir al login
+                        if (data && data.ok === false && data.error &&
+                            data.error.includes('Sesión inválida')) {
+                            localStorage.removeItem(SESSION_KEY);
+                            window.location.href = 'index.html';
+                            return;
+                        }
+
                         if (onSuccess) onSuccess(data);
                     })
                     .catch(function (err) {
@@ -1817,11 +1871,10 @@
             function makeRunner(onSuccess, onFailure) {
                 const runner = {
                     withSuccessHandler: function (fn) {return makeRunner(fn, onFailure);},
-                    withFailureHandler: function (fn) {return makeRunner(onSuccess, fn);},
-                    checkSession: function () {call('checkSession', [], onSuccess, onFailure);}
+                    withFailureHandler: function (fn) {return makeRunner(onSuccess, fn);}
                 };
                 Object.keys(MAP).forEach(function (name) {
-                    runner[name] = function () {call(name, arguments, onSuccess, onFailure);};
+                    runner[name] = function () {call(name, Array.from(arguments), onSuccess, onFailure);};
                 });
                 return runner;
             }
@@ -1838,8 +1891,9 @@
         let _clientes = [];
         let _inventario = [];
         let _encuestas = [];
+        let _usuarios = [];
         let _currentPage = 'overview';
-        let _modalMode = null; // { type:'cliente'|'inventario'|'encuesta', action:'add'|'edit', id:null }
+        let _modalMode = null;
         let _filtroCliActual = 'Todos';
         let _filtroInvActual = 'Todos';
         let _prospectos = [];
@@ -1847,8 +1901,8 @@
         let _rol = '';
         let _usuario = '';
 
-        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', inventario: 'Inventario', encuestas: 'Encuestas'};
-        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', inventario: 'Agregar producto', encuestas: 'Nueva encuesta'};
+        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', inventario: 'Inventario', encuestas: 'Encuestas', usuarios: 'Usuarios'};
+        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', inventario: 'Agregar producto', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario'};
 
         const ETAPAS = ['Nuevo', 'Contactado', 'Calificado', 'Propuesta', 'Negociación', 'Perdido'];
         const ORIGENES = ['Referido', 'Sitio web', 'Llamada fría', 'Evento', 'Redes sociales', 'Otro'];
@@ -1864,17 +1918,33 @@
            INICIALIZACIÓN
         ═══════════════════════════════════════════════════════ */
         document.addEventListener('DOMContentLoaded', function () {
+            // Verificar sesión en el BACKEND — no confiar solo en localStorage
             google.script.run
                 .withSuccessHandler(function (sess) {
-                    if (!sess.ok) {window.location.href = 'index.html'; return;}
+                    if (!sess || !sess.ok) {
+                        localStorage.removeItem('azyvion_session');
+                        window.location.href = 'index.html';
+                        return;
+                    }
                     document.getElementById('userName').textContent = sess.nombre;
                     document.getElementById('userRole').textContent = sess.rol;
                     _rol = sess.rol || '';
-                    _usuario = sess.nombre || '';
-                    document.getElementById('userAvatar').textContent = sess.nombre.substring(0, 2).toUpperCase();
+                    _usuario = sess.nombre || sess.usuario || '';
+                    document.getElementById('userAvatar').textContent =
+                        (sess.nombre || '??').substring(0, 2).toUpperCase();
+
+                    // Mostrar/ocultar módulo de Usuarios según rol
+                    const navUsuarios = document.getElementById('nav-usuarios');
+                    if (navUsuarios) {
+                        navUsuarios.style.display = esAdmin() ? 'flex' : 'none';
+                    }
+
                     loadAll();
                 })
-                .withFailureHandler(function () {window.location.href = 'index.html';})
+                .withFailureHandler(function () {
+                    localStorage.removeItem('azyvion_session');
+                    window.location.href = 'index.html';
+                })
                 .checkSession();
         });
 
@@ -1885,14 +1955,16 @@
             loadProspectos();
             loadInventario();
             loadEncuestas();
+            if (esAdmin()) loadUsuarios();
         }
 
         function refreshCurrent() {
-            if (_currentPage === 'overview') {loadResumen(); loadActividad(); loadClientes(); loadInventario();}
-            if (_currentPage === 'clientes') {loadClientes(); loadResumen();}
+            if (_currentPage === 'overview')   {loadResumen(); loadActividad(); loadClientes(); loadInventario();}
+            if (_currentPage === 'clientes')   {loadClientes(); loadResumen();}
             if (_currentPage === 'prospectos') {loadProspectos(); loadResumen();}
             if (_currentPage === 'inventario') {loadInventario(); loadResumen();}
-            if (_currentPage === 'encuestas') {loadEncuestas(); loadResumen();}
+            if (_currentPage === 'encuestas')  {loadEncuestas(); loadResumen();}
+            if (_currentPage === 'usuarios')   {loadUsuarios();}
             showToast('Datos actualizados', '#30D158');
         }
 
@@ -2631,6 +2703,26 @@
                     });
                 }
             }
+            else if (m.type === 'usuario') {
+                const done = (msg, color) => res => {
+                    closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                    if (res.ok) {showToast(msg, color); loadUsuarios();}
+                    else showToast('Error: ' + res.error, '#FF453A');
+                };
+                if (m.action === 'delete') {
+                    google.script.run.withSuccessHandler(done('Usuario eliminado', '#FF453A')).deleteUsuario(m.id);
+                } else if (m.action === 'add') {
+                    const usu = v('uUsuario').trim(), nom = v('uNombre').trim(), pwd = v('uPassword'), rol = v('uRol');
+                    if (!usu || !nom || !pwd) {saveBtn.disabled=false; saveBtn.textContent='Guardar'; showToast('Usuario, nombre y contraseña son requeridos', '#FF9F0A'); return;}
+                    if (pwd.length < 6) {saveBtn.disabled=false; saveBtn.textContent='Guardar'; showToast('La contraseña debe tener al menos 6 caracteres', '#FF9F0A'); return;}
+                    google.script.run.withSuccessHandler(done('Usuario creado', '#30D158')).addUsuario({usuario: usu, nombre: nom, contrasena: pwd, rol: rol, activo: v('uActivo')});
+                } else {
+                    const data = {nombre: v('uNombre'), rol: v('uRol'), activo: v('uActivo')};
+                    const pwd = v('uPassword');
+                    if (pwd && pwd.length >= 6) data.nuevaContrasena = pwd;
+                    google.script.run.withSuccessHandler(done('Usuario actualizado', '#30D158')).updateUsuario(m.id, data);
+                }
+            }
             else if (m.type === 'encuesta') {
                 if (m.action === 'delete') {
                     google.script.run.withSuccessHandler(res => {
@@ -2689,12 +2781,125 @@
             else if (_currentPage === 'prospectos') newProspecto();
             else if (_currentPage === 'inventario') newInv();
             else if (_currentPage === 'encuestas') newEncuesta();
+            else if (_currentPage === 'usuarios') newUsuario();
         }
 
         function handleSearch(q) {
-            if (_currentPage === 'clientes') renderClientes(_filtroCliActual);
+            if (_currentPage === 'clientes')   renderClientes(_filtroCliActual);
             if (_currentPage === 'prospectos') renderProspectos(_filtroProActual);
             if (_currentPage === 'inventario') renderInventario(_filtroInvActual);
+            if (_currentPage === 'usuarios')   renderUsuarios();
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           USUARIOS (Solo Admin)
+        ═══════════════════════════════════════════════════════ */
+        function loadUsuarios() {
+            if (!esAdmin()) return;
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    _usuarios = r.data;
+                    renderUsuarios();
+                })
+                .getUsuarios();
+        }
+
+        function renderUsuarios() {
+            const tbody = document.getElementById('usuariosTbody');
+            if (!tbody) return;
+            tbody.innerHTML = _usuarios.length
+                ? _usuarios.map(u => {
+                    const activo = String(u.activo).toLowerCase() === 'true';
+                    const migrated = u.migrated;
+                    return `<tr>
+                      <td><div class="cell-main">${escHtml(u.usuario)}</div></td>
+                      <td>${escHtml(u.nombre)}</td>
+                      <td><span class="tag ${u.rol==='Admin'?'tag-danger':u.rol==='Gerente'?'tag-accent':'tag-gray'}">${u.rol}</span></td>
+                      <td>${activo
+                          ? '<span class="tag tag-success">Activo</span>'
+                          : '<span class="tag tag-gray">Inactivo</span>'}</td>
+                      <td><span style="font-size:11px;color:${migrated?'var(--success)':'var(--warning)'}">
+                          ${migrated ? '🔒 Segura' : '⚠️ Migración pendiente'}</span></td>
+                      <td>
+                        <div class="row-actions">
+                          <button class="section-action" onclick="editUsuario(${u.id})">Editar</button>
+                          <button class="btn-danger-sm" onclick="confirmDeleteUsuario(${u.id},'${escAttr(u.usuario)}')">Eliminar</button>
+                        </div>
+                      </td>
+                    </tr>`;
+                }).join('')
+                : '<tr><td colspan="6" class="empty-cell">Sin usuarios</td></tr>';
+
+            const foot = document.getElementById('usrFoot');
+            if (foot) {
+                const activos = _usuarios.filter(u => String(u.activo).toLowerCase() === 'true').length;
+                foot.innerHTML = `<span><strong>${_usuarios.length}</strong> usuarios · <strong>${activos}</strong> activos</span>`;
+            }
+        }
+
+        function newUsuario() {
+            if (!esAdmin()) { showToast('Solo administradores pueden crear usuarios', '#FF9F0A'); return; }
+            _modalMode = {type: 'usuario', action: 'add', id: null};
+            openModal('Nuevo usuario', `
+              <div class="form-row">
+                <div class="form-field"><label class="form-label">USUARIO *</label><input class="form-input" id="uUsuario" placeholder="nombre.apellido"/></div>
+                <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label><input class="form-input" id="uNombre" placeholder="Ana Pérez"/></div>
+              </div>
+              <div class="form-field"><label class="form-label">CONTRASEÑA *</label><input class="form-input" id="uPassword" type="password" placeholder="Mínimo 8 caracteres"/></div>
+              <div class="form-row">
+                <div class="form-field"><label class="form-label">ROL</label>
+                  <select class="form-select" id="uRol"><option>Agente</option><option>Gerente</option><option>Admin</option></select>
+                </div>
+                <div class="form-field"><label class="form-label">ESTADO</label>
+                  <select class="form-select" id="uActivo"><option value="true">Activo</option><option value="false">Inactivo</option></select>
+                </div>
+              </div>
+              <div style="background:var(--accent-bg);border-radius:9px;padding:10px 12px;font-size:12px;color:#0060df;margin-top:4px;">
+                🔒 La contraseña se guardará de forma segura (hash+salt). Nunca se almacena en texto plano.
+              </div>
+            `);
+        }
+
+        function editUsuario(id) {
+            if (!esAdmin()) { showToast('Solo administradores pueden editar usuarios', '#FF9F0A'); return; }
+            const u = _usuarios.find(x => String(x.id) === String(id));
+            if (!u) return;
+            _modalMode = {type: 'usuario', action: 'edit', id};
+            const activo = String(u.activo).toLowerCase() === 'true';
+            openModal('Editar usuario', `
+              <div class="form-row">
+                <div class="form-field"><label class="form-label">USUARIO</label><input class="form-input" id="uUsuario" value="${escHtml(u.usuario)}" disabled style="opacity:.6"/></div>
+                <div class="form-field"><label class="form-label">NOMBRE COMPLETO</label><input class="form-input" id="uNombre" value="${escHtml(u.nombre)}"/></div>
+              </div>
+              <div class="form-field">
+                <label class="form-label">NUEVA CONTRASEÑA <span style="color:var(--text-secondary);font-weight:400">(dejar vacío para no cambiar)</span></label>
+                <input class="form-input" id="uPassword" type="password" placeholder="Nueva contraseña (opcional)"/>
+              </div>
+              <div class="form-row">
+                <div class="form-field"><label class="form-label">ROL</label>
+                  <select class="form-select" id="uRol">
+                    ${['Agente','Gerente','Admin'].map(r => `<option${r===u.rol?' selected':''}>${r}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="form-field"><label class="form-label">ESTADO</label>
+                  <select class="form-select" id="uActivo">
+                    <option value="true"${activo?' selected':''}>Activo</option>
+                    <option value="false"${!activo?' selected':''}>Inactivo</option>
+                  </select>
+                </div>
+              </div>
+            `);
+        }
+
+        function confirmDeleteUsuario(id, usuario) {
+            if (!esAdmin()) return;
+            _modalMode = {type: 'usuario', action: 'delete', id};
+            openModal('Eliminar usuario', `<div style="text-align:center;padding:10px 0">
+              <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar usuario?</div>
+              <div style="font-size:13px;color:var(--text-secondary)">Se eliminará <strong>${escHtml(usuario)}</strong> permanentemente.<br>Esta acción no se puede deshacer.</div>
+            </div>`);
         }
 
         /* ═══════════════════════════════════════════════════════
