@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Azyvion CRM</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #F2F2F7;
+            --sidebar: #1C1C1E;
+            --sidebar-text: rgba(255, 255, 255, 0.55);
+            --sidebar-active: #FFFFFF;
+            --card: #FFFFFF;
+            --text-primary: #1C1C1E;
+            --text-secondary: #8E8E93;
+            --text-muted: #AEAEB2;
+            --border: rgba(60, 60, 67, 0.12);
+            --accent: #0A84FF;
+            --accent-bg: #E3F0FF;
+            --success: #30D158;
+            --success-bg: #E3FAE9;
+            --warning: #FF9F0A;
+            --warning-bg: #FFF4E0;
+            --danger: #FF453A;
+            --danger-bg: #FFE9E8;
+            --purple: #BF5AF2;
+            --purple-bg: #F3E8FF;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: var(--sidebar);
+            display: flex;
+            flex-direction: column;
+            padding: 28px 0 24px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            padding: 0 20px 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(145deg, #0A84FF, #005cc5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .logo-icon svg {
+            width: 18px;
+            height: 18px;
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .logo-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: var(--sidebar-text);
+            letter-spacing: 0.3px;
+        }
+
+        .nav-section {
+            padding: 0 12px 6px;
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.28);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-top: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 12px;
+            margin: 1px 8px;
+            border-radius: 9px;
+            color: var(--sidebar-text);
+            cursor: pointer;
+            transition: background .15s, color .15s;
+            font-size: 13.5px;
+            font-weight: 400;
+            user-select: none;
+        }
+
+        .nav-item svg {
+            width: 17px;
+            height: 17px;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            flex-shrink: 0;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.13);
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 20px;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 12px 8px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 9px;
+            cursor: pointer;
+        }
+
+        .user-pill:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0A84FF, #5e5ce6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 10.5px;
+            color: var(--sidebar-text);
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 6px;
+            transition: color .15s, background .15s;
+            font-size: 11px;
+            margin-left: auto;
+        }
+
+        .logout-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        /* Main */
+        .main {
+            margin-left: 220px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Topbar */
+        .topbar {
+            height: 56px;
+            background: rgba(242, 242, 247, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .page-title {
+            font-size: 17px;
+            font-weight: 600;
+            flex: 1;
+            letter-spacing: -0.2px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 6px 12px;
+            width: 220px;
+        }
+
+        .search-box svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--text-muted);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            flex-shrink: 0;
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 13px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: transparent;
+            width: 100%;
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .topbar-btn {
+            height: 32px;
+            padding: 0 14px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity .15s;
+        }
+
+        .topbar-btn:hover {
+            opacity: .88;
+        }
+
+        .topbar-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: #fff;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .topbar-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg);
+        }
+
+        .icon-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--text-secondary);
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        /* Content */
+        .content {
+            padding: 24px;
+            flex: 1;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* KPI */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .kpi-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 16px 18px;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 400;
+        }
+
+        .kpi-value {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+
+        .kpi-delta {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 6px;
+            padding: 2px 7px;
+            border-radius: 20px;
+        }
+
+        .kpi-delta.up {
+            background: var(--success-bg);
+            color: #1a8a3a;
+        }
+
+        .kpi-delta.down {
+            background: var(--danger-bg);
+            color: #c0392b;
+        }
+
+        .kpi-delta.neu {
+            background: #F2F2F7;
+            color: var(--text-secondary);
+        }
+
+        .kpi-delta svg {
+            width: 10px;
+            height: 10px;
+            stroke: currentColor;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        /* Section */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.2px;
+        }
+
+        .section-action {
+            font-size: 12.5px;
+            color: var(--accent);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            padding: 0;
+        }
+
+        /* Table */
+        .table-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+
+        .table-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .filter-tab {
+            padding: 5px 12px;
+            border-radius: 7px;
+            font-size: 12.5px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-family: inherit;
+            color: var(--text-secondary);
+            transition: background .15s, color .15s;
+        }
+
+        .filter-tab.active {
+            background: var(--accent-bg);
+            color: var(--accent);
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: var(--bg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 10px 16px;
+            text-align: left;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            letter-spacing: 0.1px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background .12s;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #FAFAFA;
+        }
+
+        td {
+            padding: 11px 16px;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tag-success {
+            background: var(--success-bg);
+            color: #1a8a3a;
+        }
+
+        .tag-warning {
+            background: var(--warning-bg);
+            color: #a06000;
+        }
+
+        .tag-danger {
+            background: var(--danger-bg);
+            color: #c0392b;
+        }
+
+        .tag-accent {
+            background: var(--accent-bg);
+            color: #0060df;
+        }
+
+        .tag-purple {
+            background: var(--purple-bg);
+            color: #7c3aed;
+        }
+
+        .tag-gray {
+            background: #F2F2F7;
+            color: var(--text-secondary);
+        }
+
+        /* Client name */
+        .client-name {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .mini-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        /* Progress */
+        .progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 5px;
+            background: #E5E5EA;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: var(--accent);
+        }
+
+        .progress-fill.low {
+            background: var(--danger);
+        }
+
+        .progress-fill.mid {
+            background: var(--warning);
+        }
+
+        .progress-val {
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            min-width: 28px;
+            text-align: right;
+        }
+
+        /* Two-col */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 14px;
+        }
+
+        /* Activity */
+        .activity-feed {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .activity-dot svg {
+            width: 13px;
+            height: 13px;
+            stroke: #fff;
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .activity-text {
+            flex: 1;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .activity-time {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* Encuestas */
+        .survey-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .survey-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+        }
+
+        .survey-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .survey-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 14px;
+        }
+
+        .survey-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .survey-stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .survey-stat-value {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .bar-group {
+            margin-bottom: 6px;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            margin-bottom: 3px;
+        }
+
+        .bar-track {
+            height: 6px;
+            background: #E5E5EA;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 20px;
+        }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(4px);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .2s;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 440px;
+            margin: 16px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+            transform: translateY(12px) scale(0.97);
+            transition: transform .22s;
+        }
+
+        .modal-overlay.open .modal-box {
+            transform: none;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: background .15s;
+        }
+
+        .modal-close:hover {
+            background: var(--bg);
+        }
+
+        .modal-close svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .modal-body {
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            letter-spacing: 0.2px;
+        }
+
+        .form-input {
+            height: 40px;
+            padding: 0 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            background: #fff;
+            transition: border-color .15s;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent);
+        }
+
+        .form-select {
+            height: 40px;
+            padding: 0 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--text-primary);
+            outline: none;
+            background: #fff;
+            transition: border-color .15s;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            border-color: var(--accent);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 9px;
+            padding: 14px 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-cancel {
+            height: 36px;
+            padding: 0 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-primary);
+            transition: background .15s;
+        }
+
+        .btn-cancel:hover {
+            background: #E5E5EA;
+        }
+
+        .btn-save {
+            height: 36px;
+            padding: 0 18px;
+            background: var(--accent);
+            border: none;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: opacity .15s;
+        }
+
+        .btn-save:hover {
+            opacity: .88;
+        }
+
+        .btn-save:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        .btn-danger-sm {
+            height: 28px;
+            padding: 0 12px;
+            background: var(--danger-bg);
+            border: none;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            color: #c0392b;
+            cursor: pointer;
+            transition: opacity .15s;
+        }
+
+        .btn-danger-sm:hover {
+            opacity: .8;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            background: rgba(30, 30, 30, 0.92);
+            color: #fff;
+            padding: 11px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            backdrop-filter: blur(16px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 600;
+            transform: translateY(-80px);
+            transition: transform .3s cubic-bezier(0.34, 1.42, 0.64, 1);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        .toast svg {
+            width: 16px;
+            height: 16px;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        /* Loading skeleton */
+        .skeleton-row td {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+            border-radius: 6px;
+            height: 18px;
+        }
+
+        @keyframes shimmer {
+            from {
+                background-position: 200% 0
+            }
+
+            to {
+                background-position: -200% 0
+            }
+        }
+
+        /* Responsive */
+        @media(max-width:900px) {
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .survey-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
+                </svg>
+            </div>
+            <div>
+                <div class="logo-name">Azyvion</div>
+                <div class="logo-sub">CRM</div>
+            </div>
+        </div>
+
+        <div class="nav-section">General</div>
+        <div class="nav-item active" id="nav-overview" onclick="showPage('overview',this)">
+            <svg viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+            </svg>
+            Inicio
+        </div>
+
+        <div class="nav-section">CRM</div>
+        <div class="nav-item" id="nav-clientes" onclick="showPage('clientes',this)">
+            <svg viewBox="0 0 24 24">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            Clientes
+            <span class="badge" id="badgeClientes">—</span>
+        </div>
+        <div class="nav-item" id="nav-inventario" onclick="showPage('inventario',this)">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+            </svg>
+            Inventario
+        </div>
+        <div class="nav-item" id="nav-encuestas" onclick="showPage('encuestas',this)">
+            <svg viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="16" y1="13" x2="8" y2="13" />
+                <line x1="16" y1="17" x2="8" y2="17" />
+                <polyline points="10 9 9 9 8 9" />
+            </svg>
+            Encuestas
+            <span class="badge" id="badgeEncuestas">—</span>
+        </div>
+
+        <div class="nav-section">Config.</div>
+        <div class="nav-item" onclick="alert('Configuración — próximamente')">
+            <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+            </svg>
+            Ajustes
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div class="avatar" id="userAvatar">—</div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">Cargando…</div>
+                    <div class="user-role" id="userRole"></div>
+                </div>
+                <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="topbar">
+            <div class="page-title" id="pageTitle">Inicio</div>
+            <div class="search-box">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" id="searchInput" placeholder="Buscar…" oninput="handleSearch(this.value)" />
+            </div>
+            <div class="icon-btn" title="Actualizar" onclick="refreshCurrent()">
+                <svg viewBox="0 0 24 24">
+                    <polyline points="23 4 23 10 17 10" />
+                    <polyline points="1 20 1 14 7 14" />
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                </svg>
+            </div>
+            <button class="topbar-btn" id="mainCta" onclick="ctaAction()">
+                <svg viewBox="0 0 24 24">
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+                <span id="ctaLabel">Nuevo cliente</span>
+            </button>
+        </div>
+
+        <div class="content">
+
+            <!-- ── INICIO ── -->
+            <div class="page active" id="page-overview">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Clientes activos</div>
+                        <div class="kpi-value" id="ov-cli">—</div>
+                        <div class="kpi-delta up" id="ov-cli-d"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg> Total registrados</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Productos en stock</div>
+                        <div class="kpi-value" id="ov-prod">—</div>
+                        <div class="kpi-delta neu" id="ov-prod-d"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg> Unidades totales</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Encuestas completadas</div>
+                        <div class="kpi-value" id="ov-enc">—</div>
+                        <div class="kpi-delta up" id="ov-enc-d"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg> Respuestas recibidas</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Tasa de respuesta</div>
+                        <div class="kpi-value" id="ov-tasa">—</div>
+                        <div class="kpi-delta up" id="ov-tasa-d"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg> Encuestas activas</div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <div>
+                        <div class="section-header">
+                            <div class="section-title">Clientes recientes</div>
+                            <button class="section-action"
+                                onclick="showPage('clientes',document.getElementById('nav-clientes'))">Ver
+                                todos</button>
+                        </div>
+                        <div class="table-card">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Segmento</th>
+                                        <th>Estado</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ovClientesTbody">
+                                    <tr class="skeleton-row">
+                                        <td>&nbsp;</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="section-header">
+                            <div class="section-title">Stock crítico / bajo</div>
+                            <button class="section-action"
+                                onclick="showPage('inventario',document.getElementById('nav-inventario'))">Ver
+                                inventario</button>
+                        </div>
+                        <div class="table-card">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Disponibilidad</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ovStockTbody">
+                                    <tr class="skeleton-row">
+                                        <td>&nbsp;</td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="section-header">
+                            <div class="section-title">Actividad reciente</div>
+                        </div>
+                        <div class="activity-feed" id="activityFeed">
+                            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">
+                                Cargando…</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── CLIENTES ── -->
+            <div class="page" id="page-clientes">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total clientes</div>
+                        <div class="kpi-value" id="cli-total">—</div>
+                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg><span id="cli-total-d">…</span></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Activos</div>
+                        <div class="kpi-value" id="cli-activos">—</div>
+                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg><span id="cli-activos-d">…</span></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pendientes</div>
+                        <div class="kpi-value" id="cli-pend">—</div>
+                        <div class="kpi-delta down"><svg viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg><span id="cli-pend-d">…</span></div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Valor promedio</div>
+                        <div class="kpi-value" id="cli-valor">—</div>
+                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>Promedio por cliente</div>
+                    </div>
+                </div>
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" onclick="filtrarClientes('Todos',this)">Todos</button>
+                            <button class="filter-tab" onclick="filtrarClientes('Activo',this)">Activos</button>
+                            <button class="filter-tab" onclick="filtrarClientes('Pendiente',this)">Pendientes</button>
+                            <button class="filter-tab" onclick="filtrarClientes('Inactivo',this)">Inactivos</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cliente</th>
+                                <th>Empresa</th>
+                                <th>Segmento</th>
+                                <th>Correo</th>
+                                <th>Estado</th>
+                                <th>Valor total</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientesTbody">
+                            <tr class="skeleton-row">
+                                <td>&nbsp;</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── INVENTARIO ── -->
+            <div class="page" id="page-inventario">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total productos</div>
+                        <div class="kpi-value" id="inv-total">—</div>
+                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>Productos únicos</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Unidades en stock</div>
+                        <div class="kpi-value" id="inv-unid">—</div>
+                        <div class="kpi-delta neu"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>Unidades totales</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Stock crítico</div>
+                        <div class="kpi-value" id="inv-crit">—</div>
+                        <div class="kpi-delta down"><svg viewBox="0 0 24 24">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>Requieren reposición</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Valor inventario</div>
+                        <div class="kpi-value" id="inv-valor">—</div>
+                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>Valor total Q</div>
+                    </div>
+                </div>
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" onclick="filtrarInv('Todos',this)">Todos</button>
+                            <button class="filter-tab" onclick="filtrarInv('Redes',this)">Redes</button>
+                            <button class="filter-tab" onclick="filtrarInv('Hardware',this)">Hardware</button>
+                            <button class="filter-tab" onclick="filtrarInv('Cableado',this)">Cableado</button>
+                            <button class="filter-tab" onclick="filtrarInv('Crítico',this)">Crítico</button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Unidades</th>
+                                <th>Disponibilidad</th>
+                                <th>Precio unit.</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventarioTbody">
+                            <tr class="skeleton-row">
+                                <td>&nbsp;</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── ENCUESTAS ── -->
+            <div class="page" id="page-encuestas">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Encuestas activas</div>
+                        <div class="kpi-value" id="enc-activas">—</div>
+                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>Publicadas</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Respuestas totales</div>
+                        <div class="kpi-value" id="enc-resp">—</div>
+                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>Todas las encuestas</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Tasa de respuesta</div>
+                        <div class="kpi-value" id="enc-tasa">—</div>
+                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>Promedio general</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total enviadas</div>
+                        <div class="kpi-value" id="enc-env">—</div>
+                        <div class="kpi-delta neu"><svg viewBox="0 0 24 24">
+                                <polyline points="18 15 12 9 6 15" />
+                            </svg>Destinatarios</div>
+                    </div>
+                </div>
+                <div class="survey-grid" id="surveyGrid">
+                    <div style="text-align:center;padding:40px;color:var(--text-muted)">Cargando encuestas…</div>
+                </div>
+            </div>
+
+        </div><!-- /content -->
+    </div><!-- /main -->
+
+    <!-- ── MODAL ── -->
+    <div class="modal-overlay" id="modal" onclick="closeModalOverlay(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Modal</div>
+                <button class="modal-close" onclick="closeModal()">
+                    <svg viewBox="0 0 24 24">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="btn-save" id="modalSaveBtn" onclick="modalSave()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── TOAST ── -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        /* ═══════════════════════════════════════════════════════
+           ESTADO GLOBAL
+        ═══════════════════════════════════════════════════════ */
+        let _clientes = [];
+        let _inventario = [];
+        let _encuestas = [];
+        let _currentPage = 'overview';
+        let _modalMode = null; // { type:'cliente'|'inventario'|'encuesta', action:'add'|'edit', id:null }
+        let _filtroCliActual = 'Todos';
+        let _filtroInvActual = 'Todos';
+
+        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', inventario: 'Inventario', encuestas: 'Encuestas'};
+        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', inventario: 'Agregar producto', encuestas: 'Nueva encuesta'};
+
+        /* ═══════════════════════════════════════════════════════
+           INICIALIZACIÓN
+        ═══════════════════════════════════════════════════════ */
+        document.addEventListener('DOMContentLoaded', function () {
+            google.script.run
+                .withSuccessHandler(function (sess) {
+                    if (!sess.ok) {window.location.href = window.location.href.split('?')[0]; return;}
+                    document.getElementById('userName').textContent = sess.nombre;
+                    document.getElementById('userRole').textContent = sess.rol;
+                    document.getElementById('userAvatar').textContent = sess.nombre.substring(0, 2).toUpperCase();
+                    loadAll();
+                })
+                .withFailureHandler(function () {window.location.href = window.location.href.split('?')[0];})
+                .checkSession();
+        });
+
+        function loadAll() {
+            loadResumen();
+            loadActividad();
+            loadClientes();
+            loadInventario();
+            loadEncuestas();
+        }
+
+        function refreshCurrent() {
+            if (_currentPage === 'overview') {loadResumen(); loadActividad(); loadClientes(); loadInventario();}
+            if (_currentPage === 'clientes') {loadClientes(); loadResumen();}
+            if (_currentPage === 'inventario') {loadInventario(); loadResumen();}
+            if (_currentPage === 'encuestas') {loadEncuestas(); loadResumen();}
+            showToast('Datos actualizados', '#30D158');
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           CARGA DE DATOS
+        ═══════════════════════════════════════════════════════ */
+        function loadResumen() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    const c = r.clientes, inv = r.inventario, enc = r.encuestas;
+
+                    // Overview KPIs
+                    document.getElementById('ov-cli').textContent = c.activos;
+                    document.getElementById('ov-cli-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${c.total} total`;
+                    document.getElementById('ov-prod').textContent = inv.totalUnidades;
+                    document.getElementById('ov-prod-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${inv.totalProductos} productos`;
+                    document.getElementById('ov-enc').textContent = enc.respuestas;
+                    document.getElementById('ov-enc-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} activas`;
+                    document.getElementById('ov-tasa').textContent = enc.tasaRespuesta + '%';
+                    document.getElementById('ov-tasa-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} encuestas activas`;
+
+                    // Clientes KPIs
+                    document.getElementById('cli-total').textContent = c.total;
+                    document.getElementById('cli-total-d').textContent = `${Math.round(c.activos / Math.max(c.total, 1) * 100)}% activos`;
+                    document.getElementById('cli-activos').textContent = c.activos;
+                    document.getElementById('cli-activos-d').textContent = `${Math.round(c.activos / Math.max(c.total, 1) * 100)}% del total`;
+                    document.getElementById('cli-pend').textContent = c.pendientes;
+                    document.getElementById('cli-pend-d').textContent = 'En revisión';
+                    document.getElementById('cli-valor').textContent = 'Q ' + c.valorPromedio.toLocaleString();
+
+                    // Inventario KPIs
+                    document.getElementById('inv-total').textContent = inv.totalProductos;
+                    document.getElementById('inv-unid').textContent = inv.totalUnidades;
+                    document.getElementById('inv-crit').textContent = inv.stockCritico;
+                    const kQ = inv.valorInventario >= 1000 ? (inv.valorInventario / 1000).toFixed(1) + 'k' : inv.valorInventario;
+                    document.getElementById('inv-valor').textContent = 'Q ' + kQ;
+
+                    // Encuestas KPIs
+                    document.getElementById('enc-activas').textContent = enc.activas;
+                    document.getElementById('enc-resp').textContent = enc.respuestas;
+                    document.getElementById('enc-tasa').textContent = enc.tasaRespuesta + '%';
+
+                    // Badges sidebar
+                    document.getElementById('badgeClientes').textContent = c.total;
+                    document.getElementById('badgeEncuestas').textContent = enc.activas;
+                })
+                .getResumen();
+        }
+
+        function loadActividad() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    const feed = document.getElementById('activityFeed');
+                    if (!r.data.length) {feed.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px">Sin actividad reciente</div>'; return;}
+                    feed.innerHTML = r.data.map(a => {
+                        const dotColor = {cliente: 'var(--accent)', encuesta: 'var(--success)', inventario: 'var(--warning)', documento: 'var(--purple)', login: '#8E8E93'}[a.tipo] || '#8E8E93';
+                        const iconSvg = {cliente: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>', encuesta: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>', inventario: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>', login: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'}[a.tipo] || '<circle cx="12" cy="12" r="10"/>';
+                        return `<div class="activity-item">
+          <div class="activity-dot" style="background:${dotColor}"><svg viewBox="0 0 24 24">${iconSvg}</svg></div>
+          <div>
+            <div class="activity-text">${escHtml(a.descripcion)}</div>
+            <div class="activity-time">${timeAgo(a.fecha)}</div>
+          </div>
+        </div>`;
+                    }).join('');
+                })
+                .getActividad(8);
+        }
+
+        function loadClientes() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    _clientes = r.data;
+                    renderClientes(_filtroCliActual);
+                    renderOvClientes();
+                })
+                .getClientes();
+        }
+
+        function loadInventario() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    _inventario = r.data;
+                    renderInventario(_filtroInvActual);
+                    renderOvStock();
+                })
+                .getInventario();
+        }
+
+        function loadEncuestas() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    _encuestas = r.data;
+                    renderEncuestas();
+                    document.getElementById('enc-env').textContent = r.data.reduce((s, e) => s + Number(e.totalEnviadas || 0), 0);
+                })
+                .getEncuestas();
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           RENDER – OVERVIEW
+        ═══════════════════════════════════════════════════════ */
+        function renderOvClientes() {
+            const rows = _clientes.slice(0, 4);
+            document.getElementById('ovClientesTbody').innerHTML = rows.length
+                ? rows.map(c => `<tr>
+        <td><div class="client-name"><div class="mini-avatar" style="background:${c.color}">${initials(c.nombre)}</div>${escHtml(c.nombre)}</div></td>
+        <td>${tagSegmento(c.segmento)}</td>
+        <td>${tagEstado(c.estado)}</td>
+        <td>Q ${Number(c.valorTotal).toLocaleString()}</td>
+      </tr>`).join('')
+                : '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:20px">Sin clientes</td></tr>';
+        }
+
+        function renderOvStock() {
+            const criticos = _inventario.filter(i => i.estado === 'Crítico' || i.estado === 'Bajo').slice(0, 4);
+            document.getElementById('ovStockTbody').innerHTML = criticos.length
+                ? criticos.map(i => {
+                    const pct = Math.round(Number(i.unidades) / Math.max(Number(i.stockMax), 1) * 100);
+                    const cls = i.estado === 'Crítico' ? 'low' : 'mid';
+                    return `<tr>
+          <td>${escHtml(i.producto)}</td>
+          <td><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.max(pct, 2)}%"></div></div><span class="progress-val">${i.unidades}</span></div></td>
+          <td>${tagEstadoInv(i.estado)}</td>
+        </tr>`;
+                }).join('')
+                : '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:20px">✅ Sin stock crítico</td></tr>';
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           RENDER – CLIENTES
+        ═══════════════════════════════════════════════════════ */
+        function renderClientes(filtro) {
+            _filtroCliActual = filtro;
+            let data = filtro === 'Todos' ? _clientes : _clientes.filter(c => c.estado === filtro);
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            if (q && _currentPage === 'clientes') data = data.filter(c => c.nombre.toLowerCase().includes(q) || c.empresa.toLowerCase().includes(q) || c.correo.toLowerCase().includes(q));
+            document.getElementById('clientesTbody').innerHTML = data.length
+                ? data.map(c => `<tr>
+        <td><div class="client-name"><div class="mini-avatar" style="background:${c.color}">${initials(c.nombre)}</div>${escHtml(c.nombre)}</div></td>
+        <td style="color:var(--text-secondary)">${escHtml(c.empresa)}</td>
+        <td>${tagSegmento(c.segmento)}</td>
+        <td style="color:var(--text-secondary)">${escHtml(c.correo)}</td>
+        <td>${tagEstado(c.estado)}</td>
+        <td>Q ${Number(c.valorTotal).toLocaleString()}</td>
+        <td style="display:flex;gap:6px">
+          <button class="section-action" onclick="editCliente(${c.id})">Editar</button>
+          <button class="btn-danger-sm" onclick="confirmDeleteCliente(${c.id},'${escHtml(c.nombre)}')">Eliminar</button>
+        </td>
+      </tr>`).join('')
+                : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px">Sin resultados</td></tr>';
+        }
+
+        function filtrarClientes(filtro, el) {
+            el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            renderClientes(filtro);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           RENDER – INVENTARIO
+        ═══════════════════════════════════════════════════════ */
+        function renderInventario(filtro) {
+            _filtroInvActual = filtro;
+            let data = _inventario;
+            if (filtro === 'Crítico') data = data.filter(i => i.estado === 'Crítico');
+            else if (filtro !== 'Todos') data = data.filter(i => i.categoria === filtro);
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            if (q && _currentPage === 'inventario') data = data.filter(i => i.producto.toLowerCase().includes(q) || i.categoria.toLowerCase().includes(q));
+            document.getElementById('inventarioTbody').innerHTML = data.length
+                ? data.map(i => {
+                    const pct = Math.round(Number(i.unidades) / Math.max(Number(i.stockMax), 1) * 100);
+                    const cls = i.estado === 'Crítico' ? 'low' : i.estado === 'Bajo' ? 'mid' : '';
+                    return `<tr>
+          <td>${escHtml(i.producto)}</td>
+          <td>${tagCat(i.categoria)}</td>
+          <td>${i.unidades}</td>
+          <td><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.max(pct, 1)}%"></div></div><span class="progress-val">${pct}%</span></div></td>
+          <td>Q ${Number(i.precioUnit).toLocaleString()}</td>
+          <td>${tagEstadoInv(i.estado)}</td>
+          <td style="display:flex;gap:6px">
+            <button class="section-action" onclick="editInv(${i.id})">Editar</button>
+            <button class="btn-danger-sm" onclick="confirmDeleteInv(${i.id},'${escHtml(i.producto)}')">Eliminar</button>
+          </td>
+        </tr>`;
+                }).join('')
+                : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px">Sin resultados</td></tr>';
+        }
+
+        function filtrarInv(filtro, el) {
+            el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            renderInventario(filtro);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           RENDER – ENCUESTAS
+        ═══════════════════════════════════════════════════════ */
+        function renderEncuestas() {
+            const grid = document.getElementById('surveyGrid');
+            const cards = _encuestas.map(e => {
+                const pct = Number(e.totalEnviadas) ? Math.round(Number(e.respuestas) / Number(e.totalEnviadas) * 100) : 0;
+                const pConf = Number(e.pregConf || 0), pTot = Number(e.pregTotal || 12);
+                const pPct = pTot ? Math.round(pConf / pTot * 100) : 0;
+                const estadoTag = e.estado === 'Activa' ? '<span class="tag tag-success">Activa</span>' : e.estado === 'Borrador' ? '<span class="tag tag-warning">Borrador</span>' : '<span class="tag tag-gray">' + escHtml(e.estado) + '</span>';
+                const fecha = e.fechaEnvio ? new Date(e.fechaEnvio).toLocaleDateString('es-GT', {day: 'numeric', month: 'short', year: 'numeric'}) : '—';
+                const activos = e.estado === 'Activa';
+                return `<div class="survey-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <div class="survey-name">${escHtml(e.nombre)}</div>${estadoTag}
+      </div>
+      <div class="survey-meta">${activos ? `Enviada el ${fecha} · ${e.respuestas} respuestas de ${e.totalEnviadas}` : e.estado === 'Borrador' ? `Creada el ${fecha} · Sin enviar aún` : fecha}</div>
+      <div class="survey-stat">
+        <span class="survey-stat-label">${activos ? 'Tasa de respuesta' : 'Preguntas configuradas'}</span>
+        <span class="survey-stat-value">${activos ? pct + '%' : pConf + ' / ' + pTot}</span>
+      </div>
+      <div class="progress-bar" style="margin-bottom:14px;height:6px;">
+        <div class="progress-fill ${activos ? '' : 'mid'}" style="width:${activos ? pct : pPct}%"></div>
+      </div>
+      ${e.estado === 'Borrador' ? `<div style="background:var(--warning-bg);border-radius:9px;padding:10px 12px;font-size:12.5px;color:#a06000;line-height:1.4;">Completa las preguntas restantes antes de enviar. Faltan ${pTot - pConf} preguntas.</div>` : ''}
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="topbar-btn" style="height:30px;font-size:12px;" onclick="editEncuesta(${e.id})">Editar</button>
+        <button class="btn-danger-sm" style="height:30px;" onclick="confirmDeleteEncuesta(${e.id},'${escHtml(e.nombre)}')">Eliminar</button>
+      </div>
+    </div>`;
+            });
+
+            cards.push(`<div class="survey-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;border-style:dashed;cursor:pointer;background:#FAFAFA;" onclick="newEncuesta()">
+    <div style="width:44px;height:44px;border-radius:50%;background:var(--accent-bg);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+      <svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+    <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">Nueva encuesta</div>
+    <div style="font-size:12.5px;color:var(--text-secondary);">Crea y envía en minutos</div>
+  </div>`);
+
+            grid.innerHTML = cards.join('');
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           MODAL – CLIENTES
+        ═══════════════════════════════════════════════════════ */
+        function newCliente() {
+            _modalMode = {type: 'cliente', action: 'add', id: null};
+            openModal('Nuevo cliente', `
+    <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label><input class="form-input" id="mNombre" placeholder="Ej. Ana Pérez" required/></div>
+    <div class="form-field"><label class="form-label">EMPRESA</label><input class="form-input" id="mEmpresa" placeholder="Ej. AP Consulting"/></div>
+    <div class="form-field"><label class="form-label">SEGMENTO</label>
+      <select class="form-select" id="mSegmento"><option>Estándar</option><option>Premium</option><option>Corporativo</option></select>
+    </div>
+    <div class="form-field"><label class="form-label">CORREO</label><input class="form-input" id="mCorreo" type="email" placeholder="correo@empresa.com"/></div>
+    <div class="form-field"><label class="form-label">ESTADO</label>
+      <select class="form-select" id="mEstado"><option>Activo</option><option>Pendiente</option><option>Inactivo</option></select>
+    </div>
+    <div class="form-field"><label class="form-label">VALOR TOTAL (Q)</label><input class="form-input" id="mValor" type="number" min="0" placeholder="0"/></div>
+  `);
+        }
+
+        function editCliente(id) {
+            const c = _clientes.find(x => String(x.id) === String(id));
+            if (!c) return;
+            _modalMode = {type: 'cliente', action: 'edit', id};
+            openModal('Editar cliente', `
+    <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label><input class="form-input" id="mNombre" value="${escHtml(c.nombre)}" required/></div>
+    <div class="form-field"><label class="form-label">EMPRESA</label><input class="form-input" id="mEmpresa" value="${escHtml(c.empresa)}"/></div>
+    <div class="form-field"><label class="form-label">SEGMENTO</label>
+      <select class="form-select" id="mSegmento">
+        ${['Estándar', 'Premium', 'Corporativo'].map(s => `<option${s === c.segmento ? ' selected' : ''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-field"><label class="form-label">CORREO</label><input class="form-input" id="mCorreo" type="email" value="${escHtml(c.correo)}"/></div>
+    <div class="form-field"><label class="form-label">ESTADO</label>
+      <select class="form-select" id="mEstado">
+        ${['Activo', 'Pendiente', 'Inactivo'].map(s => `<option${s === c.estado ? ' selected' : ''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-field"><label class="form-label">VALOR TOTAL (Q)</label><input class="form-input" id="mValor" type="number" min="0" value="${c.valorTotal}"/></div>
+  `);
+        }
+
+        function confirmDeleteCliente(id, nombre) {
+            _modalMode = {type: 'cliente', action: 'delete', id};
+            openModal('Eliminar cliente', `<div style="text-align:center;padding:10px 0">
+    <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar cliente?</div>
+    <div style="font-size:13px;color:var(--text-secondary)">Se eliminará <strong>${escHtml(nombre)}</strong> permanentemente.<br>Esta acción no se puede deshacer.</div>
+  </div>`);
+            document.getElementById('modalSaveBtn').textContent = 'Eliminar';
+            document.getElementById('modalSaveBtn').style.background = 'var(--danger)';
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           MODAL – INVENTARIO
+        ═══════════════════════════════════════════════════════ */
+        function newInv() {
+            _modalMode = {type: 'inventario', action: 'add', id: null};
+            openModal('Agregar producto', `
+    <div class="form-field"><label class="form-label">NOMBRE DEL PRODUCTO *</label><input class="form-input" id="mProd" placeholder="Ej. Router Mikrotik RB450G" required/></div>
+    <div class="form-field"><label class="form-label">CATEGORÍA</label>
+      <select class="form-select" id="mCat"><option>Redes</option><option>Hardware</option><option>Cableado</option><option>Software</option><option>Otro</option></select>
+    </div>
+    <div class="form-field"><label class="form-label">UNIDADES EN STOCK</label><input class="form-input" id="mUnid" type="number" min="0" value="0"/></div>
+    <div class="form-field"><label class="form-label">STOCK MÁXIMO</label><input class="form-input" id="mStockMax" type="number" min="1" value="50"/></div>
+    <div class="form-field"><label class="form-label">PRECIO UNITARIO (Q)</label><input class="form-input" id="mPrecio" type="number" min="0" value="0"/></div>
+  `);
+        }
+
+        function editInv(id) {
+            const i = _inventario.find(x => String(x.id) === String(id));
+            if (!i) return;
+            _modalMode = {type: 'inventario', action: 'edit', id};
+            openModal('Editar producto', `
+    <div class="form-field"><label class="form-label">NOMBRE DEL PRODUCTO *</label><input class="form-input" id="mProd" value="${escHtml(i.producto)}" required/></div>
+    <div class="form-field"><label class="form-label">CATEGORÍA</label>
+      <select class="form-select" id="mCat">
+        ${['Redes', 'Hardware', 'Cableado', 'Software', 'Otro'].map(c => `<option${c === i.categoria ? ' selected' : ''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-field"><label class="form-label">UNIDADES EN STOCK</label><input class="form-input" id="mUnid" type="number" min="0" value="${i.unidades}"/></div>
+    <div class="form-field"><label class="form-label">STOCK MÁXIMO</label><input class="form-input" id="mStockMax" type="number" min="1" value="${i.stockMax}"/></div>
+    <div class="form-field"><label class="form-label">PRECIO UNITARIO (Q)</label><input class="form-input" id="mPrecio" type="number" min="0" value="${i.precioUnit}"/></div>
+  `);
+        }
+
+        function confirmDeleteInv(id, nombre) {
+            _modalMode = {type: 'inventario', action: 'delete', id};
+            openModal('Eliminar producto', `<div style="text-align:center;padding:10px 0">
+    <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar producto?</div>
+    <div style="font-size:13px;color:var(--text-secondary)">Se eliminará <strong>${escHtml(nombre)}</strong> del inventario.<br>Esta acción no se puede deshacer.</div>
+  </div>`);
+            document.getElementById('modalSaveBtn').textContent = 'Eliminar';
+            document.getElementById('modalSaveBtn').style.background = 'var(--danger)';
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           MODAL – ENCUESTAS
+        ═══════════════════════════════════════════════════════ */
+        function newEncuesta() {
+            _modalMode = {type: 'encuesta', action: 'add', id: null};
+            openModal('Nueva encuesta', `
+    <div class="form-field"><label class="form-label">NOMBRE DE LA ENCUESTA *</label><input class="form-input" id="mEncNombre" placeholder="Ej. NPS Q4 2026" required/></div>
+    <div class="form-field"><label class="form-label">TIPO</label>
+      <select class="form-select" id="mEncTipo"><option>NPS</option><option>Escala</option><option>Mixta</option><option>Opción múltiple</option></select>
+    </div>
+    <div class="form-field"><label class="form-label">TOTAL DE PREGUNTAS</label><input class="form-input" id="mEncPregTotal" type="number" min="1" value="12"/></div>
+  `);
+        }
+
+        function editEncuesta(id) {
+            const e = _encuestas.find(x => String(x.id) === String(id));
+            if (!e) return;
+            _modalMode = {type: 'encuesta', action: 'edit', id};
+            openModal('Editar encuesta', `
+    <div class="form-field"><label class="form-label">NOMBRE *</label><input class="form-input" id="mEncNombre" value="${escHtml(e.nombre)}" required/></div>
+    <div class="form-field"><label class="form-label">ESTADO</label>
+      <select class="form-select" id="mEncEstado">
+        ${['Borrador', 'Activa', 'Cerrada'].map(s => `<option${s === e.estado ? ' selected' : ''}>${s}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-field"><label class="form-label">TIPO</label>
+      <select class="form-select" id="mEncTipo">
+        ${['NPS', 'Escala', 'Mixta', 'Opción múltiple'].map(t => `<option${t === e.tipo ? ' selected' : ''}>${t}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-field"><label class="form-label">TOTAL ENVIADAS</label><input class="form-input" id="mEncEnv" type="number" min="0" value="${e.totalEnviadas}"/></div>
+    <div class="form-field"><label class="form-label">RESPUESTAS RECIBIDAS</label><input class="form-input" id="mEncResp" type="number" min="0" value="${e.respuestas}"/></div>
+    <div class="form-field"><label class="form-label">PREGUNTAS CONFIGURADAS</label><input class="form-input" id="mEncConf" type="number" min="0" value="${e.pregConf}"/></div>
+    <div class="form-field"><label class="form-label">TOTAL PREGUNTAS</label><input class="form-input" id="mEncPregTotal" type="number" min="1" value="${e.pregTotal}"/></div>
+  `);
+        }
+
+        function confirmDeleteEncuesta(id, nombre) {
+            _modalMode = {type: 'encuesta', action: 'delete', id};
+            openModal('Eliminar encuesta', `<div style="text-align:center;padding:10px 0">
+    <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar encuesta?</div>
+    <div style="font-size:13px;color:var(--text-secondary)">Se eliminará <strong>${escHtml(nombre)}</strong> y sus datos.<br>Esta acción no se puede deshacer.</div>
+  </div>`);
+            document.getElementById('modalSaveBtn').textContent = 'Eliminar';
+            document.getElementById('modalSaveBtn').style.background = 'var(--danger)';
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           MODAL SAVE – despacha al handler correcto
+        ═══════════════════════════════════════════════════════ */
+        function modalSave() {
+            const m = _modalMode;
+            if (!m) return;
+            const saveBtn = document.getElementById('modalSaveBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Guardando…';
+
+            if (m.type === 'cliente') {
+                if (m.action === 'delete') {
+                    google.script.run.withSuccessHandler(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast('Cliente eliminado', '#FF453A'); loadClientes(); loadResumen();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    }).deleteCliente(m.id);
+                } else {
+                    const nombre = document.getElementById('mNombre').value.trim();
+                    if (!nombre) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return;}
+                    const data = {nombre, empresa: v('mEmpresa'), segmento: v('mSegmento'), correo: v('mCorreo'), estado: v('mEstado'), valorTotal: v('mValor')};
+                    const fn = m.action === 'add'
+                        ? (cb => google.script.run.withSuccessHandler(cb).addCliente(data))
+                        : (cb => google.script.run.withSuccessHandler(cb).updateCliente(m.id, data));
+                    fn(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast(m.action === 'add' ? 'Cliente creado' : 'Cliente actualizado', '#30D158'); loadClientes(); loadResumen(); loadActividad();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    });
+                }
+            }
+            else if (m.type === 'inventario') {
+                if (m.action === 'delete') {
+                    google.script.run.withSuccessHandler(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast('Producto eliminado', '#FF453A'); loadInventario(); loadResumen();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    }).deleteInventario(m.id);
+                } else {
+                    const prod = document.getElementById('mProd').value.trim();
+                    if (!prod) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre del producto es requerido', '#FF9F0A'); return;}
+                    const data = {producto: prod, categoria: v('mCat'), unidades: v('mUnid'), stockMax: v('mStockMax'), precioUnit: v('mPrecio')};
+                    const fn = m.action === 'add'
+                        ? (cb => google.script.run.withSuccessHandler(cb).addInventario(data))
+                        : (cb => google.script.run.withSuccessHandler(cb).updateInventario(m.id, data));
+                    fn(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast(m.action === 'add' ? 'Producto agregado' : 'Producto actualizado', '#30D158'); loadInventario(); loadResumen(); loadActividad();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    });
+                }
+            }
+            else if (m.type === 'encuesta') {
+                if (m.action === 'delete') {
+                    google.script.run.withSuccessHandler(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast('Encuesta eliminada', '#FF453A'); loadEncuestas(); loadResumen();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    }).deleteEncuesta(m.id);
+                } else {
+                    const nombre = document.getElementById('mEncNombre').value.trim();
+                    if (!nombre) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return;}
+                    let data = {nombre, tipo: v('mEncTipo'), pregTotal: v('mEncPregTotal')};
+                    if (m.action === 'edit') Object.assign(data, {estado: v('mEncEstado'), totalEnviadas: v('mEncEnv'), respuestas: v('mEncResp'), pregConf: v('mEncConf')});
+                    const fn = m.action === 'add'
+                        ? (cb => google.script.run.withSuccessHandler(cb).addEncuesta(data))
+                        : (cb => google.script.run.withSuccessHandler(cb).updateEncuesta(m.id, data));
+                    fn(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast(m.action === 'add' ? 'Encuesta creada' : 'Encuesta actualizada', '#30D158'); loadEncuestas(); loadResumen(); loadActividad();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    });
+                }
+            }
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           MODAL HELPERS
+        ═══════════════════════════════════════════════════════ */
+        function openModal(title, bodyHtml) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = bodyHtml;
+            const btn = document.getElementById('modalSaveBtn');
+            btn.textContent = 'Guardar';
+            btn.style.background = '';
+            btn.disabled = false;
+            document.getElementById('modal').classList.add('open');
+        }
+        function closeModal() {document.getElementById('modal').classList.remove('open');}
+        function closeModalOverlay(e) {if (e.target === document.getElementById('modal')) closeModal();}
+
+        /* ═══════════════════════════════════════════════════════
+           NAVEGACIÓN Y CTA
+        ═══════════════════════════════════════════════════════ */
+        function showPage(id, navEl) {
+            _currentPage = id;
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + id).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (navEl) navEl.classList.add('active');
+            document.getElementById('pageTitle').textContent = PAGE_TITLES[id] || id;
+            document.getElementById('ctaLabel').textContent = CTA_LABELS[id] || 'Nuevo';
+            document.getElementById('searchInput').value = '';
+        }
+
+        function ctaAction() {
+            if (_currentPage === 'clientes' || _currentPage === 'overview') newCliente();
+            else if (_currentPage === 'inventario') newInv();
+            else if (_currentPage === 'encuestas') newEncuesta();
+        }
+
+        function handleSearch(q) {
+            if (_currentPage === 'clientes') renderClientes(_filtroCliActual);
+            if (_currentPage === 'inventario') renderInventario(_filtroInvActual);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           LOGOUT
+        ═══════════════════════════════════════════════════════ */
+        function doLogout() {
+            if (!confirm('¿Cerrar sesión?')) return;
+            google.script.run
+                .withSuccessHandler(function () {
+                    window.location.href = window.location.href.split('?')[0];
+                })
+                .logout();
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           TOAST
+        ═══════════════════════════════════════════════════════ */
+        let _toastTimer;
+        function showToast(msg, color) {
+            color = color || '#30D158';
+            const t = document.getElementById('toast');
+            const icon = color === '#FF453A'
+                ? '<svg viewBox="0 0 24 24" style="stroke:#FF453A"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+                : color === '#FF9F0A'
+                    ? '<svg viewBox="0 0 24 24" style="stroke:#FF9F0A"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+                    : `<svg viewBox="0 0 24 24" style="stroke:${color}"><polyline points="20 6 9 17 4 12"/></svg>`;
+            t.innerHTML = icon + ' ' + escHtml(msg);
+            t.classList.add('show');
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           UTILIDADES
+        ═══════════════════════════════════════════════════════ */
+        function v(id) {const el = document.getElementById(id); return el ? el.value : '';}
+        function escHtml(s) {return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');}
+        function initials(n) {return (n || '').split(' ').map(w => w[0] || '').join('').substring(0, 2).toUpperCase();}
+
+        function tagEstado(e) {
+            const m = {Activo: 'tag-success', Pendiente: 'tag-warning', Inactivo: 'tag-danger'};
+            return `<span class="tag ${m[e] || 'tag-gray'}">${e}</span>`;
+        }
+        function tagSegmento(s) {
+            const m = {Corporativo: 'tag-accent', Premium: 'tag-purple', Estándar: 'tag-gray'};
+            return `<span class="tag ${m[s] || 'tag-gray'}">${s}</span>`;
+        }
+        function tagCat(c) {
+            const m = {Redes: 'tag-accent', Hardware: 'tag-purple', Cableado: 'tag-gray'};
+            return `<span class="tag ${m[c] || 'tag-gray'}">${c}</span>`;
+        }
+        function tagEstadoInv(e) {
+            const m = {Crítico: 'tag-danger', Bajo: 'tag-warning', Normal: 'tag-success'};
+            return `<span class="tag ${m[e] || 'tag-gray'}">${e}</span>`;
+        }
+
+        function timeAgo(iso) {
+            const diff = (Date.now() - new Date(iso)) / 1000;
+            if (diff < 60) return 'Hace ' + Math.round(diff) + ' seg';
+            if (diff < 3600) return 'Hace ' + Math.round(diff / 60) + ' min';
+            if (diff < 86400) return 'Hace ' + Math.round(diff / 3600) + ' h';
+            if (diff < 604800) return 'Hace ' + Math.round(diff / 86400) + ' días';
+            return new Date(iso).toLocaleDateString('es-GT');
+        }
+    </script>
+</body>
+
+</html>
