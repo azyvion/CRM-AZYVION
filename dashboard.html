@@ -1463,53 +1463,104 @@
     <!-- ── TOAST ── -->
     <div class="toast" id="toast"></div>
 
+    <!-- ════════════════════════════════════════════════════════════
+         AZYVION · PUENTE API  (google.script.run  ->  fetch GET)
+         Necesario SOLO cuando el HTML se sirve fuera de Apps Script
+         (GitHub Pages, Netlify, etc.). Debe ir ANTES del script principal.
+    ═════════════════════════════════════════════════════════════ -->
     <script>
-        /* ═══════════════════════════════════════════════════════
-           CONFIG
-        ═══════════════════════════════════════════════════════ */
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbynujZGv9-hKY9oOAjCRH9YRYLKjhNFG_Qfzs9_vd6JvnZlle5VZ3hru8cz6O7updPM/exec';
-        const LOGIN_URL = 'index.html';
+    (function () {
+        const API_URL = 'https://script.google.com/macros/s/AKfycbynujZGv9-hKY9oOAjCRH9YRYLKjhNFG_Qfzs9_vd6JvnZlle5VZ3hru8cz6O7updPM/exec';
+        const SESSION_KEY = 'azyvion_session';
 
-        /* ═══════════════════════════════════════════════════════
-           GAS FETCH HELPER
-           GET  → gasGet({action, ...params})
-           POST → gasPost({action, ...params})
-        ═══════════════════════════════════════════════════════ */
-        async function gasGet(params) {
-            const url = GAS_URL + '?' + new URLSearchParams(params).toString();
-            const r = await fetch(url);
-            return r.json();
+        // Traduce cada método del backend a los parámetros que espera _dispatch()
+        const MAP = {
+            login:            (u, p)  => ({ action: 'login', usuario: u, contrasena: p }),
+            logout:           ()      => ({ action: 'logout' }),
+            getResumen:       ()      => ({ action: 'getResumen' }),
+            getActividad:     (n)     => ({ action: 'getActividad', limit: n || 10 }),
+            getClientes:      ()      => ({ action: 'getClientes' }),
+            addCliente:       (d)     => Object.assign({ action: 'addCliente' }, d),
+            updateCliente:    (id, d) => Object.assign({ action: 'updateCliente', id: id }, d),
+            deleteCliente:    (id)    => ({ action: 'deleteCliente', id: id }),
+            getInventario:    ()      => ({ action: 'getInventario' }),
+            addInventario:    (d)     => Object.assign({ action: 'addInventario' }, d),
+            updateInventario: (id, d) => Object.assign({ action: 'updateInventario', id: id }, d),
+            deleteInventario: (id)    => ({ action: 'deleteInventario', id: id }),
+            getEncuestas:     ()      => ({ action: 'getEncuestas' }),
+            addEncuesta:      (d)     => Object.assign({ action: 'addEncuesta' }, d),
+            updateEncuesta:   (id, d) => Object.assign({ action: 'updateEncuesta', id: id }, d),
+            deleteEncuesta:   (id)    => ({ action: 'deleteEncuesta', id: id })
+        };
+
+        function readSession() {
+            try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch (e) { return null; }
         }
-        async function gasPost(params) {
-            const r = await fetch(GAS_URL, {
-                method: 'POST',
-                body: JSON.stringify(params),
-                headers: {'Content-Type': 'application/json'}
-            });
-            return r.json();
-        }
-        /* wrapper unificado – usa GET para lecturas, POST para escrituras */
-        async function gas(action, params) {
-            const readActions = ['checkSession','getResumen','getActividad','getClientes','getInventario','getEncuestas'];
-            if (readActions.includes(action)) {
-                return gasGet({action, ...params});
+
+        function call(name, args, onSuccess, onFailure) {
+            // checkSession se resuelve en el navegador: el backend ya no guarda sesión
+            if (name === 'checkSession') {
+                const s = readSession();
+                setTimeout(function () {
+                    if (onSuccess) onSuccess(s && s.token
+                        ? { ok: true, nombre: s.nombre, rol: s.rol }
+                        : { ok: false });
+                }, 0);
+                return;
             }
-            return gasPost({action, ...params});
+
+            const params = MAP[name].apply(null, args);
+            const qs = new URLSearchParams();
+            Object.keys(params).forEach(function (k) {
+                const val = params[k];
+                if (val !== undefined && val !== null) qs.append(k, val);
+            });
+
+            fetch(API_URL + '?' + qs.toString(), { method: 'GET', redirect: 'follow' })
+                .then(function (r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.text();
+                })
+                .then(function (txt) {
+                    let data;
+                    try {
+                        data = JSON.parse(txt);
+                    } catch (e) {
+                        // Si llega HTML, el Web App no está publicado como "Cualquier persona"
+                        throw new Error('El Web App no devolvió JSON. Revisa la implementación.');
+                    }
+                    if (name === 'login' && data.ok) {
+                        localStorage.setItem(SESSION_KEY, JSON.stringify({
+                            token: data.token, nombre: data.nombre, rol: data.rol
+                        }));
+                    }
+                    if (name === 'logout') localStorage.removeItem(SESSION_KEY);
+                    if (onSuccess) onSuccess(data);
+                })
+                .catch(function (err) {
+                    console.error('[Azyvion API]', name, err);
+                    if (onFailure) onFailure(err);
+                });
         }
 
-        /* ═══════════════════════════════════════════════════════
-           SESIÓN (localStorage / sessionStorage)
-        ═══════════════════════════════════════════════════════ */
-        function getSession() {
-            try {
-                return JSON.parse(localStorage.getItem('crm_session') || sessionStorage.getItem('crm_session') || 'null');
-            } catch (_) { return null; }
-        }
-        function clearSession() {
-            localStorage.removeItem('crm_session');
-            sessionStorage.removeItem('crm_session');
+        function makeRunner(onSuccess, onFailure) {
+            const runner = {
+                withSuccessHandler: function (fn) { return makeRunner(fn, onFailure); },
+                withFailureHandler: function (fn) { return makeRunner(onSuccess, fn); },
+                checkSession: function () { call('checkSession', [], onSuccess, onFailure); }
+            };
+            Object.keys(MAP).forEach(function (name) {
+                runner[name] = function () { call(name, arguments, onSuccess, onFailure); };
+            });
+            return runner;
         }
 
+        window.google = window.google || {};
+        window.google.script = window.google.script || {};
+        window.google.script.run = makeRunner(null, null);
+    })();
+    </script>
+    <script>
         /* ═══════════════════════════════════════════════════════
            ESTADO GLOBAL
         ═══════════════════════════════════════════════════════ */
@@ -1517,7 +1568,7 @@
         let _inventario = [];
         let _encuestas = [];
         let _currentPage = 'overview';
-        let _modalMode = null;
+        let _modalMode = null; // { type:'cliente'|'inventario'|'encuesta', action:'add'|'edit', id:null }
         let _filtroCliActual = 'Todos';
         let _filtroInvActual = 'Todos';
 
@@ -1528,12 +1579,16 @@
            INICIALIZACIÓN
         ═══════════════════════════════════════════════════════ */
         document.addEventListener('DOMContentLoaded', function () {
-            const sess = getSession();
-            if (!sess || !sess.token) { window.location.href = LOGIN_URL; return; }
-            document.getElementById('userName').textContent = sess.nombre || '';
-            document.getElementById('userRole').textContent = sess.rol || '';
-            document.getElementById('userAvatar').textContent = (sess.nombre || 'U').substring(0, 2).toUpperCase();
-            loadAll();
+            google.script.run
+                .withSuccessHandler(function (sess) {
+                    if (!sess.ok) {window.location.href = 'index.html'; return;}
+                    document.getElementById('userName').textContent = sess.nombre;
+                    document.getElementById('userRole').textContent = sess.rol;
+                    document.getElementById('userAvatar').textContent = sess.nombre.substring(0, 2).toUpperCase();
+                    loadAll();
+                })
+                .withFailureHandler(function () {window.location.href = 'index.html';})
+                .checkSession();
         });
 
         function loadAll() {
@@ -1555,81 +1610,102 @@
         /* ═══════════════════════════════════════════════════════
            CARGA DE DATOS
         ═══════════════════════════════════════════════════════ */
-        async function loadResumen() {
-            try {
-                const r = await gas('getResumen');
-                if (!r.ok) return;
-                const c = r.clientes, inv = r.inventario, enc = r.encuestas;
-                document.getElementById('ov-cli').textContent = c.activos;
-                document.getElementById('ov-cli-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${c.total} total`;
-                document.getElementById('ov-prod').textContent = inv.totalUnidades;
-                document.getElementById('ov-prod-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${inv.totalProductos} productos`;
-                document.getElementById('ov-enc').textContent = enc.respuestas;
-                document.getElementById('ov-enc-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} activas`;
-                document.getElementById('ov-tasa').textContent = enc.tasaRespuesta + '%';
-                document.getElementById('ov-tasa-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} encuestas activas`;
-                document.getElementById('cli-total').textContent = c.total;
-                document.getElementById('cli-total-d').textContent = `${Math.round(c.activos / Math.max(c.total, 1) * 100)}% activos`;
-                document.getElementById('cli-activos').textContent = c.activos;
-                document.getElementById('cli-activos-d').textContent = `${Math.round(c.activos / Math.max(c.total, 1) * 100)}% del total`;
-                document.getElementById('cli-pend').textContent = c.pendientes;
-                document.getElementById('cli-pend-d').textContent = 'En revisión';
-                document.getElementById('cli-valor').textContent = 'Q ' + c.valorPromedio.toLocaleString();
-                document.getElementById('inv-total').textContent = inv.totalProductos;
-                document.getElementById('inv-unid').textContent = inv.totalUnidades;
-                document.getElementById('inv-crit').textContent = inv.stockCritico;
-                const kQ = inv.valorInventario >= 1000 ? (inv.valorInventario / 1000).toFixed(1) + 'k' : inv.valorInventario;
-                document.getElementById('inv-valor').textContent = 'Q ' + kQ;
-                document.getElementById('enc-activas').textContent = enc.activas;
-                document.getElementById('enc-resp').textContent = enc.respuestas;
-                document.getElementById('enc-tasa').textContent = enc.tasaRespuesta + '%';
-                document.getElementById('badgeClientes').textContent = c.total;
-                document.getElementById('badgeEncuestas').textContent = enc.activas;
-            } catch(e) { console.error('loadResumen', e); }
+        function loadResumen() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    const c = r.clientes, inv = r.inventario, enc = r.encuestas;
+
+                    // Overview KPIs
+                    document.getElementById('ov-cli').textContent = c.activos;
+                    document.getElementById('ov-cli-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${c.total} total`;
+                    document.getElementById('ov-prod').textContent = inv.totalUnidades;
+                    document.getElementById('ov-prod-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${inv.totalProductos} productos`;
+                    document.getElementById('ov-enc').textContent = enc.respuestas;
+                    document.getElementById('ov-enc-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} activas`;
+                    document.getElementById('ov-tasa').textContent = enc.tasaRespuesta + '%';
+                    document.getElementById('ov-tasa-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} encuestas activas`;
+
+                    // Clientes KPIs
+                    document.getElementById('cli-total').textContent = c.total;
+                    document.getElementById('cli-total-d').textContent = `${Math.round(c.activos / Math.max(c.total, 1) * 100)}% activos`;
+                    document.getElementById('cli-activos').textContent = c.activos;
+                    document.getElementById('cli-activos-d').textContent = `${Math.round(c.activos / Math.max(c.total, 1) * 100)}% del total`;
+                    document.getElementById('cli-pend').textContent = c.pendientes;
+                    document.getElementById('cli-pend-d').textContent = 'En revisión';
+                    document.getElementById('cli-valor').textContent = 'Q ' + c.valorPromedio.toLocaleString();
+
+                    // Inventario KPIs
+                    document.getElementById('inv-total').textContent = inv.totalProductos;
+                    document.getElementById('inv-unid').textContent = inv.totalUnidades;
+                    document.getElementById('inv-crit').textContent = inv.stockCritico;
+                    const kQ = inv.valorInventario >= 1000 ? (inv.valorInventario / 1000).toFixed(1) + 'k' : inv.valorInventario;
+                    document.getElementById('inv-valor').textContent = 'Q ' + kQ;
+
+                    // Encuestas KPIs
+                    document.getElementById('enc-activas').textContent = enc.activas;
+                    document.getElementById('enc-resp').textContent = enc.respuestas;
+                    document.getElementById('enc-tasa').textContent = enc.tasaRespuesta + '%';
+
+                    // Badges sidebar
+                    document.getElementById('badgeClientes').textContent = c.total;
+                    document.getElementById('badgeEncuestas').textContent = enc.activas;
+                })
+                .getResumen();
         }
 
-        async function loadActividad() {
-            try {
-                const r = await gas('getActividad', {limit: 8});
-                if (!r.ok) return;
-                const feed = document.getElementById('activityFeed');
-                if (!r.data.length) { feed.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px">Sin actividad reciente</div>'; return; }
-                feed.innerHTML = r.data.map(a => {
-                    const dotColor = {cliente:'var(--accent)',encuesta:'var(--success)',inventario:'var(--warning)',documento:'var(--purple)',login:'#8E8E93'}[a.tipo] || '#8E8E93';
-                    const iconSvg = {cliente:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>',encuesta:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',inventario:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>',login:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'}[a.tipo] || '<circle cx="12" cy="12" r="10"/>';
-                    return `<div class="activity-item"><div class="activity-dot" style="background:${dotColor}"><svg viewBox="0 0 24 24">${iconSvg}</svg></div><div><div class="activity-text">${escHtml(a.descripcion)}</div><div class="activity-time">${timeAgo(a.fecha)}</div></div></div>`;
-                }).join('');
-            } catch(e) { console.error('loadActividad', e); }
+        function loadActividad() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    const feed = document.getElementById('activityFeed');
+                    if (!r.data.length) {feed.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px">Sin actividad reciente</div>'; return;}
+                    feed.innerHTML = r.data.map(a => {
+                        const dotColor = {cliente: 'var(--accent)', encuesta: 'var(--success)', inventario: 'var(--warning)', documento: 'var(--purple)', login: '#8E8E93'}[a.tipo] || '#8E8E93';
+                        const iconSvg = {cliente: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>', encuesta: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>', inventario: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>', login: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'}[a.tipo] || '<circle cx="12" cy="12" r="10"/>';
+                        return `<div class="activity-item">
+          <div class="activity-dot" style="background:${dotColor}"><svg viewBox="0 0 24 24">${iconSvg}</svg></div>
+          <div>
+            <div class="activity-text">${escHtml(a.descripcion)}</div>
+            <div class="activity-time">${timeAgo(a.fecha)}</div>
+          </div>
+        </div>`;
+                    }).join('');
+                })
+                .getActividad(8);
         }
 
-        async function loadClientes() {
-            try {
-                const r = await gas('getClientes');
-                if (!r.ok) return;
-                _clientes = r.data;
-                renderClientes(_filtroCliActual);
-                renderOvClientes();
-            } catch(e) { console.error('loadClientes', e); }
+        function loadClientes() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    _clientes = r.data;
+                    renderClientes(_filtroCliActual);
+                    renderOvClientes();
+                })
+                .getClientes();
         }
 
-        async function loadInventario() {
-            try {
-                const r = await gas('getInventario');
-                if (!r.ok) return;
-                _inventario = r.data;
-                renderInventario(_filtroInvActual);
-                renderOvStock();
-            } catch(e) { console.error('loadInventario', e); }
+        function loadInventario() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    _inventario = r.data;
+                    renderInventario(_filtroInvActual);
+                    renderOvStock();
+                })
+                .getInventario();
         }
 
-        async function loadEncuestas() {
-            try {
-                const r = await gas('getEncuestas');
-                if (!r.ok) return;
-                _encuestas = r.data;
-                renderEncuestas();
-                document.getElementById('enc-env').textContent = r.data.reduce((s, e) => s + Number(e.totalEnviadas || 0), 0);
-            } catch(e) { console.error('loadEncuestas', e); }
+        function loadEncuestas() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r.ok) return;
+                    _encuestas = r.data;
+                    renderEncuestas();
+                    document.getElementById('enc-env').textContent = r.data.reduce((s, e) => s + Number(e.totalEnviadas || 0), 0);
+                })
+                .getEncuestas();
         }
 
         /* ═══════════════════════════════════════════════════════
@@ -1918,69 +1994,77 @@
         /* ═══════════════════════════════════════════════════════
            MODAL SAVE – despacha al handler correcto
         ═══════════════════════════════════════════════════════ */
-        async function modalSave() {
+        function modalSave() {
             const m = _modalMode;
             if (!m) return;
             const saveBtn = document.getElementById('modalSaveBtn');
             saveBtn.disabled = true;
             saveBtn.textContent = 'Guardando…';
 
-            try {
-                let res;
-                if (m.type === 'cliente') {
-                    if (m.action === 'delete') {
-                        res = await gas('deleteCliente', {id: m.id});
-                        closeModal();
-                        if (res.ok) { showToast('Cliente eliminado', '#FF453A'); loadClientes(); loadResumen(); }
+            if (m.type === 'cliente') {
+                if (m.action === 'delete') {
+                    google.script.run.withSuccessHandler(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast('Cliente eliminado', '#FF453A'); loadClientes(); loadResumen();}
                         else showToast('Error: ' + res.error, '#FF453A');
-                    } else {
-                        const nombre = document.getElementById('mNombre').value.trim();
-                        if (!nombre) { saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return; }
-                        const data = {nombre, empresa: v('mEmpresa'), segmento: v('mSegmento'), correo: v('mCorreo'), estado: v('mEstado'), valorTotal: v('mValor')};
-                        res = m.action === 'add' ? await gas('addCliente', data) : await gas('updateCliente', {id: m.id, ...data});
-                        closeModal();
-                        if (res.ok) { showToast(m.action === 'add' ? 'Cliente creado' : 'Cliente actualizado', '#30D158'); loadClientes(); loadResumen(); loadActividad(); }
+                    }).deleteCliente(m.id);
+                } else {
+                    const nombre = document.getElementById('mNombre').value.trim();
+                    if (!nombre) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return;}
+                    const data = {nombre, empresa: v('mEmpresa'), segmento: v('mSegmento'), correo: v('mCorreo'), estado: v('mEstado'), valorTotal: v('mValor')};
+                    const fn = m.action === 'add'
+                        ? (cb => google.script.run.withSuccessHandler(cb).addCliente(data))
+                        : (cb => google.script.run.withSuccessHandler(cb).updateCliente(m.id, data));
+                    fn(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast(m.action === 'add' ? 'Cliente creado' : 'Cliente actualizado', '#30D158'); loadClientes(); loadResumen(); loadActividad();}
                         else showToast('Error: ' + res.error, '#FF453A');
-                    }
+                    });
                 }
-                else if (m.type === 'inventario') {
-                    if (m.action === 'delete') {
-                        res = await gas('deleteInventario', {id: m.id});
-                        closeModal();
-                        if (res.ok) { showToast('Producto eliminado', '#FF453A'); loadInventario(); loadResumen(); }
-                        else showToast('Error: ' + res.error, '#FF453A');
-                    } else {
-                        const prod = document.getElementById('mProd').value.trim();
-                        if (!prod) { saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre del producto es requerido', '#FF9F0A'); return; }
-                        const data = {producto: prod, categoria: v('mCat'), unidades: v('mUnid'), stockMax: v('mStockMax'), precioUnit: v('mPrecio')};
-                        res = m.action === 'add' ? await gas('addInventario', data) : await gas('updateInventario', {id: m.id, ...data});
-                        closeModal();
-                        if (res.ok) { showToast(m.action === 'add' ? 'Producto agregado' : 'Producto actualizado', '#30D158'); loadInventario(); loadResumen(); loadActividad(); }
-                        else showToast('Error: ' + res.error, '#FF453A');
-                    }
-                }
-                else if (m.type === 'encuesta') {
-                    if (m.action === 'delete') {
-                        res = await gas('deleteEncuesta', {id: m.id});
-                        closeModal();
-                        if (res.ok) { showToast('Encuesta eliminada', '#FF453A'); loadEncuestas(); loadResumen(); }
-                        else showToast('Error: ' + res.error, '#FF453A');
-                    } else {
-                        const nombre = document.getElementById('mEncNombre').value.trim();
-                        if (!nombre) { saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return; }
-                        let data = {nombre, tipo: v('mEncTipo'), pregTotal: v('mEncPregTotal')};
-                        if (m.action === 'edit') Object.assign(data, {estado: v('mEncEstado'), totalEnviadas: v('mEncEnv'), respuestas: v('mEncResp'), pregConf: v('mEncConf')});
-                        res = m.action === 'add' ? await gas('addEncuesta', data) : await gas('updateEncuesta', {id: m.id, ...data});
-                        closeModal();
-                        if (res.ok) { showToast(m.action === 'add' ? 'Encuesta creada' : 'Encuesta actualizada', '#30D158'); loadEncuestas(); loadResumen(); loadActividad(); }
-                        else showToast('Error: ' + res.error, '#FF453A');
-                    }
-                }
-            } catch(e) {
-                showToast('Error de conexión', '#FF453A');
             }
-            saveBtn.disabled = false;
-            saveBtn.textContent = 'Guardar';
+            else if (m.type === 'inventario') {
+                if (m.action === 'delete') {
+                    google.script.run.withSuccessHandler(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast('Producto eliminado', '#FF453A'); loadInventario(); loadResumen();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    }).deleteInventario(m.id);
+                } else {
+                    const prod = document.getElementById('mProd').value.trim();
+                    if (!prod) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre del producto es requerido', '#FF9F0A'); return;}
+                    const data = {producto: prod, categoria: v('mCat'), unidades: v('mUnid'), stockMax: v('mStockMax'), precioUnit: v('mPrecio')};
+                    const fn = m.action === 'add'
+                        ? (cb => google.script.run.withSuccessHandler(cb).addInventario(data))
+                        : (cb => google.script.run.withSuccessHandler(cb).updateInventario(m.id, data));
+                    fn(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast(m.action === 'add' ? 'Producto agregado' : 'Producto actualizado', '#30D158'); loadInventario(); loadResumen(); loadActividad();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    });
+                }
+            }
+            else if (m.type === 'encuesta') {
+                if (m.action === 'delete') {
+                    google.script.run.withSuccessHandler(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast('Encuesta eliminada', '#FF453A'); loadEncuestas(); loadResumen();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    }).deleteEncuesta(m.id);
+                } else {
+                    const nombre = document.getElementById('mEncNombre').value.trim();
+                    if (!nombre) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return;}
+                    let data = {nombre, tipo: v('mEncTipo'), pregTotal: v('mEncPregTotal')};
+                    if (m.action === 'edit') Object.assign(data, {estado: v('mEncEstado'), totalEnviadas: v('mEncEnv'), respuestas: v('mEncResp'), pregConf: v('mEncConf')});
+                    const fn = m.action === 'add'
+                        ? (cb => google.script.run.withSuccessHandler(cb).addEncuesta(data))
+                        : (cb => google.script.run.withSuccessHandler(cb).updateEncuesta(m.id, data));
+                    fn(res => {
+                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                        if (res.ok) {showToast(m.action === 'add' ? 'Encuesta creada' : 'Encuesta actualizada', '#30D158'); loadEncuestas(); loadResumen(); loadActividad();}
+                        else showToast('Error: ' + res.error, '#FF453A');
+                    });
+                }
+            }
         }
 
         /* ═══════════════════════════════════════════════════════
@@ -2028,8 +2112,11 @@
         ═══════════════════════════════════════════════════════ */
         function doLogout() {
             if (!confirm('¿Cerrar sesión?')) return;
-            clearSession();
-            window.location.href = LOGIN_URL;
+            google.script.run
+                .withSuccessHandler(function () {
+                    window.location.href = 'index.html';
+                })
+                .logout();
         }
 
         /* ═══════════════════════════════════════════════════════
