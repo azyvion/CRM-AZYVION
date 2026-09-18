@@ -521,47 +521,65 @@
          (GitHub Pages, Netlify, etc.). Debe ir ANTES del script principal.
     ═════════════════════════════════════════════════════════════ -->
     <script>
+    /* ════════════════════════════════════════════════════════════
+       AZYVION · PUENTE API v4 — Sesiones reales con token seguro
+       ════════════════════════════════════════════════════════════
+       ⚠️  REEMPLAZA ESTA URL CON LA URL DE TU WEB APP ACTUAL
+    ════════════════════════════════════════════════════════════ */
     (function () {
-        const API_URL = 'https://script.google.com/macros/s/AKfycbynujZGv9-hKY9oOAjCRH9YRYLKjhNFG_Qfzs9_vd6JvnZlle5VZ3hru8cz6O7updPM/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxDuKJuK_xsHm1v8ftCv-t1NeohLg62Topu13a-Z_pxDqDN0qznvjKUOd5-hVksuFaA/exec';
         const SESSION_KEY = 'azyvion_session';
 
-        // Traduce cada método del backend a los parámetros que espera _dispatch()
+        // Duración máxima de sesión "Recordarme" en ms (30 días)
+        const REMEMBER_DURATION = 30 * 24 * 60 * 60 * 1000;
+
         const MAP = {
-            login:            (u, p)  => ({ action: 'login', usuario: u, contrasena: p }),
-            logout:           ()      => ({ action: 'logout' }),
-            getResumen:       ()      => ({ action: 'getResumen' }),
-            getActividad:     (n)     => ({ action: 'getActividad', limit: n || 10 }),
-            getClientes:      ()      => ({ action: 'getClientes' }),
-            addCliente:       (d)     => Object.assign({ action: 'addCliente' }, d),
-            updateCliente:    (id, d) => Object.assign({ action: 'updateCliente', id: id }, d),
-            deleteCliente:    (id)    => ({ action: 'deleteCliente', id: id }),
-            getInventario:    ()      => ({ action: 'getInventario' }),
-            addInventario:    (d)     => Object.assign({ action: 'addInventario' }, d),
-            updateInventario: (id, d) => Object.assign({ action: 'updateInventario', id: id }, d),
-            deleteInventario: (id)    => ({ action: 'deleteInventario', id: id }),
-            getEncuestas:     ()      => ({ action: 'getEncuestas' }),
-            addEncuesta:      (d)     => Object.assign({ action: 'addEncuesta' }, d),
-            updateEncuesta:   (id, d) => Object.assign({ action: 'updateEncuesta', id: id }, d),
-            deleteEncuesta:   (id)    => ({ action: 'deleteEncuesta', id: id })
+            login:            (u, p, r) => ({ action: 'login', usuario: u, contrasena: p, remember: r ? 'true' : 'false' }),
+            logout:           ()        => ({ action: 'logout' }),
+            checkSession:     ()        => ({ action: 'checkSession' }),
+            getResumen:       ()        => ({ action: 'getResumen' }),
+            getActividad:     (n)       => ({ action: 'getActividad', limit: n || 10 }),
+            getClientes:      ()        => ({ action: 'getClientes' }),
+            addCliente:       (d)       => Object.assign({ action: 'addCliente' }, d),
+            updateCliente:    (id, d)   => Object.assign({ action: 'updateCliente', id: id }, d),
+            deleteCliente:    (id)      => ({ action: 'deleteCliente', id: id }),
+            getProspectos:    ()        => ({ action: 'getProspectos' }),
+            addProspecto:     (d)       => Object.assign({ action: 'addProspecto' }, d),
+            updateProspecto:  (id, d)   => Object.assign({ action: 'updateProspecto', id: id }, d),
+            deleteProspecto:  (id)      => ({ action: 'deleteProspecto', id: id }),
+            convertirProspecto:(id,d)   => Object.assign({ action: 'convertirProspecto', id: id }, d || {}),
+            getInventario:    ()        => ({ action: 'getInventario' }),
+            addInventario:    (d)       => Object.assign({ action: 'addInventario' }, d),
+            updateInventario: (id, d)   => Object.assign({ action: 'updateInventario', id: id }, d),
+            deleteInventario: (id)      => ({ action: 'deleteInventario', id: id }),
+            getEncuestas:     ()        => ({ action: 'getEncuestas' }),
+            addEncuesta:      (d)       => Object.assign({ action: 'addEncuesta' }, d),
+            updateEncuesta:   (id, d)   => Object.assign({ action: 'updateEncuesta', id: id }, d),
+            deleteEncuesta:   (id)      => ({ action: 'deleteEncuesta', id: id }),
+            getUsuarios:      ()        => ({ action: 'getUsuarios' }),
+            addUsuario:       (d)       => Object.assign({ action: 'addUsuario' }, d),
+            updateUsuario:    (id, d)   => Object.assign({ action: 'updateUsuario', id: id }, d),
+            deleteUsuario:    (id)      => ({ action: 'deleteUsuario', id: id })
         };
 
         function readSession() {
             try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch (e) { return null; }
         }
 
+        function getToken() {
+            const s = readSession();
+            return s ? s.token : null;
+        }
+
         function call(name, args, onSuccess, onFailure) {
-            // checkSession se resuelve en el navegador: el backend ya no guarda sesión
-            if (name === 'checkSession') {
-                const s = readSession();
-                setTimeout(function () {
-                    if (onSuccess) onSuccess(s && s.token
-                        ? { ok: true, nombre: s.nombre, rol: s.rol }
-                        : { ok: false });
-                }, 0);
-                return;
+            const params = MAP[name].apply(null, args);
+
+            // Adjuntar token en todas las peticiones que no sean login
+            if (name !== 'login') {
+                const token = getToken();
+                if (token) params.token = token;
             }
 
-            const params = MAP[name].apply(null, args);
             const qs = new URLSearchParams();
             Object.keys(params).forEach(function (k) {
                 const val = params[k];
@@ -578,15 +596,30 @@
                     try {
                         data = JSON.parse(txt);
                     } catch (e) {
-                        // Si llega HTML, el Web App no está publicado como "Cualquier persona"
-                        throw new Error('El Web App no devolvió JSON. Revisa la implementación.');
+                        throw new Error('El Web App no devolvió JSON. Verifica que esté publicado como "Cualquier persona".');
                     }
+
                     if (name === 'login' && data.ok) {
-                        localStorage.setItem(SESSION_KEY, JSON.stringify({
-                            token: data.token, nombre: data.nombre, rol: data.rol
-                        }));
+                        // Guardar sesión: NUNCA la contraseña, solo el token del servidor
+                        const sess = {
+                            token:  data.token,
+                            nombre: data.nombre,
+                            rol:    data.rol,
+                            expira: data.expira
+                        };
+                        localStorage.setItem(SESSION_KEY, JSON.stringify(sess));
                     }
-                    if (name === 'logout') localStorage.removeItem(SESSION_KEY);
+
+                    if (name === 'logout') {
+                        localStorage.removeItem(SESSION_KEY);
+                    }
+
+                    // Si el servidor dice que la sesión es inválida, limpiar localStorage
+                    if (data && data.ok === false && data.error &&
+                        data.error.includes('Sesión inválida')) {
+                        localStorage.removeItem(SESSION_KEY);
+                    }
+
                     if (onSuccess) onSuccess(data);
                 })
                 .catch(function (err) {
@@ -598,11 +631,10 @@
         function makeRunner(onSuccess, onFailure) {
             const runner = {
                 withSuccessHandler: function (fn) { return makeRunner(fn, onFailure); },
-                withFailureHandler: function (fn) { return makeRunner(onSuccess, fn); },
-                checkSession: function () { call('checkSession', [], onSuccess, onFailure); }
+                withFailureHandler: function (fn) { return makeRunner(onSuccess, fn); }
             };
             Object.keys(MAP).forEach(function (name) {
-                runner[name] = function () { call(name, arguments, onSuccess, onFailure); };
+                runner[name] = function () { call(name, Array.from(arguments), onSuccess, onFailure); };
             });
             return runner;
         }
@@ -627,10 +659,11 @@
 
         /* ---------- Login con GAS ---------- */
         function handleLogin() {
-            const usuario = document.getElementById('usuario').value.trim();
-            const pwd = document.getElementById('password').value;
-            const btn = document.getElementById('loginBtn');
-            const err = document.getElementById('errMsg');
+            const usuario   = document.getElementById('usuario').value.trim();
+            const pwd       = document.getElementById('password').value;
+            const remember  = document.getElementById('remember').checked;
+            const btn       = document.getElementById('loginBtn');
+            const err       = document.getElementById('errMsg');
 
             err.classList.remove('visible');
 
@@ -648,10 +681,15 @@
                     btn.classList.remove('loading');
                     btn.disabled = false;
                     if (res.ok) {
+                        // "Recordarme": guarda el nombre de usuario para autocompletar
+                        // (NUNCA la contraseña — el token seguro sí se guarda)
+                        if (remember) {
+                            try { localStorage.setItem('azyvion_remember_user', usuario); } catch(e) {}
+                        } else {
+                            try { localStorage.removeItem('azyvion_remember_user'); } catch(e) {}
+                        }
                         showToast('Sesión iniciada — bienvenido, ' + res.nombre, '#30d158');
                         setTimeout(function () {
-                            // Redirige al dashboard pasando page=dashboard como parámetro
-                            const base = window.location.href.split('?')[0];
                             window.location.href = 'dashboard.html';
                         }, 1300);
                     } else {
@@ -665,8 +703,28 @@
                     err.textContent = 'Error de conexión: ' + (e.message || 'intenta de nuevo.');
                     err.classList.add('visible');
                 })
-                .login(usuario, pwd);
+                .login(usuario, pwd, remember);
         }
+
+        /* ---------- Pre-rellenar usuario si Recordarme estaba activo ---------- */
+        (function() {
+            try {
+                const savedUser = localStorage.getItem('azyvion_remember_user');
+                if (savedUser) {
+                    document.getElementById('usuario').value = savedUser;
+                    document.getElementById('remember').checked = true;
+                }
+                // Si ya hay sesión válida, comprobar con el backend
+                const sess = JSON.parse(localStorage.getItem('azyvion_session') || 'null');
+                if (sess && sess.token) {
+                    google.script.run
+                        .withSuccessHandler(function(r) {
+                            if (r.ok) window.location.href = 'dashboard.html';
+                        })
+                        .checkSession();
+                }
+            } catch(e) {}
+        })();
 
         function handleForgot() {
             showToast('Contacta al administrador para restablecer tu contraseña', '#0A84FF');
