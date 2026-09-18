@@ -910,24 +910,6 @@
             border-color: var(--accent);
         }
 
-        .form-textarea {
-            padding: 10px 12px;
-            border: 1.5px solid var(--border);
-            border-radius: 9px;
-            font-family: inherit;
-            font-size: 14px;
-            color: var(--text-primary);
-            outline: none;
-            background: #fff;
-            transition: border-color .15s;
-            resize: vertical;
-            min-height: 70px;
-        }
-
-        .form-textarea:focus {
-            border-color: var(--accent);
-        }
-
         .modal-footer {
             display: flex;
             justify-content: flex-end;
@@ -1061,6 +1043,153 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* ─── v2 · Prospectos, tablas y toolbars ─── */
+        .table-toolbar { flex-wrap: wrap; }
+        .toolbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .mini-select {
+            height: 30px;
+            padding: 0 26px 0 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 8px center;
+            background-size: 12px;
+            font-family: inherit;
+            font-size: 12.5px;
+            color: var(--text-primary);
+            cursor: pointer;
+            appearance: none;
+        }
+        .btn-ghost {
+            height: 30px;
+            padding: 0 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card);
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background .15s, border-color .15s;
+        }
+        .btn-ghost:hover { background: #F7F7FA; border-color: rgba(60,60,67,.2); }
+        .btn-ghost svg {
+            width: 14px; height: 14px; fill: none;
+            stroke: var(--text-secondary); stroke-width: 2;
+            stroke-linecap: round; stroke-linejoin: round;
+        }
+        .btn-success-sm {
+            height: 28px;
+            padding: 0 12px;
+            background: var(--success-bg);
+            border: none;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1B8F3C;
+            cursor: pointer;
+            transition: opacity .15s;
+        }
+        .btn-success-sm:hover { opacity: .8; }
+
+        .table-scroll { overflow-x: auto; }
+        .row-actions { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+        .cell-main { font-weight: 600; font-size: 13.5px; line-height: 1.25; }
+        .cell-sub {
+            font-size: 11.5px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+        .cell-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .cell-mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .cell-clip {
+            max-width: 210px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-secondary);
+            font-size: 12.5px;
+        }
+        .cell-link { color: var(--text-secondary); text-decoration: none; }
+        .cell-link:hover { color: var(--accent); }
+        .table-foot {
+            padding: 11px 16px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+        .table-foot strong { color: var(--text-primary); font-weight: 600; }
+        .empty-cell { text-align: center; color: var(--text-muted); padding: 30px 12px; }
+
+        /* Etapas del pipeline */
+        .tag-nuevo       { background: #EDEDF2; color: #5A5A60; }
+        .tag-contactado  { background: var(--accent-bg);  color: #0060df; }
+        .tag-calificado  { background: #E0F7F4; color: #0F7C6C; }
+        .tag-propuesta   { background: var(--purple-bg);  color: #8B2FC9; }
+        .tag-negociacion { background: var(--warning-bg); color: #B36B00; }
+        .tag-perdido     { background: var(--danger-bg);  color: #c0392b; }
+
+        .funnel-card { padding: 18px 20px 20px; }
+        .funnel-grid { display: flex; flex-direction: column; gap: 11px; margin-top: 14px; }
+        .bar-group { margin-bottom: 0; }
+        .bar-label span:last-child { color: var(--text-primary); font-weight: 600; }
+        .bar-track { height: 8px; }
+
+        .prob-wrap { display: flex; align-items: center; gap: 8px; min-width: 104px; }
+        .prob-track { flex: 1; height: 6px; background: #E5E5EA; border-radius: 20px; overflow: hidden; }
+        .prob-fill { height: 100%; border-radius: 20px; background: var(--accent); }
+        .prob-fill.hot  { background: var(--success); }
+        .prob-fill.cold { background: var(--warning); }
+        .prob-val { font-size: 11.5px; color: var(--text-secondary); width: 30px; text-align: right; }
+
+        .notes-box {
+            background: #F7F7FA;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 11px 13px;
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-textarea {
+            width: 100%;
+            min-height: 70px;
+            resize: vertical;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 13.5px;
+            color: var(--text-primary);
+            background: var(--card);
+        }
+        .form-textarea:focus { outline: none; border-color: var(--accent); }
+        .convert-summary {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px;
+            background: var(--success-bg);
+            border-radius: 11px;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 720px) { .form-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 
@@ -1106,10 +1235,10 @@
         </div>
         <div class="nav-item" id="nav-prospectos" onclick="showPage('prospectos',this)">
             <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="8" r="5" />
-                <path d="M20 21a8 8 0 1 0-16 0" />
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
                 <line x1="19" y1="8" x2="19" y2="14" />
-                <line x1="16" y1="11" x2="22" y2="11" />
+                <line x1="22" y1="11" x2="16" y2="11" />
             </svg>
             Prospectos
             <span class="badge" id="badgeProspectos">—</span>
@@ -1136,13 +1265,6 @@
         </div>
 
         <div class="nav-section">Config.</div>
-        <div class="nav-item" id="nav-usuarios" style="display:none" onclick="showPage('usuarios',this)">
-            <svg viewBox="0 0 24 24">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-            </svg>
-            Usuarios
-        </div>
         <div class="nav-item" onclick="alert('Configuración — próximamente')">
             <svg viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="3" />
@@ -1338,31 +1460,45 @@
                             <button class="filter-tab" onclick="filtrarClientes('Pendiente',this)">Pendientes</button>
                             <button class="filter-tab" onclick="filtrarClientes('Inactivo',this)">Inactivos</button>
                         </div>
+                        <div class="toolbar-right">
+                            <select class="mini-select" id="cliFiltroSeg" onchange="renderClientes(_filtroCliActual)">
+                                <option value="">Todos los segmentos</option>
+                                <option>Estándar</option>
+                                <option>Premium</option>
+                                <option>Corporativo</option>
+                            </select>
+                            <select class="mini-select" id="cliOrden" onchange="renderClientes(_filtroCliActual)">
+                                <option value="nombre">Ordenar: nombre</option>
+                                <option value="valor">Ordenar: valor</option>
+                                <option value="reciente">Ordenar: más reciente</option>
+                            </select>
+                            <button class="btn-ghost" onclick="exportarClientes()">
+                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Exportar
+                            </button>
+                        </div>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Cliente</th>
-                                <th>Empresa</th>
-                                <th>Segmento</th>
-                                <th>Correo</th>
-                                <th>Estado</th>
-                                <th>Valor total</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="clientesTbody">
-                            <tr class="skeleton-row">
-                                <td>&nbsp;</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Contacto</th>
+                                    <th>Dirección</th>
+                                    <th>Segmento</th>
+                                    <th>Estado</th>
+                                    <th class="cell-num">Valor total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="clientesTbody">
+                                <tr class="skeleton-row">
+                                    <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-foot" id="cliFoot"></div>
                 </div>
             </div>
 
@@ -1374,66 +1510,87 @@
                         <div class="kpi-value" id="pro-activos">—</div>
                         <div class="kpi-delta up"><svg viewBox="0 0 24 24">
                                 <polyline points="18 15 12 9 6 15" />
-                            </svg><span id="pro-total-d">Total registrados</span></div>
+                            </svg><span id="pro-activos-d">…</span></div>
                     </div>
                     <div class="kpi-card">
-                        <div class="kpi-label">Calificados</div>
+                        <div class="kpi-label">Calificados o más</div>
                         <div class="kpi-value" id="pro-calif">—</div>
-                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg>Calificado, Propuesta o Negociación</div>
+                        <div class="kpi-delta neu"><span id="pro-calif-d">…</span></div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Valor potencial</div>
-                        <div class="kpi-value" id="pro-valorpot">—</div>
-                        <div class="kpi-delta neu"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg>Suma sin descartados</div>
+                        <div class="kpi-value" id="pro-valor">—</div>
+                        <div class="kpi-delta neu">Suma de oportunidades abiertas</div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Valor ponderado</div>
-                        <div class="kpi-value" id="pro-ponderado">—</div>
-                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg>Ajustado por probabilidad</div>
+                        <div class="kpi-value" id="pro-pond">—</div>
+                        <div class="kpi-delta neu">Ajustado por probabilidad</div>
                     </div>
                 </div>
+
+                <div class="table-card funnel-card" style="margin-bottom:18px">
+                    <div class="section-header" style="margin:0">
+                        <div class="section-title">Embudo de ventas</div>
+                        <button class="section-action" onclick="loadProspectos()">Actualizar</button>
+                    </div>
+                    <div class="funnel-grid" id="funnelGrid"></div>
+                </div>
+
                 <div class="table-card">
                     <div class="table-toolbar">
                         <div class="filter-tabs">
                             <button class="filter-tab active" onclick="filtrarProspectos('Todos',this)">Todos</button>
-                            <button class="filter-tab" onclick="filtrarProspectos('Nuevo',this)">Nuevo</button>
-                            <button class="filter-tab" onclick="filtrarProspectos('Contactado',this)">Contactado</button>
-                            <button class="filter-tab" onclick="filtrarProspectos('Calificado',this)">Calificado</button>
+                            <button class="filter-tab" onclick="filtrarProspectos('Nuevo',this)">Nuevos</button>
+                            <button class="filter-tab" onclick="filtrarProspectos('Contactado',this)">Contactados</button>
+                            <button class="filter-tab" onclick="filtrarProspectos('Calificado',this)">Calificados</button>
                             <button class="filter-tab" onclick="filtrarProspectos('Propuesta',this)">Propuesta</button>
                             <button class="filter-tab" onclick="filtrarProspectos('Negociación',this)">Negociación</button>
-                            <button class="filter-tab" onclick="filtrarProspectos('Perdido',this)">Perdido</button>
+                            <button class="filter-tab" onclick="filtrarProspectos('Perdido',this)">Perdidos</button>
+                        </div>
+                        <div class="toolbar-right">
+                            <select class="mini-select" id="proFiltroOrigen" onchange="renderProspectos(_filtroProActual)">
+                                <option value="">Todos los orígenes</option>
+                                <option>Referido</option>
+                                <option>Sitio web</option>
+                                <option>Llamada fría</option>
+                                <option>Evento</option>
+                                <option>Redes sociales</option>
+                                <option>Otro</option>
+                            </select>
+                            <select class="mini-select" id="proOrden" onchange="renderProspectos(_filtroProActual)">
+                                <option value="valor">Ordenar: valor</option>
+                                <option value="prob">Ordenar: probabilidad</option>
+                                <option value="nombre">Ordenar: nombre</option>
+                                <option value="reciente">Ordenar: más reciente</option>
+                            </select>
+                            <button class="btn-ghost" onclick="exportarProspectos()">
+                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Exportar
+                            </button>
                         </div>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Prospecto</th>
-                                <th>Empresa</th>
-                                <th>Origen</th>
-                                <th>Etapa</th>
-                                <th>Valor estimado</th>
-                                <th>Prob.</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="prospectosTbody">
-                            <tr class="skeleton-row">
-                                <td>&nbsp;</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Prospecto</th>
+                                    <th>Contacto</th>
+                                    <th>Origen</th>
+                                    <th>Etapa</th>
+                                    <th>Probabilidad</th>
+                                    <th class="cell-num">Valor estimado</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="prospectosTbody">
+                                <tr class="skeleton-row">
+                                    <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-foot" id="proFoot"></div>
                 </div>
             </div>
 
@@ -1543,71 +1700,6 @@
                 </div>
             </div>
 
-            <!-- ── USUARIOS (solo Admin) ── -->
-            <div class="page" id="page-usuarios">
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-label">Total usuarios</div>
-                        <div class="kpi-value" id="usr-total">—</div>
-                        <div class="kpi-delta neu"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg>Cuentas registradas</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Activos</div>
-                        <div class="kpi-value" id="usr-activos">—</div>
-                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg>Con acceso al sistema</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Administradores</div>
-                        <div class="kpi-value" id="usr-admins">—</div>
-                        <div class="kpi-delta neu"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg>Control total</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Inactivos</div>
-                        <div class="kpi-value" id="usr-inactivos">—</div>
-                        <div class="kpi-delta down"><svg viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9" />
-                            </svg>Acceso bloqueado</div>
-                    </div>
-                </div>
-                <div class="table-card">
-                    <div class="table-toolbar">
-                        <div class="filter-tabs">
-                            <button class="filter-tab active" onclick="filtrarUsuarios('Todos',this)">Todos</button>
-                            <button class="filter-tab" onclick="filtrarUsuarios('Admin',this)">Admin</button>
-                            <button class="filter-tab" onclick="filtrarUsuarios('Gerente',this)">Gerente</button>
-                            <button class="filter-tab" onclick="filtrarUsuarios('Agente',this)">Agente</button>
-                            <button class="filter-tab" onclick="filtrarUsuarios('Inactivo',this)">Inactivos</button>
-                        </div>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Usuario</th>
-                                <th>Nombre</th>
-                                <th>Rol</th>
-                                <th>Estado</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="usuariosTbody">
-                            <tr class="skeleton-row">
-                                <td>&nbsp;</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
         </div><!-- /content -->
     </div><!-- /main -->
 
@@ -1641,7 +1733,7 @@
     ═════════════════════════════════════════════════════════════ -->
     <script>
         (function () {
-            const API_URL = 'https://script.google.com/macros/s/AKfycbzGSGoVuh7PMiKIRbhjiNT3mnfCe-Ee8DCM04barErdSKkyKDGTxraM5WuIg-nNPZ7a/exec';
+            const API_URL = 'https://script.google.com/macros/s/AKfycbzCN391z3L1ijeemGTlnFWlhDlDWDnurUHKF42tZnRArKkHk17x0zhyoORZEE69312e/exec';
             const SESSION_KEY = 'azyvion_session';
 
             // Traduce cada método del backend a los parámetros que espera _dispatch()
@@ -1650,27 +1742,23 @@
                 logout: () => ({action: 'logout'}),
                 getResumen: () => ({action: 'getResumen'}),
                 getActividad: (n) => ({action: 'getActividad', limit: n || 10}),
-                getClientes: () => ({action: 'getClientes'}),
+                getClientes:      () => ({action: 'getClientes'}),
+                getProspectos:      ()      => ({action: 'getProspectos'}),
+                addProspecto:       (d)     => Object.assign({action: 'addProspecto'}, d),
+                updateProspecto:    (id, d) => Object.assign({action: 'updateProspecto', id: id}, d),
+                deleteProspecto:    (id)    => ({action: 'deleteProspecto', id: id}),
+                convertirProspecto: (id, d) => Object.assign({action: 'convertirProspecto', id: id}, d || {}),
                 addCliente: (d) => Object.assign({action: 'addCliente'}, d),
                 updateCliente: (id, d) => Object.assign({action: 'updateCliente', id: id}, d),
-                deleteCliente: (id) => ({action: 'deleteCliente', id: id, authUser: (readSession() || {}).nombre}),
-                getProspectos: () => ({action: 'getProspectos'}),
-                addProspecto: (d) => Object.assign({action: 'addProspecto'}, d),
-                updateProspecto: (id, d) => Object.assign({action: 'updateProspecto', id: id}, d),
-                deleteProspecto: (id) => ({action: 'deleteProspecto', id: id, authUser: (readSession() || {}).nombre}),
-                convertirProspecto: (id, d) => Object.assign({action: 'convertirProspecto', id: id, authUser: (readSession() || {}).nombre}, d || {}),
+                deleteCliente: (id) => ({action: 'deleteCliente', id: id}),
                 getInventario: () => ({action: 'getInventario'}),
                 addInventario: (d) => Object.assign({action: 'addInventario'}, d),
                 updateInventario: (id, d) => Object.assign({action: 'updateInventario', id: id}, d),
-                deleteInventario: (id) => ({action: 'deleteInventario', id: id, authUser: (readSession() || {}).nombre}),
+                deleteInventario: (id) => ({action: 'deleteInventario', id: id}),
                 getEncuestas: () => ({action: 'getEncuestas'}),
                 addEncuesta: (d) => Object.assign({action: 'addEncuesta'}, d),
                 updateEncuesta: (id, d) => Object.assign({action: 'updateEncuesta', id: id}, d),
-                deleteEncuesta: (id) => ({action: 'deleteEncuesta', id: id, authUser: (readSession() || {}).nombre}),
-                getUsuarios: () => ({action: 'getUsuarios', authUser: (readSession() || {}).nombre}),
-                addUsuario: (d) => Object.assign({action: 'addUsuario', authUser: (readSession() || {}).nombre}, d),
-                updateUsuario: (id, d) => Object.assign({action: 'updateUsuario', id: id, authUser: (readSession() || {}).nombre}, d),
-                deleteUsuario: (id) => ({action: 'deleteUsuario', id: id, authUser: (readSession() || {}).nombre})
+                deleteEncuesta: (id) => ({action: 'deleteEncuesta', id: id})
             };
 
             function readSession() {
@@ -1690,6 +1778,9 @@
                 }
 
                 const params = MAP[name].apply(null, args);
+                // Identidad del usuario en sesión: el backend la usa para permisos
+                const ses = readSession();
+                if (ses && ses.nombre && name !== 'login') params.authUser = ses.nombre;
                 const qs = new URLSearchParams();
                 Object.keys(params).forEach(function (k) {
                     const val = params[k];
@@ -1745,21 +1836,29 @@
            ESTADO GLOBAL
         ═══════════════════════════════════════════════════════ */
         let _clientes = [];
-        let _prospectos = [];
         let _inventario = [];
         let _encuestas = [];
-        let _usuarios = [];
         let _currentPage = 'overview';
-        let _modalMode = null; // { type:'cliente'|'prospecto'|'inventario'|'encuesta'|'usuario', action:'add'|'edit'|'delete'|'convertir', id:null }
+        let _modalMode = null; // { type:'cliente'|'inventario'|'encuesta', action:'add'|'edit', id:null }
         let _filtroCliActual = 'Todos';
-        let _filtroProActual = 'Todos';
         let _filtroInvActual = 'Todos';
-        let _filtroUsrActual = 'Todos';
-        let _sesionNombre = '';
-        let _sesionRol = '';
+        let _prospectos = [];
+        let _filtroProActual = 'Todos';
+        let _rol = '';
+        let _usuario = '';
 
-        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', inventario: 'Inventario', encuestas: 'Encuestas', usuarios: 'Usuarios'};
-        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', inventario: 'Agregar producto', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario'};
+        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', inventario: 'Inventario', encuestas: 'Encuestas'};
+        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', inventario: 'Agregar producto', encuestas: 'Nueva encuesta'};
+
+        const ETAPAS = ['Nuevo', 'Contactado', 'Calificado', 'Propuesta', 'Negociación', 'Perdido'];
+        const ORIGENES = ['Referido', 'Sitio web', 'Llamada fría', 'Evento', 'Redes sociales', 'Otro'];
+        const SEGMENTOS = ['Estándar', 'Premium', 'Corporativo'];
+        const ETAPA_COLOR = {
+            'Nuevo': '#8E8E93', 'Contactado': '#0A84FF', 'Calificado': '#14B8A6',
+            'Propuesta': '#BF5AF2', 'Negociación': '#FF9F0A', 'Perdido': '#FF453A'
+        };
+
+        function esAdmin() {return String(_rol).trim().toLowerCase() === 'admin';}
 
         /* ═══════════════════════════════════════════════════════
            INICIALIZACIÓN
@@ -1768,14 +1867,11 @@
             google.script.run
                 .withSuccessHandler(function (sess) {
                     if (!sess.ok) {window.location.href = 'index.html'; return;}
-                    _sesionNombre = sess.nombre;
-                    _sesionRol = sess.rol;
                     document.getElementById('userName').textContent = sess.nombre;
                     document.getElementById('userRole').textContent = sess.rol;
+                    _rol = sess.rol || '';
+                    _usuario = sess.nombre || '';
                     document.getElementById('userAvatar').textContent = sess.nombre.substring(0, 2).toUpperCase();
-                    if (sess.rol === 'Admin') {
-                        document.getElementById('nav-usuarios').style.display = '';
-                    }
                     loadAll();
                 })
                 .withFailureHandler(function () {window.location.href = 'index.html';})
@@ -1789,7 +1885,6 @@
             loadProspectos();
             loadInventario();
             loadEncuestas();
-            if (_sesionRol === 'Admin') loadUsuarios();
         }
 
         function refreshCurrent() {
@@ -1798,7 +1893,6 @@
             if (_currentPage === 'prospectos') {loadProspectos(); loadResumen();}
             if (_currentPage === 'inventario') {loadInventario(); loadResumen();}
             if (_currentPage === 'encuestas') {loadEncuestas(); loadResumen();}
-            if (_currentPage === 'usuarios') {loadUsuarios();}
             showToast('Datos actualizados', '#30D158');
         }
 
@@ -1809,7 +1903,8 @@
             google.script.run
                 .withSuccessHandler(function (r) {
                     if (!r.ok) return;
-                    const c = r.clientes, inv = r.inventario, enc = r.encuestas, pro = r.prospectos || {total: 0, activos: 0, calificados: 0, valorPotencial: 0, valorPonderado: 0};
+                    const c = r.clientes, inv = r.inventario, enc = r.encuestas;
+                    const pro = r.prospectos || {total: 0, activos: 0, calificados: 0, valorPotencial: 0, valorPonderado: 0};
 
                     // Overview KPIs
                     document.getElementById('ov-cli').textContent = c.activos;
@@ -1844,16 +1939,15 @@
 
                     // Prospectos KPIs
                     document.getElementById('pro-activos').textContent = pro.activos;
-                    document.getElementById('pro-total-d').textContent = pro.total + ' total registrados';
+                    document.getElementById('pro-activos-d').textContent = `${pro.total} en total`;
                     document.getElementById('pro-calif').textContent = pro.calificados;
-                    const kPot = pro.valorPotencial >= 1000 ? (pro.valorPotencial / 1000).toFixed(1) + 'k' : pro.valorPotencial;
-                    document.getElementById('pro-valorpot').textContent = 'Q ' + kPot;
-                    const kPond = pro.valorPonderado >= 1000 ? (pro.valorPonderado / 1000).toFixed(1) + 'k' : pro.valorPonderado;
-                    document.getElementById('pro-ponderado').textContent = 'Q ' + kPond;
+                    document.getElementById('pro-calif-d').textContent = `${Math.round(pro.calificados / Math.max(pro.activos, 1) * 100)}% del embudo abierto`;
+                    document.getElementById('pro-valor').textContent = 'Q ' + Number(pro.valorPotencial).toLocaleString();
+                    document.getElementById('pro-pond').textContent = 'Q ' + Number(pro.valorPonderado).toLocaleString();
 
                     // Badges sidebar
-                    document.getElementById('badgeClientes').textContent = c.total;
                     document.getElementById('badgeProspectos').textContent = pro.activos;
+                    document.getElementById('badgeClientes').textContent = c.total;
                     document.getElementById('badgeEncuestas').textContent = enc.activas;
                 })
                 .getResumen();
@@ -1894,9 +1988,10 @@
         function loadProspectos() {
             google.script.run
                 .withSuccessHandler(function (r) {
-                    if (!r.ok) {showToast('Error al cargar prospectos: ' + (r.error || ''), '#FF453A'); return;}
+                    if (!r.ok) {showToast('Error al cargar prospectos: ' + r.error, '#FF453A'); return;}
                     _prospectos = r.data;
                     renderProspectos(_filtroProActual);
+                    renderFunnel();
                 })
                 .getProspectos();
         }
@@ -1910,20 +2005,6 @@
                     renderOvStock();
                 })
                 .getInventario();
-        }
-
-        function loadUsuarios() {
-            google.script.run
-                .withSuccessHandler(function (r) {
-                    if (!r.ok) return;
-                    _usuarios = r.data;
-                    renderUsuarios(_filtroUsrActual);
-                    document.getElementById('usr-total').textContent = _usuarios.length;
-                    document.getElementById('usr-activos').textContent = _usuarios.filter(u => u.activo === true).length;
-                    document.getElementById('usr-admins').textContent = _usuarios.filter(u => u.rol === 'Admin').length;
-                    document.getElementById('usr-inactivos').textContent = _usuarios.filter(u => u.activo !== true).length;
-                })
-                .getUsuarios();
         }
 
         function loadEncuestas() {
@@ -1972,60 +2053,73 @@
         ═══════════════════════════════════════════════════════ */
         function renderClientes(filtro) {
             _filtroCliActual = filtro;
-            let data = filtro === 'Todos' ? _clientes : _clientes.filter(c => c.estado === filtro);
+            let data = filtro === 'Todos' ? _clientes.slice() : _clientes.filter(c => c.estado === filtro);
+
+            const seg = valOf('cliFiltroSeg');
+            if (seg) data = data.filter(c => c.segmento === seg);
+
             const q = document.getElementById('searchInput').value.toLowerCase();
-            if (q && _currentPage === 'clientes') data = data.filter(c => c.nombre.toLowerCase().includes(q) || c.empresa.toLowerCase().includes(q) || c.correo.toLowerCase().includes(q));
+            if (q && _currentPage === 'clientes') {
+                data = data.filter(c => [c.nombre, c.empresa, c.correo, c.telefono, c.direccion]
+                    .some(f => String(f || '').toLowerCase().includes(q)));
+            }
+
+            const orden = valOf('cliOrden') || 'nombre';
+            data.sort((a, b) => {
+                if (orden === 'valor') return Number(b.valorTotal || 0) - Number(a.valorTotal || 0);
+                if (orden === 'reciente') return new Date(b.fechaReg || 0) - new Date(a.fechaReg || 0);
+                return String(a.nombre).localeCompare(String(b.nombre), 'es');
+            });
+
+            const admin = esAdmin();
             document.getElementById('clientesTbody').innerHTML = data.length
                 ? data.map(c => `<tr>
-        <td><div class="client-name"><div class="mini-avatar" style="background:${c.color}">${initials(c.nombre)}</div>${escHtml(c.nombre)}</div></td>
-        <td style="color:var(--text-secondary)">${escHtml(c.empresa)}</td>
+        <td>
+          <div class="client-name">
+            <div class="mini-avatar" style="background:${c.color || '#8E8E93'}">${initials(c.nombre)}</div>
+            <div>
+              <div class="cell-main">${escHtml(c.nombre)}</div>
+              <div class="cell-sub">${escHtml(c.empresa) || '—'}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="cell-sub" style="margin:0">${c.correo ? `<a class="cell-link" href="mailto:${escHtml(c.correo)}">${escHtml(c.correo)}</a>` : '—'}</div>
+          <div class="cell-sub cell-mono">${c.telefono ? `<a class="cell-link" href="tel:${escHtml(String(c.telefono).replace(/\s/g, ''))}">${escHtml(c.telefono)}</a>` : '—'}</div>
+        </td>
+        <td><div class="cell-clip" title="${escHtml(c.direccion)}">${escHtml(c.direccion) || '—'}</div></td>
         <td>${tagSegmento(c.segmento)}</td>
-        <td style="color:var(--text-secondary)">${escHtml(c.correo)}</td>
         <td>${tagEstado(c.estado)}</td>
-        <td>Q ${Number(c.valorTotal).toLocaleString()}</td>
-        <td style="display:flex;gap:6px">
-          <button class="section-action" onclick="editCliente(${c.id})">Editar</button>
-          <button class="btn-danger-sm" onclick="confirmDeleteCliente(${c.id},'${escHtml(c.nombre)}')">Eliminar</button>
+        <td class="cell-num">Q ${Number(c.valorTotal || 0).toLocaleString()}</td>
+        <td>
+          <div class="row-actions">
+            <button class="section-action" onclick="editCliente(${c.id})">Editar</button>
+            ${admin ? `<button class="btn-danger-sm" onclick="confirmDeleteCliente(${c.id},'${escAttr(c.nombre)}')">Eliminar</button>` : ''}
+          </div>
         </td>
       </tr>`).join('')
-                : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px">Sin resultados</td></tr>';
+                : '<tr><td colspan="7" class="empty-cell">Sin resultados con estos filtros</td></tr>';
+
+            const suma = data.reduce((s, c) => s + Number(c.valorTotal || 0), 0);
+            document.getElementById('cliFoot').innerHTML =
+                `<span><strong>${data.length}</strong> de ${_clientes.length} clientes</span>` +
+                `<span>Valor sumado: <strong>Q ${suma.toLocaleString()}</strong></span>` +
+                (admin ? '' : '<span style="color:var(--text-muted)">Eliminar requiere rol Admin</span>');
+        }
+
+        function exportarClientes() {
+            const filas = _clientes.map(c => ({
+                ID: c.id, Nombre: c.nombre, Empresa: c.empresa, Segmento: c.segmento,
+                Correo: c.correo, Telefono: c.telefono, Direccion: c.direccion,
+                Estado: c.estado, ValorTotal: c.valorTotal, FechaRegistro: fechaCorta(c.fechaReg)
+            }));
+            descargarCSV(filas, 'clientes');
         }
 
         function filtrarClientes(filtro, el) {
             el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
             renderClientes(filtro);
-        }
-
-        /* ═══════════════════════════════════════════════════════
-           RENDER – PROSPECTOS
-        ═══════════════════════════════════════════════════════ */
-        function renderProspectos(filtro) {
-            _filtroProActual = filtro;
-            let data = filtro === 'Todos' ? _prospectos : _prospectos.filter(p => p.etapa === filtro);
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            if (q && _currentPage === 'prospectos') data = data.filter(p => (p.nombre || '').toLowerCase().includes(q) || (p.empresa || '').toLowerCase().includes(q) || (p.correo || '').toLowerCase().includes(q));
-            document.getElementById('prospectosTbody').innerHTML = data.length
-                ? data.map(p => `<tr>
-        <td><div class="client-name"><div class="mini-avatar" style="background:${p.color || '#8E8E93'}">${initials(p.nombre)}</div>${escHtml(p.nombre)}</div></td>
-        <td style="color:var(--text-secondary)">${escHtml(p.empresa || '—')}</td>
-        <td style="color:var(--text-secondary)">${escHtml(p.origen || '—')}</td>
-        <td>${tagEtapa(p.etapa)}</td>
-        <td>Q ${Number(p.valorEstimado || 0).toLocaleString()}</td>
-        <td>${Number(p.probabilidad || 0)}%</td>
-        <td style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="section-action" onclick="editProspecto(${p.id})">Editar</button>
-          ${p.etapa !== 'Perdido' ? `<button class="section-action" style="color:var(--success)" onclick="confirmConvertirProspecto(${p.id},'${escHtml(p.nombre)}')">Convertir</button>` : ''}
-          <button class="btn-danger-sm" onclick="confirmDeleteProspecto(${p.id},'${escHtml(p.nombre)}')">Eliminar</button>
-        </td>
-      </tr>`).join('')
-                : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px">Sin prospectos. Si esperabas ver datos aquí, ejecuta migrar() en Apps Script para crear la hoja Prospectos.</td></tr>';
-        }
-
-        function filtrarProspectos(filtro, el) {
-            el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            renderProspectos(filtro);
         }
 
         /* ═══════════════════════════════════════════════════════
@@ -2108,36 +2202,6 @@
         }
 
         /* ═══════════════════════════════════════════════════════
-           RENDER – USUARIOS (solo Admin)
-        ═══════════════════════════════════════════════════════ */
-        function renderUsuarios(filtro) {
-            _filtroUsrActual = filtro;
-            let data = _usuarios;
-            if (filtro === 'Inactivo') data = data.filter(u => u.activo !== true);
-            else if (filtro !== 'Todos') data = data.filter(u => u.rol === filtro);
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            if (q && _currentPage === 'usuarios') data = data.filter(u => u.nombre.toLowerCase().includes(q) || u.usuario.toLowerCase().includes(q));
-            document.getElementById('usuariosTbody').innerHTML = data.length
-                ? data.map(u => `<tr>
-        <td><div class="client-name"><div class="mini-avatar" style="background:${'#0A84FF'}">${initials(u.nombre)}</div>${escHtml(u.usuario)}</div></td>
-        <td style="color:var(--text-secondary)">${escHtml(u.nombre)}</td>
-        <td>${tagRol(u.rol)}</td>
-        <td>${u.activo === true ? '<span class="tag tag-success">Activo</span>' : '<span class="tag tag-gray">Inactivo</span>'}</td>
-        <td style="display:flex;gap:6px">
-          <button class="section-action" onclick="editUsuario(${u.id})">Editar</button>
-          <button class="btn-danger-sm" onclick="confirmDeleteUsuario(${u.id},'${escHtml(u.nombre)}')">Eliminar</button>
-        </td>
-      </tr>`).join('')
-                : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px">Sin resultados</td></tr>';
-        }
-
-        function filtrarUsuarios(filtro, el) {
-            el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            renderUsuarios(filtro);
-        }
-
-        /* ═══════════════════════════════════════════════════════
            MODAL – CLIENTES
         ═══════════════════════════════════════════════════════ */
         function newCliente() {
@@ -2148,7 +2212,11 @@
     <div class="form-field"><label class="form-label">SEGMENTO</label>
       <select class="form-select" id="mSegmento"><option>Estándar</option><option>Premium</option><option>Corporativo</option></select>
     </div>
-    <div class="form-field"><label class="form-label">CORREO</label><input class="form-input" id="mCorreo" type="email" placeholder="correo@empresa.com"/></div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">CORREO</label><input class="form-input" id="mCorreo" type="email" placeholder="correo@empresa.com"/></div>
+      <div class="form-field"><label class="form-label">TELÉFONO</label><input class="form-input" id="mTelefono" placeholder="+502 0000 0000"/></div>
+    </div>
+    <div class="form-field"><label class="form-label">DIRECCIÓN</label><input class="form-input" id="mDireccion" placeholder="Zona, calle, referencia"/></div>
     <div class="form-field"><label class="form-label">ESTADO</label>
       <select class="form-select" id="mEstado"><option>Activo</option><option>Pendiente</option><option>Inactivo</option></select>
     </div>
@@ -2168,7 +2236,11 @@
         ${['Estándar', 'Premium', 'Corporativo'].map(s => `<option${s === c.segmento ? ' selected' : ''}>${s}</option>`).join('')}
       </select>
     </div>
-    <div class="form-field"><label class="form-label">CORREO</label><input class="form-input" id="mCorreo" type="email" value="${escHtml(c.correo)}"/></div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">CORREO</label><input class="form-input" id="mCorreo" type="email" value="${escAttr(c.correo)}"/></div>
+      <div class="form-field"><label class="form-label">TELÉFONO</label><input class="form-input" id="mTelefono" value="${escAttr(c.telefono)}"/></div>
+    </div>
+    <div class="form-field"><label class="form-label">DIRECCIÓN</label><input class="form-input" id="mDireccion" value="${escAttr(c.direccion)}"/></div>
     <div class="form-field"><label class="form-label">ESTADO</label>
       <select class="form-select" id="mEstado">
         ${['Activo', 'Pendiente', 'Inactivo'].map(s => `<option${s === c.estado ? ' selected' : ''}>${s}</option>`).join('')}
@@ -2179,6 +2251,7 @@
         }
 
         function confirmDeleteCliente(id, nombre) {
+            if (!esAdmin()) {showToast('Solo un administrador puede eliminar registros', '#FF9F0A'); return;}
             _modalMode = {type: 'cliente', action: 'delete', id};
             openModal('Eliminar cliente', `<div style="text-align:center;padding:10px 0">
     <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -2190,63 +2263,160 @@
         }
 
         /* ═══════════════════════════════════════════════════════
+           RENDER – PROSPECTOS
+        ═══════════════════════════════════════════════════════ */
+        function renderFunnel() {
+            const abiertos = _prospectos.filter(p => p.etapa !== 'Perdido');
+            const max = Math.max.apply(null, ETAPAS.map(e =>
+                _prospectos.filter(p => p.etapa === e).length).concat([1]));
+            document.getElementById('funnelGrid').innerHTML = ETAPAS.map(e => {
+                const grupo = _prospectos.filter(p => p.etapa === e);
+                const valor = grupo.reduce((s, p) => s + Number(p.valorEstimado || 0), 0);
+                const pct = Math.round(grupo.length / max * 100);
+                return `<div class="bar-group">
+          <div class="bar-label">
+            <span>${e} · ${grupo.length} prospecto${grupo.length === 1 ? '' : 's'}</span>
+            <span>Q ${valor.toLocaleString()}</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(pct, 2)}%;background:${ETAPA_COLOR[e]}"></div></div>
+        </div>`;
+            }).join('') + `<div class="cell-sub" style="margin-top:4px">Embudo abierto: ${abiertos.length} oportunidades</div>`;
+        }
+
+        function renderProspectos(filtro) {
+            _filtroProActual = filtro;
+            let data = filtro === 'Todos' ? _prospectos.slice() : _prospectos.filter(p => p.etapa === filtro);
+
+            const ori = valOf('proFiltroOrigen');
+            if (ori) data = data.filter(p => p.origen === ori);
+
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            if (q && _currentPage === 'prospectos') {
+                data = data.filter(p => [p.nombre, p.empresa, p.correo, p.telefono, p.direccion, p.notas]
+                    .some(f => String(f || '').toLowerCase().includes(q)));
+            }
+
+            const orden = valOf('proOrden') || 'valor';
+            data.sort((a, b) => {
+                if (orden === 'prob') return Number(b.probabilidad || 0) - Number(a.probabilidad || 0);
+                if (orden === 'nombre') return String(a.nombre).localeCompare(String(b.nombre), 'es');
+                if (orden === 'reciente') return new Date(b.fechaReg || 0) - new Date(a.fechaReg || 0);
+                return Number(b.valorEstimado || 0) - Number(a.valorEstimado || 0);
+            });
+
+            const admin = esAdmin();
+            document.getElementById('prospectosTbody').innerHTML = data.length
+                ? data.map(p => {
+                    const prob = Math.max(0, Math.min(100, Number(p.probabilidad || 0)));
+                    const cls = prob >= 65 ? 'hot' : prob <= 30 ? 'cold' : '';
+                    return `<tr>
+        <td>
+          <div class="client-name">
+            <div class="mini-avatar" style="background:${p.color || '#8E8E93'}">${initials(p.nombre)}</div>
+            <div>
+              <div class="cell-main">${escHtml(p.nombre)}</div>
+              <div class="cell-sub">${escHtml(p.empresa) || '—'} · ${escHtml(p.segmento)}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="cell-sub" style="margin:0">${p.correo ? `<a class="cell-link" href="mailto:${escAttr(p.correo)}">${escHtml(p.correo)}</a>` : '—'}</div>
+          <div class="cell-sub cell-mono">${p.telefono ? `<a class="cell-link" href="tel:${escAttr(String(p.telefono).replace(/\s/g, ''))}">${escHtml(p.telefono)}</a>` : '—'}</div>
+        </td>
+        <td><span class="cell-sub" style="margin:0">${escHtml(p.origen) || '—'}</span></td>
+        <td>${tagEtapa(p.etapa)}</td>
+        <td>
+          <div class="prob-wrap">
+            <div class="prob-track"><div class="prob-fill ${cls}" style="width:${Math.max(prob, 2)}%"></div></div>
+            <span class="prob-val">${prob}%</span>
+          </div>
+        </td>
+        <td class="cell-num">Q ${Number(p.valorEstimado || 0).toLocaleString()}</td>
+        <td>
+          <div class="row-actions">
+            ${p.etapa !== 'Perdido' ? `<button class="btn-success-sm" onclick="confirmConvertir(${p.id})">Convertir</button>` : ''}
+            <button class="section-action" onclick="editProspecto(${p.id})">Editar</button>
+            ${admin ? `<button class="btn-danger-sm" onclick="confirmDeleteProspecto(${p.id},'${escAttr(p.nombre)}')">Eliminar</button>` : ''}
+          </div>
+        </td>
+      </tr>`;
+                }).join('')
+                : '<tr><td colspan="7" class="empty-cell">Sin prospectos con estos filtros</td></tr>';
+
+            const suma = data.reduce((s, p) => s + Number(p.valorEstimado || 0), 0);
+            const pond = data.reduce((s, p) => s + Number(p.valorEstimado || 0) * (Number(p.probabilidad || 0) / 100), 0);
+            document.getElementById('proFoot').innerHTML =
+                `<span><strong>${data.length}</strong> de ${_prospectos.length} prospectos</span>` +
+                `<span>Potencial: <strong>Q ${suma.toLocaleString()}</strong></span>` +
+                `<span>Ponderado: <strong>Q ${Math.round(pond).toLocaleString()}</strong></span>` +
+                (admin ? '' : '<span style="color:var(--text-muted)">Eliminar requiere rol Admin</span>');
+        }
+
+        function filtrarProspectos(filtro, el) {
+            el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            renderProspectos(filtro);
+        }
+
+        function exportarProspectos() {
+            const filas = _prospectos.map(p => ({
+                ID: p.id, Nombre: p.nombre, Empresa: p.empresa, Segmento: p.segmento,
+                Correo: p.correo, Telefono: p.telefono, Direccion: p.direccion,
+                Origen: p.origen, Etapa: p.etapa, ValorEstimado: p.valorEstimado,
+                Probabilidad: p.probabilidad, Notas: p.notas, FechaRegistro: fechaCorta(p.fechaReg)
+            }));
+            descargarCSV(filas, 'prospectos');
+        }
+
+        /* ═══════════════════════════════════════════════════════
            MODAL – PROSPECTOS
         ═══════════════════════════════════════════════════════ */
+        function _formProspecto(p) {
+            p = p || {};
+            const opt = (arr, sel) => arr.map(o => `<option${o === sel ? ' selected' : ''}>${o}</option>`).join('');
+            return `
+    <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label><input class="form-input" id="pNombre" value="${escAttr(p.nombre)}" placeholder="Ej. Diego Herrera" required/></div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">EMPRESA</label><input class="form-input" id="pEmpresa" value="${escAttr(p.empresa)}" placeholder="Ej. Herrera & Asociados"/></div>
+      <div class="form-field"><label class="form-label">SEGMENTO</label>
+        <select class="form-select" id="pSegmento">${opt(SEGMENTOS, p.segmento || 'Estándar')}</select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">CORREO</label><input class="form-input" id="pCorreo" type="email" value="${escAttr(p.correo)}" placeholder="correo@empresa.com"/></div>
+      <div class="form-field"><label class="form-label">TELÉFONO</label><input class="form-input" id="pTelefono" value="${escAttr(p.telefono)}" placeholder="+502 0000 0000"/></div>
+    </div>
+    <div class="form-field"><label class="form-label">DIRECCIÓN</label><input class="form-input" id="pDireccion" value="${escAttr(p.direccion)}" placeholder="Zona, calle, referencia"/></div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">ORIGEN</label>
+        <select class="form-select" id="pOrigen">${opt(ORIGENES, p.origen || 'Referido')}</select>
+      </div>
+      <div class="form-field"><label class="form-label">ETAPA</label>
+        <select class="form-select" id="pEtapa">${opt(ETAPAS, p.etapa || 'Nuevo')}</select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">VALOR ESTIMADO (Q)</label><input class="form-input" id="pValor" type="number" min="0" value="${p.valorEstimado !== undefined ? p.valorEstimado : ''}" placeholder="0"/></div>
+      <div class="form-field"><label class="form-label">PROBABILIDAD (%)</label><input class="form-input" id="pProb" type="number" min="0" max="100" value="${p.probabilidad !== undefined ? p.probabilidad : 20}"/></div>
+    </div>
+    <div class="form-field"><label class="form-label">NOTAS</label><textarea class="form-textarea" id="pNotas" placeholder="Contexto, próximos pasos, objeciones…">${escHtml(p.notas)}</textarea></div>
+  `;
+        }
+
         function newProspecto() {
             _modalMode = {type: 'prospecto', action: 'add', id: null};
-            openModal('Nuevo prospecto', `
-    <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label><input class="form-input" id="mProNombre" placeholder="Ej. Diego Herrera" required/></div>
-    <div class="form-field"><label class="form-label">EMPRESA</label><input class="form-input" id="mProEmpresa" placeholder="Ej. Herrera & Asociados"/></div>
-    <div class="form-field"><label class="form-label">SEGMENTO</label>
-      <select class="form-select" id="mProSegmento"><option>Estándar</option><option>Premium</option><option>Corporativo</option></select>
-    </div>
-    <div class="form-field"><label class="form-label">CORREO</label><input class="form-input" id="mProCorreo" type="email" placeholder="correo@empresa.com"/></div>
-    <div class="form-field"><label class="form-label">TELÉFONO</label><input class="form-input" id="mProTelefono" placeholder="+502 0000 0000"/></div>
-    <div class="form-field"><label class="form-label">DIRECCIÓN</label><input class="form-input" id="mProDireccion" placeholder="Dirección completa"/></div>
-    <div class="form-field"><label class="form-label">ORIGEN</label>
-      <select class="form-select" id="mProOrigen"><option>Referido</option><option>Sitio web</option><option>Llamada fría</option><option>Evento</option><option>Redes sociales</option><option>Otro</option></select>
-    </div>
-    <div class="form-field"><label class="form-label">ETAPA</label>
-      <select class="form-select" id="mProEtapa"><option>Nuevo</option><option>Contactado</option><option>Calificado</option><option>Propuesta</option><option>Negociación</option><option>Perdido</option></select>
-    </div>
-    <div class="form-field"><label class="form-label">VALOR ESTIMADO (Q)</label><input class="form-input" id="mProValor" type="number" min="0" placeholder="0"/></div>
-    <div class="form-field"><label class="form-label">PROBABILIDAD (%)</label><input class="form-input" id="mProProb" type="number" min="0" max="100" value="20"/></div>
-    <div class="form-field"><label class="form-label">NOTAS</label><textarea class="form-textarea" id="mProNotas" placeholder="Detalles de la oportunidad…"></textarea></div>
-  `);
+            openModal('Nuevo prospecto', _formProspecto({}));
         }
 
         function editProspecto(id) {
             const p = _prospectos.find(x => String(x.id) === String(id));
             if (!p) return;
             _modalMode = {type: 'prospecto', action: 'edit', id};
-            openModal('Editar prospecto', `
-    <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label><input class="form-input" id="mProNombre" value="${escHtml(p.nombre)}" required/></div>
-    <div class="form-field"><label class="form-label">EMPRESA</label><input class="form-input" id="mProEmpresa" value="${escHtml(p.empresa)}"/></div>
-    <div class="form-field"><label class="form-label">SEGMENTO</label>
-      <select class="form-select" id="mProSegmento">
-        ${['Estándar', 'Premium', 'Corporativo'].map(s => `<option${s === p.segmento ? ' selected' : ''}>${s}</option>`).join('')}
-      </select>
-    </div>
-    <div class="form-field"><label class="form-label">CORREO</label><input class="form-input" id="mProCorreo" type="email" value="${escHtml(p.correo)}"/></div>
-    <div class="form-field"><label class="form-label">TELÉFONO</label><input class="form-input" id="mProTelefono" value="${escHtml(p.telefono)}"/></div>
-    <div class="form-field"><label class="form-label">DIRECCIÓN</label><input class="form-input" id="mProDireccion" value="${escHtml(p.direccion)}"/></div>
-    <div class="form-field"><label class="form-label">ORIGEN</label>
-      <select class="form-select" id="mProOrigen">
-        ${['Referido', 'Sitio web', 'Llamada fría', 'Evento', 'Redes sociales', 'Otro'].map(o => `<option${o === p.origen ? ' selected' : ''}>${o}</option>`).join('')}
-      </select>
-    </div>
-    <div class="form-field"><label class="form-label">ETAPA</label>
-      <select class="form-select" id="mProEtapa">
-        ${['Nuevo', 'Contactado', 'Calificado', 'Propuesta', 'Negociación', 'Perdido'].map(e => `<option${e === p.etapa ? ' selected' : ''}>${e}</option>`).join('')}
-      </select>
-    </div>
-    <div class="form-field"><label class="form-label">VALOR ESTIMADO (Q)</label><input class="form-input" id="mProValor" type="number" min="0" value="${p.valorEstimado}"/></div>
-    <div class="form-field"><label class="form-label">PROBABILIDAD (%)</label><input class="form-input" id="mProProb" type="number" min="0" max="100" value="${p.probabilidad}"/></div>
-    <div class="form-field"><label class="form-label">NOTAS</label><textarea class="form-textarea" id="mProNotas">${escHtml(p.notas || '')}</textarea></div>
-  `);
+            openModal('Editar prospecto', _formProspecto(p));
         }
 
         function confirmDeleteProspecto(id, nombre) {
+            if (!esAdmin()) {showToast('Solo un administrador puede eliminar registros', '#FF9F0A'); return;}
             _modalMode = {type: 'prospecto', action: 'delete', id};
             openModal('Eliminar prospecto', `<div style="text-align:center;padding:10px 0">
     <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -2257,13 +2427,33 @@
             document.getElementById('modalSaveBtn').style.background = 'var(--danger)';
         }
 
-        function confirmConvertirProspecto(id, nombre) {
-            _modalMode = {type: 'prospecto', action: 'convertir', id};
-            openModal('Convertir en cliente', `<div style="text-align:center;padding:10px 0">
-    <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--success);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><path d="M20 6 9 17l-5-5"/></svg>
-    <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Convertir a cliente?</div>
-    <div style="font-size:13px;color:var(--text-secondary)"><strong>${escHtml(nombre)}</strong> se moverá a la lista de Clientes y desaparecerá de Prospectos.</div>
-  </div>`);
+        function confirmConvertir(id) {
+            const p = _prospectos.find(x => String(x.id) === String(id));
+            if (!p) return;
+            _modalMode = {type: 'prospecto', action: 'convert', id};
+            const opt = (arr, sel) => arr.map(o => `<option${o === sel ? ' selected' : ''}>${o}</option>`).join('');
+            openModal('Convertir en cliente', `
+    <div class="convert-summary">
+      <div class="mini-avatar" style="background:${p.color || '#30D158'};width:38px;height:38px;font-size:13px">${initials(p.nombre)}</div>
+      <div>
+        <div class="cell-main">${escHtml(p.nombre)}</div>
+        <div class="cell-sub">${escHtml(p.empresa) || 'Sin empresa'} · ${escHtml(p.origen)}</div>
+      </div>
+    </div>
+    <div class="notes-box" style="margin-bottom:16px">
+      El registro se moverá de la hoja <strong>Prospectos</strong> a la hoja <strong>Clientes</strong>.
+      Se conservan correo, teléfono y dirección; la fila desaparece de Prospectos.
+    </div>
+    <div class="form-row">
+      <div class="form-field"><label class="form-label">SEGMENTO</label>
+        <select class="form-select" id="cvSegmento">${opt(SEGMENTOS, p.segmento || 'Estándar')}</select>
+      </div>
+      <div class="form-field"><label class="form-label">ESTADO INICIAL</label>
+        <select class="form-select" id="cvEstado">${opt(['Activo', 'Pendiente'], 'Activo')}</select>
+      </div>
+    </div>
+    <div class="form-field"><label class="form-label">VALOR TOTAL (Q)</label><input class="form-input" id="cvValor" type="number" min="0" value="${Number(p.valorEstimado || 0)}"/></div>
+  `);
             document.getElementById('modalSaveBtn').textContent = 'Convertir';
             document.getElementById('modalSaveBtn').style.background = 'var(--success)';
         }
@@ -2361,57 +2551,6 @@
         }
 
         /* ═══════════════════════════════════════════════════════
-           MODAL – USUARIOS (solo Admin)
-        ═══════════════════════════════════════════════════════ */
-        function newUsuario() {
-            _modalMode = {type: 'usuario', action: 'add', id: null};
-            openModal('Nuevo usuario', `
-    <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label><input class="form-input" id="mUsrNombre" placeholder="Ej. Hector Reyes" required/></div>
-    <div class="form-field"><label class="form-label">USUARIO (LOGIN) *</label><input class="form-input" id="mUsrLogin" placeholder="Ej. hreyes" required/></div>
-    <div class="form-field"><label class="form-label">CONTRASEÑA *</label><input class="form-input" id="mUsrPass" type="password" placeholder="Mínimo 6 caracteres" required/></div>
-    <div class="form-field"><label class="form-label">ROL</label>
-      <select class="form-select" id="mUsrRol"><option>Agente</option><option>Gerente</option><option>Admin</option></select>
-    </div>
-    <div class="form-field"><label class="form-label">ESTADO</label>
-      <select class="form-select" id="mUsrActivo"><option value="true">Activo</option><option value="false">Inactivo</option></select>
-    </div>
-  `);
-        }
-
-        function editUsuario(id) {
-            const u = _usuarios.find(x => String(x.id) === String(id));
-            if (!u) return;
-            _modalMode = {type: 'usuario', action: 'edit', id};
-            openModal('Editar usuario', `
-    <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label><input class="form-input" id="mUsrNombre" value="${escHtml(u.nombre)}" required/></div>
-    <div class="form-field"><label class="form-label">USUARIO (LOGIN) *</label><input class="form-input" id="mUsrLogin" value="${escHtml(u.usuario)}" required/></div>
-    <div class="form-field"><label class="form-label">NUEVA CONTRASEÑA</label><input class="form-input" id="mUsrPass" type="password" placeholder="Dejar en blanco para no cambiarla"/></div>
-    <div class="form-field"><label class="form-label">ROL</label>
-      <select class="form-select" id="mUsrRol">
-        ${['Agente', 'Gerente', 'Admin'].map(r => `<option${r === u.rol ? ' selected' : ''}>${r}</option>`).join('')}
-      </select>
-    </div>
-    <div class="form-field"><label class="form-label">ESTADO</label>
-      <select class="form-select" id="mUsrActivo">
-        <option value="true"${u.activo === true ? ' selected' : ''}>Activo</option>
-        <option value="false"${u.activo !== true ? ' selected' : ''}>Inactivo</option>
-      </select>
-    </div>
-  `);
-        }
-
-        function confirmDeleteUsuario(id, nombre) {
-            _modalMode = {type: 'usuario', action: 'delete', id};
-            openModal('Eliminar usuario', `<div style="text-align:center;padding:10px 0">
-    <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-    <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar usuario?</div>
-    <div style="font-size:13px;color:var(--text-secondary)">Se eliminará el acceso de <strong>${escHtml(nombre)}</strong> permanentemente.<br>Esta acción no se puede deshacer.</div>
-  </div>`);
-            document.getElementById('modalSaveBtn').textContent = 'Eliminar';
-            document.getElementById('modalSaveBtn').style.background = 'var(--danger)';
-        }
-
-        /* ═══════════════════════════════════════════════════════
            MODAL SAVE – despacha al handler correcto
         ═══════════════════════════════════════════════════════ */
         function modalSave() {
@@ -2431,7 +2570,9 @@
                 } else {
                     const nombre = document.getElementById('mNombre').value.trim();
                     if (!nombre) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return;}
-                    const data = {nombre, empresa: v('mEmpresa'), segmento: v('mSegmento'), correo: v('mCorreo'), estado: v('mEstado'), valorTotal: v('mValor')};
+                    const data = {nombre, empresa: v('mEmpresa'), segmento: v('mSegmento'), correo: v('mCorreo'),
+                                  telefono: v('mTelefono'), direccion: v('mDireccion'),
+                                  estado: v('mEstado'), valorTotal: v('mValor')};
                     const fn = m.action === 'add'
                         ? (cb => google.script.run.withSuccessHandler(cb).addCliente(data))
                         : (cb => google.script.run.withSuccessHandler(cb).updateCliente(m.id, data));
@@ -2440,6 +2581,33 @@
                         if (res.ok) {showToast(m.action === 'add' ? 'Cliente creado' : 'Cliente actualizado', '#30D158'); loadClientes(); loadResumen(); loadActividad();}
                         else showToast('Error: ' + res.error, '#FF453A');
                     });
+                }
+            }
+            else if (m.type === 'prospecto') {
+                const done = (msg, color) => res => {
+                    closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                    if (res.ok) {showToast(msg, color); loadProspectos(); loadClientes(); loadResumen(); loadActividad();}
+                    else showToast('Error: ' + res.error, '#FF453A');
+                };
+
+                if (m.action === 'delete') {
+                    google.script.run.withSuccessHandler(done('Prospecto eliminado', '#FF453A')).deleteProspecto(m.id);
+                }
+                else if (m.action === 'convert') {
+                    google.script.run.withSuccessHandler(done('Prospecto convertido en cliente', '#30D158'))
+                        .convertirProspecto(m.id, {segmento: v('cvSegmento'), estado: v('cvEstado'), valorTotal: v('cvValor')});
+                }
+                else {
+                    const nombre = document.getElementById('pNombre').value.trim();
+                    if (!nombre) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return;}
+                    const data = {
+                        nombre, empresa: v('pEmpresa'), segmento: v('pSegmento'), correo: v('pCorreo'),
+                        telefono: v('pTelefono'), direccion: v('pDireccion'), origen: v('pOrigen'),
+                        etapa: v('pEtapa'), valorEstimado: v('pValor'), probabilidad: v('pProb'), notas: v('pNotas')
+                    };
+                    const cb = done(m.action === 'add' ? 'Prospecto creado' : 'Prospecto actualizado', '#30D158');
+                    if (m.action === 'add') google.script.run.withSuccessHandler(cb).addProspecto(data);
+                    else google.script.run.withSuccessHandler(cb).updateProspecto(m.id, data);
                 }
             }
             else if (m.type === 'inventario') {
@@ -2485,32 +2653,6 @@
                     });
                 }
             }
-            else if (m.type === 'usuario') {
-                if (m.action === 'delete') {
-                    google.script.run.withSuccessHandler(res => {
-                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
-                        if (res.ok) {showToast('Usuario eliminado', '#FF453A'); loadUsuarios();}
-                        else showToast('Error: ' + res.error, '#FF453A');
-                    }).deleteUsuario(m.id);
-                } else {
-                    const nombre = document.getElementById('mUsrNombre').value.trim();
-                    const usuario = document.getElementById('mUsrLogin').value.trim();
-                    const pass = document.getElementById('mUsrPass').value;
-                    if (!nombre || !usuario) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('Nombre y usuario son requeridos', '#FF9F0A'); return;}
-                    if (m.action === 'add' && (!pass || pass.length < 6)) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('La contraseña debe tener al menos 6 caracteres', '#FF9F0A'); return;}
-                    if (pass && pass.length > 0 && pass.length < 6) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('La contraseña debe tener al menos 6 caracteres', '#FF9F0A'); return;}
-                    const data = {nombre, usuario, rol: v('mUsrRol'), activo: v('mUsrActivo') === 'true'};
-                    if (pass) data.contrasena = pass;
-                    const fn = m.action === 'add'
-                        ? (cb => google.script.run.withSuccessHandler(cb).addUsuario(data))
-                        : (cb => google.script.run.withSuccessHandler(cb).updateUsuario(m.id, data));
-                    fn(res => {
-                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
-                        if (res.ok) {showToast(m.action === 'add' ? 'Usuario creado' : 'Usuario actualizado', '#30D158'); loadUsuarios();}
-                        else showToast('Error: ' + res.error, '#FF453A');
-                    });
-                }
-            }
         }
 
         /* ═══════════════════════════════════════════════════════
@@ -2544,15 +2686,15 @@
 
         function ctaAction() {
             if (_currentPage === 'clientes' || _currentPage === 'overview') newCliente();
+            else if (_currentPage === 'prospectos') newProspecto();
             else if (_currentPage === 'inventario') newInv();
             else if (_currentPage === 'encuestas') newEncuesta();
-            else if (_currentPage === 'usuarios') newUsuario();
         }
 
         function handleSearch(q) {
             if (_currentPage === 'clientes') renderClientes(_filtroCliActual);
+            if (_currentPage === 'prospectos') renderProspectos(_filtroProActual);
             if (_currentPage === 'inventario') renderInventario(_filtroInvActual);
-            if (_currentPage === 'usuarios') renderUsuarios(_filtroUsrActual);
         }
 
         /* ═══════════════════════════════════════════════════════
@@ -2589,12 +2731,52 @@
            UTILIDADES
         ═══════════════════════════════════════════════════════ */
         function v(id) {const el = document.getElementById(id); return el ? el.value : '';}
+        function valOf(id) {const el = document.getElementById(id); return el ? el.value : '';}
+        function escAttr(s) {return escHtml(s).replace(/'/g, '&#39;');}
+
+        function fechaCorta(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            return isNaN(d) ? String(iso) : d.toLocaleDateString('es-GT');
+        }
+
+        /* Exporta a CSV con BOM para que Excel respete los acentos */
+        function descargarCSV(filas, nombreBase) {
+            if (!filas.length) {showToast('No hay datos para exportar', '#FF9F0A'); return;}
+            const cols = Object.keys(filas[0]);
+            const esc = val => {
+                const s = val === null || val === undefined ? '' : String(val);
+                return /[",;\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+            };
+            const csv = [cols.join(',')]
+                .concat(filas.map(f => cols.map(c => esc(f[c])).join(',')))
+                .join('\r\n');
+
+            const stamp = new Date().toISOString().slice(0, 10);
+            const blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `azyvion_${nombreBase}_${stamp}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast(`${filas.length} registros exportados`, '#30D158');
+        }
         function escHtml(s) {return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');}
         function initials(n) {return (n || '').split(' ').map(w => w[0] || '').join('').substring(0, 2).toUpperCase();}
 
         function tagEstado(e) {
             const m = {Activo: 'tag-success', Pendiente: 'tag-warning', Inactivo: 'tag-danger'};
             return `<span class="tag ${m[e] || 'tag-gray'}">${e}</span>`;
+        }
+        function tagEtapa(e) {
+            const m = {
+                'Nuevo': 'tag-nuevo', 'Contactado': 'tag-contactado', 'Calificado': 'tag-calificado',
+                'Propuesta': 'tag-propuesta', 'Negociación': 'tag-negociacion', 'Perdido': 'tag-perdido'
+            };
+            return `<span class="tag ${m[e] || 'tag-gray'}">${escHtml(e) || '—'}</span>`;
         }
         function tagSegmento(s) {
             const m = {Corporativo: 'tag-accent', Premium: 'tag-purple', Estándar: 'tag-gray'};
@@ -2603,10 +2785,6 @@
         function tagCat(c) {
             const m = {Redes: 'tag-accent', Hardware: 'tag-purple', Cableado: 'tag-gray'};
             return `<span class="tag ${m[c] || 'tag-gray'}">${c}</span>`;
-        }
-        function tagRol(r) {
-            const m = {Admin: 'tag-danger', Gerente: 'tag-purple', Agente: 'tag-accent'};
-            return `<span class="tag ${m[r] || 'tag-gray'}">${escHtml(r)}</span>`;
         }
         function tagEstadoInv(e) {
             const m = {Crítico: 'tag-danger', Bajo: 'tag-warning', Normal: 'tag-success'};
