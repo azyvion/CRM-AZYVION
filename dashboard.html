@@ -1774,7 +1774,7 @@
            ⚠️  REEMPLAZA ESTA URL CON LA URL DE TU WEB APP ACTUAL
         ════════════════════════════════════════════════════════════ */
         (function () {
-            const API_URL = 'https://script.google.com/macros/s/AKfycbxDuKJuK_xsHm1v8ftCv-t1NeohLg62Topu13a-Z_pxDqDN0qznvjKUOd5-hVksuFaA/exec';
+            const API_URL = 'https://script.google.com/macros/s/AKfycbxmYsm-d6XB6aWSV_U84cGINQOpMyY8eqf87t6XAaV0OYrjmqUvUtZHl1c4lw5vlz0U/exec';
             const SESSION_KEY = 'azyvion_session';
 
             const MAP = {
@@ -1974,9 +1974,30 @@
         function loadResumen() {
             google.script.run
                 .withSuccessHandler(function (r) {
-                    if (!r.ok) return;
-                    const c = r.clientes, inv = r.inventario, enc = r.encuestas;
-                    const pro = r.prospectos || {total: 0, activos: 0, calificados: 0, valorPotencial: 0, valorPonderado: 0};
+                    if (!r.ok) { showToast('Error al cargar resumen: ' + (r.error || ''), '#FF453A'); return; }
+                    const c   = r.clientes   || {};
+                    const inv = r.inventario || {};
+                    const enc = r.encuestas  || {};
+                    const pro = r.prospectos || {};
+
+                    // Normalizar campos que pueden venir con nombre distinto según versión del backend
+                    c.activos        = c.activos        || 0;
+                    c.total          = c.total          || 0;
+                    c.pendientes     = c.pendientes     != null ? c.pendientes : (c.total - c.activos);
+                    c.valorPromedio  = c.valorPromedio  != null ? c.valorPromedio
+                                       : (c.total > 0 ? Math.round((c.valorTotal || 0) / c.total) : 0);
+                    inv.totalProductos = inv.totalProductos || 0;
+                    inv.totalUnidades  = inv.totalUnidades  || 0;
+                    inv.stockCritico   = inv.stockCritico   != null ? inv.stockCritico : (inv.criticos || 0);
+                    inv.valorInventario= inv.valorInventario!= null ? inv.valorInventario : 0;
+                    enc.activas        = enc.activas    || 0;
+                    enc.respuestas     = enc.respuestas || 0;
+                    enc.tasaRespuesta  = enc.tasaRespuesta || 0;
+                    pro.total          = pro.total          || 0;
+                    pro.activos        = pro.activos        || 0;
+                    pro.calificados    = pro.calificados    || 0;
+                    pro.valorPotencial = pro.valorPotencial || 0;
+                    pro.valorPonderado = pro.valorPonderado || 0;
 
                     // Overview KPIs
                     document.getElementById('ov-cli').textContent = c.activos;
@@ -1995,7 +2016,7 @@
                     document.getElementById('cli-activos-d').textContent = `${Math.round(c.activos / Math.max(c.total, 1) * 100)}% del total`;
                     document.getElementById('cli-pend').textContent = c.pendientes;
                     document.getElementById('cli-pend-d').textContent = 'En revisión';
-                    document.getElementById('cli-valor').textContent = 'Q ' + c.valorPromedio.toLocaleString();
+                    document.getElementById('cli-valor').textContent = 'Q ' + Number(c.valorPromedio).toLocaleString();
 
                     // Inventario KPIs
                     document.getElementById('inv-total').textContent = inv.totalProductos;
@@ -2022,6 +2043,7 @@
                     document.getElementById('badgeClientes').textContent = c.total;
                     document.getElementById('badgeEncuestas').textContent = enc.activas;
                 })
+                .withFailureHandler(function (err) { _onApiError('resumen', err); })
                 .getResumen();
         }
 
@@ -2043,50 +2065,60 @@
         </div>`;
                     }).join('');
                 })
+                .withFailureHandler(function (err) { _onApiError('actividad', err); })
                 .getActividad(8);
+        }
+
+        function _onApiError(modulo, err) {
+            console.error('[Azyvion]', modulo, err);
+            showToast('Error al cargar ' + modulo + ': ' + (err && err.message ? err.message : String(err)), '#FF453A');
         }
 
         function loadClientes() {
             google.script.run
                 .withSuccessHandler(function (r) {
-                    if (!r.ok) return;
-                    _clientes = r.data;
+                    if (!r.ok) { showToast('Error clientes: ' + (r.error || 'sin datos'), '#FF453A'); return; }
+                    _clientes = r.data || [];
                     renderClientes(_filtroCliActual);
                     renderOvClientes();
                 })
+                .withFailureHandler(function (err) { _onApiError('clientes', err); })
                 .getClientes();
         }
 
         function loadProspectos() {
             google.script.run
                 .withSuccessHandler(function (r) {
-                    if (!r.ok) {showToast('Error al cargar prospectos: ' + r.error, '#FF453A'); return;}
-                    _prospectos = r.data;
+                    if (!r.ok) { showToast('Error prospectos: ' + (r.error || 'sin datos'), '#FF453A'); return; }
+                    _prospectos = r.data || [];
                     renderProspectos(_filtroProActual);
                     renderFunnel();
                 })
+                .withFailureHandler(function (err) { _onApiError('prospectos', err); })
                 .getProspectos();
         }
 
         function loadInventario() {
             google.script.run
                 .withSuccessHandler(function (r) {
-                    if (!r.ok) return;
-                    _inventario = r.data;
+                    if (!r.ok) { showToast('Error inventario: ' + (r.error || 'sin datos'), '#FF453A'); return; }
+                    _inventario = r.data || [];
                     renderInventario(_filtroInvActual);
                     renderOvStock();
                 })
+                .withFailureHandler(function (err) { _onApiError('inventario', err); })
                 .getInventario();
         }
 
         function loadEncuestas() {
             google.script.run
                 .withSuccessHandler(function (r) {
-                    if (!r.ok) return;
-                    _encuestas = r.data;
+                    if (!r.ok) { showToast('Error encuestas: ' + (r.error || 'sin datos'), '#FF453A'); return; }
+                    _encuestas = r.data || [];
                     renderEncuestas();
-                    document.getElementById('enc-env').textContent = r.data.reduce((s, e) => s + Number(e.totalEnviadas || 0), 0);
+                    document.getElementById('enc-env').textContent = (r.data || []).reduce((s, e) => s + Number(e.totalEnviadas || 0), 0);
                 })
+                .withFailureHandler(function (err) { _onApiError('encuestas', err); })
                 .getEncuestas();
         }
 
