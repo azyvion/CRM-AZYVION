@@ -2353,34 +2353,44 @@
            INICIALIZACIÓN
         ═══════════════════════════════════════════════════════ */
         document.addEventListener('DOMContentLoaded', function () {
-            // Verificar sesión en el BACKEND — no confiar solo en localStorage
-            google.script.run
-                .withSuccessHandler(function (sess) {
-                    if (!sess || !sess.ok) {
-                        localStorage.removeItem('azyvion_session');
-                        window.location.href = 'index.html';
-                        return;
-                    }
-                    document.getElementById('userName').textContent = sess.nombre;
-                    document.getElementById('userRole').textContent = sess.rol;
-                    _rol = sess.rol || '';
-                    _usuario = sess.nombre || sess.usuario || '';
-                    document.getElementById('userAvatar').textContent =
-                        (sess.nombre || '??').substring(0, 2).toUpperCase();
+            // Verificar sesión en el BACKEND con reintentos ante fallas de red
+            function verificarSesion(intento) {
+                intento = intento || 1;
+                google.script.run
+                    .withSuccessHandler(function (sess) {
+                        if (!sess || !sess.ok) {
+                            localStorage.removeItem('azyvion_session');
+                            window.location.href = 'index.html';
+                            return;
+                        }
+                        document.getElementById('userName').textContent = sess.nombre;
+                        document.getElementById('userRole').textContent = sess.rol;
+                        _rol = sess.rol || '';
+                        _usuario = sess.nombre || sess.usuario || '';
+                        document.getElementById('userAvatar').textContent =
+                            (sess.nombre || '??').substring(0, 2).toUpperCase();
 
-                    // Mostrar/ocultar módulo de Usuarios según rol
-                    const navUsuarios = document.getElementById('nav-usuarios');
-                    if (navUsuarios) {
-                        navUsuarios.style.display = esAdmin() ? 'flex' : 'none';
-                    }
+                        // Mostrar/ocultar módulo de Usuarios según rol
+                        const navUsuarios = document.getElementById('nav-usuarios');
+                        if (navUsuarios) {
+                            navUsuarios.style.display = esAdmin() ? 'flex' : 'none';
+                        }
 
-                    loadAll();
-                })
-                .withFailureHandler(function () {
-                    localStorage.removeItem('azyvion_session');
-                    window.location.href = 'index.html';
-                })
-                .checkSession();
+                        loadAll();
+                    })
+                    .withFailureHandler(function (err) {
+                        console.warn('[Azyvion] checkSession falló (intento ' + intento + '):', err);
+                        if (intento < 3) {
+                            // Reintentar hasta 3 veces antes de redirigir al login
+                            setTimeout(function () { verificarSesion(intento + 1); }, 1500);
+                        } else {
+                            localStorage.removeItem('azyvion_session');
+                            window.location.href = 'index.html';
+                        }
+                    })
+                    .checkSession();
+            }
+            verificarSesion();
         });
 
         function loadAll() {
