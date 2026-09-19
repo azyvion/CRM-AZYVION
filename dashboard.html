@@ -1392,6 +1392,125 @@
 }
 .bank-add-card:hover { border-color: var(--accent); color: var(--accent); }
 .bank-add-card svg { width: 28px; height: 28px; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+
+/* ══════════════════════════════════════════════════════════
+   COTIZACIONES
+══════════════════════════════════════════════════════════ */
+.tag-borrador  { background: #EDEDF2; color: #5A5A60; }
+.tag-enviada   { background: var(--accent-bg);  color: #0060df; }
+.tag-aprobada  { background: var(--success-bg); color: #1a8a3a; }
+.tag-rechazada { background: var(--danger-bg);  color: #c0392b; }
+.tag-vencida   { background: var(--warning-bg); color: #B36B00; }
+.tag-producto  { background: var(--accent-bg);  color: #0060df; }
+.tag-servicio  { background: #E0F7F4; color: #0F7C6C; }
+
+.cot-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.42);
+    backdrop-filter: blur(3px); z-index: 900;
+    opacity: 0; visibility: hidden; transition: opacity .2s, visibility .2s;
+}
+.cot-overlay.open { opacity: 1; visibility: visible; }
+
+.cot-builder {
+    position: fixed; z-index: 901; top: 50%; left: 50%;
+    transform: translate(-50%, -46%) scale(.985);
+    width: min(1040px, calc(100vw - 40px));
+    max-height: calc(100vh - 48px);
+    background: var(--card); border-radius: 16px;
+    box-shadow: 0 24px 70px rgba(0,0,0,.24);
+    display: flex; flex-direction: column;
+    opacity: 0; visibility: hidden;
+    transition: opacity .2s, transform .2s, visibility .2s;
+}
+.cot-builder.open { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
+
+.cot-builder-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 22px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.cot-builder-title { font-size: 16px; font-weight: 600; }
+.cot-builder-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.cot-builder-body { padding: 18px 22px; overflow-y: auto; flex: 1; }
+.cot-builder-foot {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 14px 22px; border-top: 1px solid var(--border); flex-shrink: 0;
+    background: #FAFAFC; border-radius: 0 0 16px 16px;
+}
+
+.cot-section-title {
+    font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text-secondary); font-weight: 600; margin: 4px 0 10px;
+}
+.cot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.cot-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+@media (max-width: 860px) {
+    .cot-grid, .cot-grid-2 { grid-template-columns: 1fr; }
+}
+
+.cot-items-head, .cot-item-row {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 82px 120px 78px 118px 34px;
+    gap: 8px; align-items: start;
+}
+.cot-items-head {
+    font-size: 10px; letter-spacing: .8px; text-transform: uppercase;
+    color: var(--text-secondary); font-weight: 600;
+    padding: 0 2px 8px; border-bottom: 1px solid var(--border);
+}
+.cot-item-row { padding: 10px 2px; border-bottom: 1px solid var(--border); }
+.cot-item-row:last-child { border-bottom: 0; }
+.cot-item-total { font-size: 13.5px; font-weight: 600; text-align: right; padding-top: 9px; font-variant-numeric: tabular-nums; }
+.cot-item-del {
+    width: 30px; height: 30px; margin-top: 3px; border: 1px solid var(--border);
+    background: #fff; border-radius: 8px; cursor: pointer; color: var(--danger);
+    font-size: 15px; line-height: 1; display: flex; align-items: center; justify-content: center;
+}
+.cot-item-del:hover { background: var(--danger-bg); border-color: var(--danger-bg); }
+.cot-item-detalle {
+    width: 100%; margin-top: 6px; font-size: 12px; padding: 6px 9px;
+    border: 1px solid var(--border); border-radius: 7px; font-family: inherit;
+    resize: vertical; min-height: 30px; color: var(--text-secondary);
+}
+.cot-item-empty { text-align: center; color: var(--text-muted); padding: 22px; font-size: 13px; }
+.cot-add-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0 4px; }
+
+.cot-tot-box {
+    margin-left: auto; width: 320px; border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; background: #FAFAFC;
+}
+.cot-tot-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; }
+.cot-tot-row.final {
+    border-top: 1.5px solid var(--text-primary); margin-top: 8px; padding-top: 10px;
+    font-size: 17px; font-weight: 700;
+}
+.cot-tot-row .neg { color: var(--danger); }
+.cot-check { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; user-select: none; }
+.cot-check input { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+
+textarea.form-input {
+    height: auto; min-height: 76px; padding: 10px 12px; line-height: 1.45;
+}
+
+.switch-field {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 11px 13px; border: 1px solid var(--border); border-radius: 10px;
+    background: #FAFAFC; margin-bottom: 14px;
+}
+.switch-field .sf-txt { font-size: 13px; font-weight: 600; }
+.switch-field .sf-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+.switch {
+    position: relative; width: 44px; height: 25px; flex-shrink: 0;
+    background: #D1D1D6; border-radius: 20px; cursor: pointer; transition: background .2s;
+}
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.switch .knob {
+    position: absolute; top: 3px; left: 3px; width: 19px; height: 19px;
+    background: #fff; border-radius: 50%; transition: transform .2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,.24);
+}
+.switch.on { background: var(--success); }
+.switch.on .knob { transform: translateX(19px); }
+
     </style>
 </head>
 
@@ -1444,6 +1563,16 @@
             </svg>
             Prospectos
             <span class="badge" id="badgeProspectos">—</span>
+        </div>
+        <div class="nav-item" id="nav-cotizaciones" onclick="showPage('cotizaciones',this)">
+            <svg viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+                <line x1="8" y1="13" x2="16" y2="13" />
+                <line x1="8" y1="17" x2="13" y2="17" />
+            </svg>
+            <span>Cotizaciones</span>
+            <span class="badge" id="badgeCotizaciones">—</span>
         </div>
         <div class="nav-item" id="nav-inventario" onclick="showPage('inventario',this)">
             <svg viewBox="0 0 24 24">
@@ -1826,7 +1955,7 @@
                         <div class="kpi-value" id="inv-total">—</div>
                         <div class="kpi-delta up"><svg viewBox="0 0 24 24">
                                 <polyline points="18 15 12 9 6 15" />
-                            </svg>Productos únicos</div>
+                            </svg><span id="inv-serv-d">Productos únicos</span></div>
                     </div>
                     <div class="kpi-card">
                         <div class="kpi-label">Unidades en stock</div>
@@ -1854,6 +1983,8 @@
                     <div class="table-toolbar">
                         <div class="filter-tabs">
                             <button class="filter-tab active" onclick="filtrarInv('Todos',this)">Todos</button>
+                            <button class="filter-tab" onclick="filtrarInv('Productos',this)">Productos</button>
+                            <button class="filter-tab" onclick="filtrarInv('Servicios',this)">Servicios</button>
                             <button class="filter-tab" onclick="filtrarInv('Redes',this)">Redes</button>
                             <button class="filter-tab" onclick="filtrarInv('Hardware',this)">Hardware</button>
                             <button class="filter-tab" onclick="filtrarInv('Cableado',this)">Cableado</button>
@@ -1863,7 +1994,8 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Producto</th>
+                                <th>Ítem</th>
+                                <th>Tipo</th>
                                 <th>Categoría</th>
                                 <th>Unidades</th>
                                 <th>Disponibilidad</th>
@@ -1881,9 +2013,76 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
+                                <td></td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+
+            <!-- ── COTIZACIONES ── -->
+            <div class="page" id="page-cotizaciones">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Cotizaciones</div>
+                        <div class="kpi-value" id="cot-total">—</div>
+                        <div class="kpi-delta neu" id="cot-total-d">…</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Enviadas</div>
+                        <div class="kpi-value" id="cot-enviadas">—</div>
+                        <div class="kpi-delta neu" id="cot-enviadas-d">…</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Aprobadas</div>
+                        <div class="kpi-value" id="cot-aprobadas">—</div>
+                        <div class="kpi-delta up" id="cot-aprobadas-d">…</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Monto aprobado</div>
+                        <div class="kpi-value" id="cot-monto">—</div>
+                        <div class="kpi-delta neu" id="cot-monto-d">…</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" onclick="filtrarCot('Todas',this)">Todas</button>
+                            <button class="filter-tab" onclick="filtrarCot('Borrador',this)">Borradores</button>
+                            <button class="filter-tab" onclick="filtrarCot('Enviada',this)">Enviadas</button>
+                            <button class="filter-tab" onclick="filtrarCot('Aprobada',this)">Aprobadas</button>
+                            <button class="filter-tab" onclick="filtrarCot('Rechazada',this)">Rechazadas</button>
+                            <button class="filter-tab" onclick="filtrarCot('Vencidas',this)">Vencidas</button>
+                        </div>
+                        <div class="toolbar-right">
+                            <button class="btn-ghost" onclick="exportarCotizaciones()">
+                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha</th>
+                                    <th>Válida hasta</th>
+                                    <th class="cell-num">Ítems</th>
+                                    <th class="cell-num">Total</th>
+                                    <th>Estado</th>
+                                    <th style="text-align:right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cotTbody">
+                                <tr><td colspan="8" class="empty-cell">Cargando cotizaciones…</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-foot" id="cotFoot"></div>
                 </div>
             </div>
 
@@ -2175,6 +2374,137 @@
         </div><!-- /content -->
     </div><!-- /main -->
 
+
+    <!-- ── CONSTRUCTOR DE COTIZACIONES ── -->
+    <div class="cot-overlay" id="cotOverlay" onclick="closeCotBuilder()"></div>
+    <div class="cot-builder" id="cotBuilder">
+        <div class="cot-builder-head">
+            <div>
+                <div class="cot-builder-title" id="cotBuilderTitle">Nueva cotización</div>
+                <div class="cot-builder-sub" id="cotBuilderSub">Completa los datos y agrega ítems del inventario</div>
+            </div>
+            <button class="modal-close" onclick="closeCotBuilder()">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+
+        <div class="cot-builder-body">
+            <div class="cot-section-title">Cliente</div>
+            <div class="cot-grid">
+                <div class="form-field">
+                    <label class="form-label">SELECCIONAR CLIENTE</label>
+                    <select class="form-select" id="cotClienteSel" onchange="cotAplicarCliente(this.value)">
+                        <option value="">— Escribir manualmente —</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label class="form-label">NOMBRE / CONTACTO *</label>
+                    <input class="form-input" id="cotCliente" placeholder="Ej. Juan Pérez" />
+                </div>
+                <div class="form-field">
+                    <label class="form-label">EMPRESA</label>
+                    <input class="form-input" id="cotEmpresa" placeholder="Ej. Constructora XYZ" />
+                </div>
+                <div class="form-field">
+                    <label class="form-label">CORREO</label>
+                    <input class="form-input" id="cotCorreo" type="email" placeholder="cliente@correo.com" />
+                </div>
+                <div class="form-field">
+                    <label class="form-label">TELÉFONO</label>
+                    <input class="form-input" id="cotTelefono" placeholder="+502 0000-0000" />
+                </div>
+                <div class="form-field">
+                    <label class="form-label">DIRECCIÓN</label>
+                    <input class="form-input" id="cotDireccion" placeholder="Dirección del cliente" />
+                </div>
+            </div>
+
+            <div class="cot-section-title" style="margin-top:16px">Datos del documento</div>
+            <div class="cot-grid">
+                <div class="form-field">
+                    <label class="form-label">FECHA</label>
+                    <input class="form-input" id="cotFecha" type="date" />
+                </div>
+                <div class="form-field">
+                    <label class="form-label">VALIDEZ (DÍAS)</label>
+                    <input class="form-input" id="cotValidez" type="number" min="1" max="365" value="15" />
+                </div>
+                <div class="form-field">
+                    <label class="form-label">ESTADO</label>
+                    <select class="form-select" id="cotEstado">
+                        <option>Borrador</option>
+                        <option>Enviada</option>
+                        <option>Aprobada</option>
+                        <option>Rechazada</option>
+                        <option>Vencida</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="cot-section-title" style="margin-top:16px">Ítems</div>
+            <div class="cot-add-bar">
+                <select class="mini-select" id="cotItemSel" style="min-width:260px;flex:1">
+                    <option value="">Selecciona un producto o servicio del inventario…</option>
+                </select>
+                <button class="btn-ghost" onclick="cotAgregarDesdeInventario()">
+                    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Agregar del inventario
+                </button>
+                <button class="btn-ghost" onclick="cotAgregarLibre()">
+                    <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+                    Línea manual
+                </button>
+            </div>
+
+            <div class="cot-items-head">
+                <div>Descripción</div><div>Cantidad</div><div>P. unitario</div>
+                <div>Desc. %</div><div style="text-align:right">Total</div><div></div>
+            </div>
+            <div id="cotItemsWrap">
+                <div class="cot-item-empty">Aún no has agregado ítems.</div>
+            </div>
+
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;align-items:flex-start">
+                <div style="flex:1;min-width:260px">
+                    <div class="form-field">
+                        <label class="form-label">DESCUENTO GENERAL (%)</label>
+                        <input class="form-input" id="cotDescuento" type="number" min="0" max="100" step="0.01" value="0" oninput="cotRecalcular()" />
+                    </div>
+                    <label class="cot-check" style="margin-top:6px">
+                        <input type="checkbox" id="cotIVA" onchange="cotRecalcular()" />
+                        Agregar IVA (12%) sobre el subtotal
+                    </label>
+                </div>
+                <div class="cot-tot-box">
+                    <div class="cot-tot-row"><span>Subtotal</span><span id="cotSubtotal">Q 0.00</span></div>
+                    <div class="cot-tot-row"><span>Descuento</span><span class="neg" id="cotDescMonto">Q 0.00</span></div>
+                    <div class="cot-tot-row"><span>IVA</span><span id="cotIvaMonto">Incluido</span></div>
+                    <div class="cot-tot-row final"><span>Total</span><span id="cotTotal">Q 0.00</span></div>
+                </div>
+            </div>
+
+            <div class="cot-section-title" style="margin-top:18px">Términos y notas</div>
+            <div class="cot-grid-2">
+                <div class="form-field">
+                    <label class="form-label">TÉRMINOS Y CONDICIONES</label>
+                    <textarea class="form-input" id="cotCondiciones" rows="4" style="resize:vertical"></textarea>
+                </div>
+                <div class="form-field">
+                    <label class="form-label">NOTAS INTERNAS / ADICIONALES</label>
+                    <textarea class="form-input" id="cotNotas" rows="4" style="resize:vertical" placeholder="Opcional"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <div class="cot-builder-foot">
+            <div style="font-size:12px;color:var(--text-secondary)" id="cotBuilderHint">Los totales se calculan automáticamente.</div>
+            <div style="display:flex;gap:10px">
+                <button class="btn-cancel" onclick="closeCotBuilder()">Cancelar</button>
+                <button class="btn-save" id="cotSaveBtn" onclick="guardarCotizacion()">Guardar cotización</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ── MODAL ── -->
     <div class="modal-overlay" id="modal" onclick="closeModalOverlay(event)">
         <div class="modal-box">
@@ -2209,7 +2539,7 @@
            ⚠️  REEMPLAZA ESTA URL CON LA URL DE TU WEB APP ACTUAL
         ════════════════════════════════════════════════════════════ */
         (function () {
-            const API_URL = 'https://script.google.com/macros/s/AKfycbwrGuW770yHyvvz8T9r84akSj6R0ZXkv7rUe2IXSIooZeB59LQBm4cVFyVQMaZfZmKX/exec';
+            const API_URL = 'https://script.google.com/macros/s/AKfycbyaWUX1qTPNuhxb9seFc5lgh29iC4bzlrCKDc6X3vKTVaB2GT3niiHDzuUFqeezwVNb/exec';
             const SESSION_KEY = 'azyvion_session';
 
             const MAP = {
@@ -2255,8 +2585,22 @@
                 addTransaccion:       (d)       => Object.assign({action: 'addTransaccion'}, d),
                 deleteTransaccion:    (d)       => Object.assign({action: 'deleteTransaccion'}, d),
 
-                getResumenContable:   ()        => ({action: 'getResumenContable'})
+                getResumenContable:   ()        => ({action: 'getResumenContable'}),
+
+                // ── Cotizaciones ──
+                getCotizaciones:        (f) => Object.assign({action: 'getCotizaciones'}, f || {}),
+                getCotizacion:          (d) => Object.assign({action: 'getCotizacion'}, d),
+                getCotizacionHtml:      (d) => Object.assign({action: 'getCotizacionHtml'}, d),
+                addCotizacion:          (d) => Object.assign({action: 'addCotizacion'}, d),
+                updateCotizacion:       (d) => Object.assign({action: 'updateCotizacion'}, d),
+                updateEstadoCotizacion: (d) => Object.assign({action: 'updateEstadoCotizacion'}, d),
+                deleteCotizacion:       (d) => Object.assign({action: 'deleteCotizacion'}, d),
+                enviarCotizacion:       (d) => Object.assign({action: 'enviarCotizacion'}, d),
+                getResumenCotizaciones: ()  => ({action: 'getResumenCotizaciones'})
             };
+
+            // Acciones que viajan por POST (payload grande: ítems, mensajes largos)
+            const POST_ACTIONS = ['addCotizacion', 'updateCotizacion', 'enviarCotizacion'];
 
             function readSession() {
                 try {return JSON.parse(localStorage.getItem(SESSION_KEY));} catch (e) {return null;}
@@ -2276,13 +2620,26 @@
                     if (token) params.token = token;
                 }
 
-                const qs = new URLSearchParams();
-                Object.keys(params).forEach(function (k) {
-                    const val = params[k];
-                    if (val !== undefined && val !== null) qs.append(k, val);
-                });
+                let peticion;
+                if (POST_ACTIONS.indexOf(params.action) !== -1) {
+                    // text/plain evita el preflight CORS con Apps Script
+                    peticion = fetch(API_URL, {
+                        method: 'POST',
+                        redirect: 'follow',
+                        headers: {'Content-Type': 'text/plain;charset=utf-8'},
+                        body: JSON.stringify(params)
+                    });
+                } else {
+                    const qs = new URLSearchParams();
+                    Object.keys(params).forEach(function (k) {
+                        const val = params[k];
+                        if (val === undefined || val === null) return;
+                        qs.append(k, typeof val === 'object' ? JSON.stringify(val) : val);
+                    });
+                    peticion = fetch(API_URL + '?' + qs.toString(), {method: 'GET', redirect: 'follow'});
+                }
 
-                fetch(API_URL + '?' + qs.toString(), {method: 'GET', redirect: 'follow'})
+                peticion
                     .then(function (r) {
                         if (!r.ok) throw new Error('HTTP ' + r.status);
                         return r.text();
@@ -2350,11 +2707,16 @@
         let _filtroInvActual = 'Todos';
         let _prospectos = [];
         let _filtroProActual = 'Todos';
+        let _cotizaciones = [];
+        let _filtroCotActual = 'Todas';
+        let _cotItems = [];
+        let _cotEditId = null;
+        let _cotEmpresa = null;
         let _rol = '';
         let _usuario = '';
 
-        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', inventario: 'Inventario', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad'};
-        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', inventario: 'Agregar producto', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria'};
+        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', cotizaciones: 'Cotizaciones', inventario: 'Inventario', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad'};
+        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', cotizaciones: 'Nueva cotización', inventario: 'Nuevo ítem', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria'};
 
         const ETAPAS = ['Nuevo', 'Contactado', 'Calificado', 'Propuesta', 'Negociación', 'Perdido'];
         const ORIGENES = ['Referido', 'Sitio web', 'Llamada fría', 'Evento', 'Redes sociales', 'Otro'];
@@ -2445,6 +2807,7 @@
             loadProspectos();
             loadInventario();
             loadEncuestas();
+            loadCotizaciones();
             if (esAdmin()) loadUsuarios();
             _initContabilidad();
         }
@@ -2454,6 +2817,7 @@
             if (_currentPage === 'clientes')   {loadClientes(); loadResumen();}
             if (_currentPage === 'prospectos') {loadProspectos(); loadResumen();}
             if (_currentPage === 'inventario') {loadInventario(); loadResumen();}
+            if (_currentPage === 'cotizaciones') {loadCotizaciones(); loadInventario(); loadClientes();}
             if (_currentPage === 'encuestas')  {loadEncuestas(); loadResumen();}
             if (_currentPage === 'usuarios')   {loadUsuarios();}
             if (_currentPage === 'contabilidad') { loadCuentasBancarias(); loadPlanCuentas(); loadTransacciones(); loadResumenContable(); }
@@ -2512,6 +2876,8 @@
 
                     // Inventario KPIs
                     document.getElementById('inv-total').textContent = inv.totalProductos;
+                    const invServEl = document.getElementById('inv-serv-d');
+                    if (invServEl) invServEl.textContent = (inv.totalServicios || 0) + ' servicios registrados';
                     document.getElementById('inv-unid').textContent = inv.totalUnidades;
                     document.getElementById('inv-crit').textContent = inv.stockCritico;
                     const kQ = inv.valorInventario >= 1000 ? (inv.valorInventario / 1000).toFixed(1) + 'k' : inv.valorInventario;
@@ -2573,6 +2939,7 @@
                     _clientes = r.data || [];
                     renderClientes(_filtroCliActual);
                     renderOvClientes();
+                    cotLlenarSelectClientes();
                 })
                 .withFailureHandler(function (err) { _onApiError('clientes', err); })
                 .getClientes();
@@ -2597,6 +2964,7 @@
                     _inventario = r.data || [];
                     renderInventario(_filtroInvActual);
                     renderOvStock();
+                    cotLlenarSelectItems();
                 })
                 .withFailureHandler(function (err) { _onApiError('inventario', err); })
                 .getInventario();
@@ -2724,28 +3092,44 @@
         function renderInventario(filtro) {
             _filtroInvActual = filtro;
             let data = _inventario;
-            if (filtro === 'Crítico') data = data.filter(i => i.estado === 'Crítico');
-            else if (filtro !== 'Todos') data = data.filter(i => i.categoria === filtro);
+            if (filtro === 'Crítico')        data = data.filter(i => i.estado === 'Crítico');
+            else if (filtro === 'Productos') data = data.filter(i => i.tipo !== 'Servicio');
+            else if (filtro === 'Servicios') data = data.filter(i => i.tipo === 'Servicio');
+            else if (filtro !== 'Todos')     data = data.filter(i => i.categoria === filtro);
+
             const q = document.getElementById('searchInput').value.toLowerCase();
-            if (q && _currentPage === 'inventario') data = data.filter(i => i.producto.toLowerCase().includes(q) || i.categoria.toLowerCase().includes(q));
+            if (q && _currentPage === 'inventario') {
+                data = data.filter(i =>
+                    String(i.producto || '').toLowerCase().includes(q) ||
+                    String(i.categoria || '').toLowerCase().includes(q) ||
+                    String(i.sku || '').toLowerCase().includes(q));
+            }
+
             document.getElementById('inventarioTbody').innerHTML = data.length
                 ? data.map(i => {
-                    const pct = Math.round(Number(i.unidades) / Math.max(Number(i.stockMax), 1) * 100);
+                    const esServicio = i.tipo === 'Servicio';
+                    const pct = esServicio ? 0 : Math.round(Number(i.unidades) / Math.max(Number(i.stockMax), 1) * 100);
                     const cls = i.estado === 'Crítico' ? 'low' : i.estado === 'Bajo' ? 'mid' : '';
+                    const inactivo = (i.activo === false || String(i.activo).toLowerCase() === 'false')
+                        ? ' <span class="tag tag-gray">Inactivo</span>' : '';
+                    const disp = esServicio
+                        ? '<span style="color:var(--text-muted)">No aplica</span>'
+                        : `<div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.max(pct, 1)}%"></div></div><span class="progress-val">${pct}%</span></div>`;
                     return `<tr>
-          <td>${escHtml(i.producto)}</td>
+          <td><div class="cell-main">${escHtml(i.producto)}${inactivo}</div>${i.sku ? `<div class="cell-sub">SKU: ${escHtml(i.sku)}</div>` : ''}</td>
+          <td><span class="tag ${esServicio ? 'tag-servicio' : 'tag-producto'}">${esServicio ? 'Servicio' : 'Producto'}</span></td>
           <td>${tagCat(i.categoria)}</td>
-          <td>${i.unidades}</td>
-          <td><div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.max(pct, 1)}%"></div></div><span class="progress-val">${pct}%</span></div></td>
+          <td>${esServicio ? '—' : i.unidades}</td>
+          <td>${disp}</td>
           <td>Q ${Number(i.precioUnit).toLocaleString()}</td>
-          <td>${tagEstadoInv(i.estado)}</td>
+          <td>${esServicio ? '<span class="tag tag-servicio">Servicio</span>' : tagEstadoInv(i.estado)}</td>
           <td style="display:flex;gap:6px">
             <button class="section-action" onclick="editInv(${i.id})">Editar</button>
-            <button class="btn-danger-sm" onclick="confirmDeleteInv(${i.id},'${escHtml(i.producto)}')">Eliminar</button>
+            <button class="btn-danger-sm" onclick="confirmDeleteInv(${i.id},'${escAttr(i.producto)}')">Eliminar</button>
           </td>
         </tr>`;
                 }).join('')
-                : '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px">Sin resultados</td></tr>';
+                : '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px">Sin resultados</td></tr>';
         }
 
         function filtrarInv(filtro, el) {
@@ -3057,39 +3441,80 @@
         /* ═══════════════════════════════════════════════════════
            MODAL – INVENTARIO
         ═══════════════════════════════════════════════════════ */
+        const CAT_INV = ['Redes', 'Hardware', 'Cableado', 'Software', 'Instalación', 'Soporte', 'Consultoría', 'Otro'];
+
+        function _formInventario(i) {
+            i = i || {};
+            const esServicio = i.tipo === 'Servicio';
+            const cat = i.categoria || 'Redes';
+            return `
+    <div class="switch-field">
+      <div>
+        <div class="sf-txt">Es un servicio</div>
+        <div class="sf-sub">Actívalo para servicios (sin control de stock). Desactivado = producto.</div>
+      </div>
+      <label class="switch${esServicio ? ' on' : ''}" id="mServSwitch">
+        <input type="checkbox" id="mEsServicio" ${esServicio ? 'checked' : ''} onchange="toggleServicioCampos()"/>
+        <span class="knob"></span>
+      </label>
+    </div>
+    <div class="form-field"><label class="form-label" id="mProdLabel">${esServicio ? 'NOMBRE DEL SERVICIO *' : 'NOMBRE DEL PRODUCTO *'}</label>
+      <input class="form-input" id="mProd" value="${escAttr(i.producto || '')}" placeholder="Ej. Router Mikrotik RB450G" required/></div>
+    <div class="form-field"><label class="form-label">CÓDIGO / SKU</label>
+      <input class="form-input" id="mSku" value="${escAttr(i.sku || '')}" placeholder="Opcional"/></div>
+    <div class="form-field"><label class="form-label">CATEGORÍA</label>
+      <select class="form-select" id="mCat">
+        ${CAT_INV.map(c => `<option${c === cat ? ' selected' : ''}>${c}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-field"><label class="form-label">DESCRIPCIÓN (APARECE EN LA COTIZACIÓN)</label>
+      <textarea class="form-input" id="mDesc" rows="2" style="resize:vertical" placeholder="Opcional">${escHtml(i.descripcion || '')}</textarea></div>
+    <div class="form-field"><label class="form-label">UNIDAD DE MEDIDA</label>
+      <input class="form-input" id="mUnidad" value="${escAttr(i.unidad || (esServicio ? 'Servicio' : 'Unidad'))}" placeholder="Unidad, Hora, Metro, Licencia…"/></div>
+    <div id="mStockWrap" style="${esServicio ? 'display:none' : ''}">
+      <div class="form-field"><label class="form-label">UNIDADES EN STOCK</label>
+        <input class="form-input" id="mUnid" type="number" min="0" value="${i.unidades !== undefined ? i.unidades : 0}"/></div>
+      <div class="form-field"><label class="form-label">STOCK MÁXIMO</label>
+        <input class="form-input" id="mStockMax" type="number" min="1" value="${i.stockMax || 50}"/></div>
+    </div>
+    <div class="form-field"><label class="form-label">PRECIO UNITARIO (Q)</label>
+      <input class="form-input" id="mPrecio" type="number" min="0" step="0.01" value="${i.precioUnit !== undefined ? i.precioUnit : 0}"/></div>
+    <label class="cot-check" style="margin-top:4px">
+      <input type="checkbox" id="mActivo" ${(i.activo === false || String(i.activo).toLowerCase() === 'false') ? '' : 'checked'}/>
+      Disponible para cotizar
+    </label>
+  `;
+        }
+
+        function toggleServicioCampos() {
+            const chk = document.getElementById('mEsServicio');
+            if (!chk) return;
+            const on = chk.checked;
+            const sw = document.getElementById('mServSwitch');
+            if (sw) sw.classList.toggle('on', on);
+            const wrap = document.getElementById('mStockWrap');
+            if (wrap) wrap.style.display = on ? 'none' : '';
+            const lbl = document.getElementById('mProdLabel');
+            if (lbl) lbl.textContent = on ? 'NOMBRE DEL SERVICIO *' : 'NOMBRE DEL PRODUCTO *';
+            const u = document.getElementById('mUnidad');
+            if (u && (u.value === 'Unidad' || u.value === 'Servicio' || !u.value.trim())) u.value = on ? 'Servicio' : 'Unidad';
+        }
+
         function newInv() {
             _modalMode = {type: 'inventario', action: 'add', id: null};
-            openModal('Agregar producto', `
-    <div class="form-field"><label class="form-label">NOMBRE DEL PRODUCTO *</label><input class="form-input" id="mProd" placeholder="Ej. Router Mikrotik RB450G" required/></div>
-    <div class="form-field"><label class="form-label">CATEGORÍA</label>
-      <select class="form-select" id="mCat"><option>Redes</option><option>Hardware</option><option>Cableado</option><option>Software</option><option>Otro</option></select>
-    </div>
-    <div class="form-field"><label class="form-label">UNIDADES EN STOCK</label><input class="form-input" id="mUnid" type="number" min="0" value="0"/></div>
-    <div class="form-field"><label class="form-label">STOCK MÁXIMO</label><input class="form-input" id="mStockMax" type="number" min="1" value="50"/></div>
-    <div class="form-field"><label class="form-label">PRECIO UNITARIO (Q)</label><input class="form-input" id="mPrecio" type="number" min="0" value="0"/></div>
-  `);
+            openModal('Nuevo ítem de inventario', _formInventario({}));
         }
 
         function editInv(id) {
             const i = _inventario.find(x => String(x.id) === String(id));
             if (!i) return;
             _modalMode = {type: 'inventario', action: 'edit', id};
-            openModal('Editar producto', `
-    <div class="form-field"><label class="form-label">NOMBRE DEL PRODUCTO *</label><input class="form-input" id="mProd" value="${escHtml(i.producto)}" required/></div>
-    <div class="form-field"><label class="form-label">CATEGORÍA</label>
-      <select class="form-select" id="mCat">
-        ${['Redes', 'Hardware', 'Cableado', 'Software', 'Otro'].map(c => `<option${c === i.categoria ? ' selected' : ''}>${c}</option>`).join('')}
-      </select>
-    </div>
-    <div class="form-field"><label class="form-label">UNIDADES EN STOCK</label><input class="form-input" id="mUnid" type="number" min="0" value="${i.unidades}"/></div>
-    <div class="form-field"><label class="form-label">STOCK MÁXIMO</label><input class="form-input" id="mStockMax" type="number" min="1" value="${i.stockMax}"/></div>
-    <div class="form-field"><label class="form-label">PRECIO UNITARIO (Q)</label><input class="form-input" id="mPrecio" type="number" min="0" value="${i.precioUnit}"/></div>
-  `);
+            openModal(i.tipo === 'Servicio' ? 'Editar servicio' : 'Editar producto', _formInventario(i));
         }
 
         function confirmDeleteInv(id, nombre) {
             _modalMode = {type: 'inventario', action: 'delete', id};
-            openModal('Eliminar producto', `<div style="text-align:center;padding:10px 0">
+            openModal('Eliminar ítem', `<div style="text-align:center;padding:10px 0">
     <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
     <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar producto?</div>
     <div style="font-size:13px;color:var(--text-secondary)">Se eliminará <strong>${escHtml(nombre)}</strong> del inventario.<br>Esta acción no se puede deshacer.</div>
@@ -3157,6 +3582,7 @@
             saveBtn.textContent = 'Guardando…';
 
             if (_handleModalSaveContabilidad(m, saveBtn)) return;
+            if (_handleModalSaveCotizaciones(m, saveBtn)) return;
 
             if (m.type === 'cliente') {
                 if (m.action === 'delete') {
@@ -3217,14 +3643,28 @@
                     }).deleteInventario(m.id);
                 } else {
                     const prod = document.getElementById('mProd').value.trim();
-                    if (!prod) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre del producto es requerido', '#FF9F0A'); return;}
-                    const data = {producto: prod, categoria: v('mCat'), unidades: v('mUnid'), stockMax: v('mStockMax'), precioUnit: v('mPrecio')};
+                    if (!prod) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre del ítem es requerido', '#FF9F0A'); return;}
+                    const chkServ = document.getElementById('mEsServicio');
+                    const esServ  = !!(chkServ && chkServ.checked);
+                    const chkAct  = document.getElementById('mActivo');
+                    const data = {
+                        producto: prod,
+                        categoria: v('mCat'),
+                        tipo: esServ ? 'Servicio' : 'Producto',
+                        sku: v('mSku'),
+                        descripcion: v('mDesc'),
+                        unidad: v('mUnidad'),
+                        activo: chkAct ? (chkAct.checked ? 'true' : 'false') : 'true',
+                        unidades: esServ ? 0 : (v('mUnid') || 0),
+                        stockMax: esServ ? 0 : (v('mStockMax') || 1),
+                        precioUnit: v('mPrecio') || 0
+                    };
                     const fn = m.action === 'add'
                         ? (cb => google.script.run.withSuccessHandler(cb).addInventario(data))
                         : (cb => google.script.run.withSuccessHandler(cb).updateInventario(m.id, data));
                     fn(res => {
                         closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
-                        if (res.ok) {showToast(m.action === 'add' ? 'Producto agregado' : 'Producto actualizado', '#30D158'); loadInventario(); loadResumen(); loadActividad();}
+                        if (res.ok) {showToast(m.action === 'add' ? 'Ítem agregado' : 'Ítem actualizado', '#30D158'); loadInventario(); loadResumen(); loadActividad();}
                         else showToast('Error: ' + res.error, '#FF453A');
                     });
                 }
@@ -3305,6 +3745,7 @@
         function ctaAction() {
             if (_currentPage === 'clientes' || _currentPage === 'overview') newCliente();
             else if (_currentPage === 'prospectos') newProspecto();
+            else if (_currentPage === 'cotizaciones') nuevaCotizacion();
             else if (_currentPage === 'inventario') newInv();
             else if (_currentPage === 'encuestas') newEncuesta();
             else if (_currentPage === 'usuarios') newUsuario();
@@ -3315,6 +3756,7 @@
             if (_currentPage === 'clientes')   renderClientes(_filtroCliActual);
             if (_currentPage === 'prospectos') renderProspectos(_filtroProActual);
             if (_currentPage === 'inventario') renderInventario(_filtroInvActual);
+            if (_currentPage === 'cotizaciones') renderCotizaciones(_filtroCotActual);
             if (_currentPage === 'usuarios')   renderUsuarios();
         }
 
@@ -4302,6 +4744,554 @@
                 return true;
             }
             return false; // no era contabilidad, dejar que maneje el resto
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           MÓDULO COTIZACIONES — JavaScript
+        ══════════════════════════════════════════════════════════ */
+
+        const COT_IVA_PCT = 12;
+
+        function cotQ(n) {
+            const v = Number(n) || 0;
+            return 'Q ' + v.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        function cotR2(n) {
+            const v = Number(n);
+            return isNaN(v) ? 0 : Math.round(v * 100) / 100;
+        }
+        function cotHoyISO() {
+            const d = new Date();
+            return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+        }
+        function cotTagEstado(c) {
+            if (c.vencida) return '<span class="tag tag-vencida">Vencida</span>';
+            const m = {
+                'Borrador': 'tag-borrador', 'Enviada': 'tag-enviada', 'Aprobada': 'tag-aprobada',
+                'Rechazada': 'tag-rechazada', 'Vencida': 'tag-vencida'
+            };
+            return `<span class="tag ${m[c.estado] || 'tag-gray'}">${escHtml(c.estado)}</span>`;
+        }
+
+        /* ── Carga ─────────────────────────────────────────────── */
+        function loadCotizaciones() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r || !r.ok) {
+                        const tb = document.getElementById('cotTbody');
+                        if (tb) tb.innerHTML = '<tr><td colspan="8" class="empty-cell">' +
+                            escHtml((r && r.error) || 'No se pudieron cargar las cotizaciones') + '</td></tr>';
+                        return;
+                    }
+                    _cotizaciones = r.data || [];
+                    _cotEmpresa   = r.empresa || _cotEmpresa;
+                    renderCotizaciones(_filtroCotActual);
+                    renderKpisCotizaciones();
+                })
+                .withFailureHandler(function (err) { _onApiError('cotizaciones', err); })
+                .getCotizaciones({});
+        }
+
+        function renderKpisCotizaciones() {
+            const d = _cotizaciones;
+            const aprobadas = d.filter(c => c.estado === 'Aprobada');
+            const enviadas  = d.filter(c => c.estado === 'Enviada');
+            const borrador  = d.filter(c => c.estado === 'Borrador');
+            const vencidas  = d.filter(c => c.vencida);
+            const montoAp   = aprobadas.reduce((s, c) => s + Number(c.total || 0), 0);
+            const montoEnv  = enviadas.reduce((s, c) => s + Number(c.total || 0), 0);
+            const tasa      = d.length ? Math.round(aprobadas.length / d.length * 100) : 0;
+
+            const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            set('cot-total', d.length);
+            set('cot-total-d', borrador.length + ' en borrador · ' + vencidas.length + ' vencidas');
+            set('cot-enviadas', enviadas.length);
+            set('cot-enviadas-d', cotQ(montoEnv) + ' en seguimiento');
+            set('cot-aprobadas', aprobadas.length);
+            set('cot-aprobadas-d', tasa + '% de aprobación');
+            const kQ = montoAp >= 1000 ? 'Q ' + (montoAp / 1000).toFixed(1) + 'k' : cotQ(montoAp);
+            set('cot-monto', kQ);
+            set('cot-monto-d', 'Total cerrado');
+            const badge = document.getElementById('badgeCotizaciones');
+            if (badge) badge.textContent = d.length;
+        }
+
+        /* ── Tabla ─────────────────────────────────────────────── */
+        function filtrarCot(filtro, el) {
+            if (el) {
+                el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                el.classList.add('active');
+            }
+            renderCotizaciones(filtro);
+        }
+
+        function renderCotizaciones(filtro) {
+            _filtroCotActual = filtro || 'Todas';
+            let data = _cotizaciones.slice();
+
+            if (_filtroCotActual === 'Vencidas')      data = data.filter(c => c.vencida);
+            else if (_filtroCotActual !== 'Todas')    data = data.filter(c => c.estado === _filtroCotActual);
+
+            const inp = document.getElementById('searchInput');
+            const q = inp ? inp.value.toLowerCase() : '';
+            if (q && _currentPage === 'cotizaciones') {
+                data = data.filter(c =>
+                    String(c.numero || '').toLowerCase().includes(q) ||
+                    String(c.cliente || '').toLowerCase().includes(q) ||
+                    String(c.empresa || '').toLowerCase().includes(q));
+            }
+
+            const tb = document.getElementById('cotTbody');
+            if (!tb) return;
+
+            tb.innerHTML = data.length ? data.map(c => `<tr>
+        <td><div class="cell-main">${escHtml(c.numero)}</div><div class="cell-sub">${escHtml(c.creadoPor || '')}</div></td>
+        <td><div class="cell-main">${escHtml(c.cliente)}</div>${c.empresa ? `<div class="cell-sub">${escHtml(c.empresa)}</div>` : ''}</td>
+        <td class="cell-mono">${escHtml(c.fecha)}</td>
+        <td class="cell-mono" style="${c.vencida ? 'color:var(--danger)' : ''}">${escHtml(c.validaHasta)}</td>
+        <td class="cell-num">${c.numItems}</td>
+        <td class="cell-num"><strong>${cotQ(c.total)}</strong></td>
+        <td>
+          <select class="mini-select" style="width:118px" onchange="cambiarEstadoCot(${c.id}, this.value)">
+            ${['Borrador', 'Enviada', 'Aprobada', 'Rechazada', 'Vencida']
+                .map(e => `<option${e === c.estado ? ' selected' : ''}>${e}</option>`).join('')}
+          </select>
+          ${c.vencida ? '<div class="cell-sub" style="color:var(--danger)">Vencida</div>' : ''}
+        </td>
+        <td>
+          <div class="row-actions">
+            <button class="section-action" onclick="verCotizacion(${c.id})">Ver / PDF</button>
+            <button class="btn-success-sm" onclick="enviarCotizacionModal(${c.id})">Correo</button>
+            <button class="section-action" onclick="editarCotizacion(${c.id})">Editar</button>
+            <button class="btn-danger-sm" onclick="confirmDeleteCot(${c.id},'${escAttr(c.numero)}')">Eliminar</button>
+          </div>
+        </td>
+      </tr>`).join('')
+                : '<tr><td colspan="8" class="empty-cell">Sin cotizaciones para este filtro</td></tr>';
+
+            const total = data.reduce((s, c) => s + Number(c.total || 0), 0);
+            const foot = document.getElementById('cotFoot');
+            if (foot) foot.innerHTML = `<span><strong>${data.length}</strong> cotizaciones</span>
+                <span>Monto listado: <strong>${cotQ(total)}</strong></span>`;
+        }
+
+        function exportarCotizaciones() {
+            const filas = _cotizaciones.map(c => ({
+                Numero: c.numero, Cliente: c.cliente, Empresa: c.empresa, Correo: c.correo,
+                Fecha: c.fecha, ValidaHasta: c.validaHasta, Items: c.numItems,
+                Subtotal: c.subtotal, Descuento: c.descuento, IVA: c.iva, Total: c.total,
+                Estado: c.estado, CreadoPor: c.creadoPor
+            }));
+            descargarCSV(filas, 'cotizaciones');
+        }
+
+        /* ── Constructor ───────────────────────────────────────── */
+        function cotLlenarSelectClientes() {
+            const sel = document.getElementById('cotClienteSel');
+            if (!sel) return;
+            const actual = sel.value;
+            sel.innerHTML = '<option value="">— Escribir manualmente —</option>' +
+                (_clientes || []).map(c =>
+                    `<option value="${escAttr(c.id)}">${escHtml(c.nombre)}${c.empresa ? ' · ' + escHtml(c.empresa) : ''}</option>`
+                ).join('');
+            if (actual) sel.value = actual;
+        }
+
+        function cotLlenarSelectItems() {
+            const sel = document.getElementById('cotItemSel');
+            if (!sel) return;
+            const disponibles = (_inventario || []).filter(i =>
+                !(i.activo === false || String(i.activo).toLowerCase() === 'false'));
+            sel.innerHTML = '<option value="">Selecciona un producto o servicio del inventario…</option>' +
+                disponibles.map(i =>
+                    `<option value="${escAttr(i.id)}">${escHtml(i.producto)} · ${i.tipo === 'Servicio' ? 'Servicio' : 'Producto'} · ${cotQ(i.precioUnit)}</option>`
+                ).join('');
+        }
+
+        function cotAplicarCliente(id) {
+            if (!id) return;
+            const c = (_clientes || []).find(x => String(x.id) === String(id));
+            if (!c) return;
+            const set = (elId, val) => { const el = document.getElementById(elId); if (el) el.value = val || ''; };
+            set('cotCliente', c.nombre);
+            set('cotEmpresa', c.empresa);
+            set('cotCorreo', c.correo);
+            set('cotTelefono', c.telefono);
+            set('cotDireccion', c.direccion);
+        }
+
+        function openCotBuilder() {
+            cotLlenarSelectClientes();
+            cotLlenarSelectItems();
+            document.getElementById('cotOverlay').classList.add('open');
+            document.getElementById('cotBuilder').classList.add('open');
+        }
+
+        function closeCotBuilder() {
+            document.getElementById('cotOverlay').classList.remove('open');
+            document.getElementById('cotBuilder').classList.remove('open');
+        }
+
+        function nuevaCotizacion() {
+            _cotEditId = null;
+            _cotItems = [];
+            const cond = (_cotEmpresa && _cotEmpresa.condicionesDefault) ||
+                'Precios expresados en quetzales (GTQ). Tiempo de entrega sujeto a disponibilidad. Esta cotización no constituye una factura.';
+            document.getElementById('cotBuilderTitle').textContent = 'Nueva cotización';
+            document.getElementById('cotBuilderSub').textContent = 'Completa los datos y agrega ítems del inventario';
+            document.getElementById('cotSaveBtn').textContent = 'Guardar cotización';
+            ['cotCliente', 'cotEmpresa', 'cotCorreo', 'cotTelefono', 'cotDireccion', 'cotNotas'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.value = '';
+            });
+            document.getElementById('cotClienteSel').value = '';
+            document.getElementById('cotFecha').value = cotHoyISO();
+            document.getElementById('cotValidez').value = 15;
+            document.getElementById('cotEstado').value = 'Borrador';
+            document.getElementById('cotDescuento').value = 0;
+            document.getElementById('cotIVA').checked = false;
+            document.getElementById('cotCondiciones').value = cond;
+            cotRenderItems();
+            openCotBuilder();
+        }
+
+        function editarCotizacion(id) {
+            const btn = document.getElementById('cotSaveBtn');
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo abrir la cotización', '#FF453A'); return; }
+                    const c = r.data;
+                    _cotEditId = c.id;
+                    _cotItems = (r.items || []).map(i => ({
+                        itemId: i.itemId, tipo: i.tipo, descripcion: i.descripcion, detalle: i.detalle,
+                        cantidad: Number(i.cantidad) || 0, precioUnit: Number(i.precioUnit) || 0,
+                        descuentoPct: Number(i.descuentoPct) || 0
+                    }));
+                    document.getElementById('cotBuilderTitle').textContent = 'Editar ' + c.numero;
+                    document.getElementById('cotBuilderSub').textContent = 'Los cambios se guardan sobre la misma cotización';
+                    if (btn) btn.textContent = 'Guardar cambios';
+                    document.getElementById('cotClienteSel').value = c.clienteId || '';
+                    document.getElementById('cotCliente').value = c.cliente || '';
+                    document.getElementById('cotEmpresa').value = c.empresa || '';
+                    document.getElementById('cotCorreo').value = c.correo || '';
+                    document.getElementById('cotTelefono').value = c.telefono || '';
+                    document.getElementById('cotDireccion').value = c.direccion || '';
+                    document.getElementById('cotFecha').value = c.fecha || cotHoyISO();
+                    document.getElementById('cotValidez').value = c.validezDias || 15;
+                    document.getElementById('cotEstado').value = c.estado || 'Borrador';
+                    document.getElementById('cotDescuento').value = c.descuentoPct || 0;
+                    document.getElementById('cotIVA').checked = !!c.aplicaIVA;
+                    document.getElementById('cotCondiciones').value = c.condiciones || '';
+                    document.getElementById('cotNotas').value = c.notas || '';
+                    cotRenderItems();
+                    openCotBuilder();
+                })
+                .withFailureHandler(function (e) { showToast('Error: ' + e.message, '#FF453A'); })
+                .getCotizacion({id: id});
+        }
+
+        /* ── Ítems ─────────────────────────────────────────────── */
+        function cotAgregarDesdeInventario() {
+            const sel = document.getElementById('cotItemSel');
+            if (!sel || !sel.value) { showToast('Selecciona un ítem del inventario', '#FF9F0A'); return; }
+            const i = (_inventario || []).find(x => String(x.id) === String(sel.value));
+            if (!i) return;
+            _cotItems.push({
+                itemId: i.id,
+                tipo: i.tipo === 'Servicio' ? 'Servicio' : 'Producto',
+                descripcion: i.producto,
+                detalle: i.descripcion || '',
+                cantidad: 1,
+                precioUnit: Number(i.precioUnit) || 0,
+                descuentoPct: 0
+            });
+            sel.value = '';
+            cotRenderItems();
+        }
+
+        function cotAgregarLibre() {
+            _cotItems.push({itemId: '', tipo: 'Servicio', descripcion: '', detalle: '', cantidad: 1, precioUnit: 0, descuentoPct: 0});
+            cotRenderItems();
+            setTimeout(function () {
+                const el = document.getElementById('cotDesc-' + (_cotItems.length - 1));
+                if (el) el.focus();
+            }, 50);
+        }
+
+        function cotEliminarItem(idx) {
+            _cotItems.splice(idx, 1);
+            cotRenderItems();
+        }
+
+        function cotSet(idx, campo, valor) {
+            const it = _cotItems[idx];
+            if (!it) return;
+            if (campo === 'cantidad' || campo === 'precioUnit' || campo === 'descuentoPct') {
+                let n = Number(valor);
+                if (isNaN(n) || n < 0) n = 0;
+                if (campo === 'descuentoPct' && n > 100) n = 100;
+                it[campo] = n;
+            } else {
+                it[campo] = valor;
+            }
+            const tot = document.getElementById('cotRowTot-' + idx);
+            if (tot) tot.textContent = cotQ(cotTotalLinea(it));
+            cotRecalcular();
+        }
+
+        function cotTotalLinea(it) {
+            const bruto = (Number(it.cantidad) || 0) * (Number(it.precioUnit) || 0);
+            return cotR2(bruto - bruto * (Number(it.descuentoPct) || 0) / 100);
+        }
+
+        function cotRenderItems() {
+            const wrap = document.getElementById('cotItemsWrap');
+            if (!wrap) return;
+            if (!_cotItems.length) {
+                wrap.innerHTML = '<div class="cot-item-empty">Aún no has agregado ítems.</div>';
+                cotRecalcular();
+                return;
+            }
+            wrap.innerHTML = _cotItems.map((it, idx) => `
+        <div class="cot-item-row">
+          <div>
+            <input class="form-input" id="cotDesc-${idx}" style="height:34px;font-size:13px"
+                   value="${escAttr(it.descripcion || '')}" placeholder="Descripción del ítem"
+                   oninput="cotSet(${idx},'descripcion',this.value)"/>
+            <textarea class="cot-item-detalle" rows="1" placeholder="Detalle opcional"
+                      oninput="cotSet(${idx},'detalle',this.value)">${escHtml(it.detalle || '')}</textarea>
+            <span class="tag ${it.tipo === 'Servicio' ? 'tag-servicio' : 'tag-producto'}" style="margin-top:6px;display:inline-block">${it.tipo}</span>
+          </div>
+          <input class="form-input" type="number" min="0" step="0.01" style="height:34px;font-size:13px"
+                 value="${it.cantidad}" oninput="cotSet(${idx},'cantidad',this.value)"/>
+          <input class="form-input" type="number" min="0" step="0.01" style="height:34px;font-size:13px"
+                 value="${it.precioUnit}" oninput="cotSet(${idx},'precioUnit',this.value)"/>
+          <input class="form-input" type="number" min="0" max="100" step="0.01" style="height:34px;font-size:13px"
+                 value="${it.descuentoPct}" oninput="cotSet(${idx},'descuentoPct',this.value)"/>
+          <div class="cot-item-total" id="cotRowTot-${idx}">${cotQ(cotTotalLinea(it))}</div>
+          <button class="cot-item-del" title="Quitar ítem" onclick="cotEliminarItem(${idx})">&times;</button>
+        </div>`).join('');
+            cotRecalcular();
+        }
+
+        function cotCalcularTotales() {
+            const subtotal  = cotR2(_cotItems.reduce((s, it) => s + cotTotalLinea(it), 0));
+            let descPct     = Number(v('cotDescuento')) || 0;
+            if (descPct < 0) descPct = 0;
+            if (descPct > 100) descPct = 100;
+            const descuento = cotR2(subtotal * descPct / 100);
+            const base      = cotR2(subtotal - descuento);
+            const chk       = document.getElementById('cotIVA');
+            const aplicaIVA = !!(chk && chk.checked);
+            const iva       = aplicaIVA ? cotR2(base * COT_IVA_PCT / 100) : 0;
+            return {subtotal, descPct, descuento, iva, aplicaIVA, total: cotR2(base + iva)};
+        }
+
+        function cotRecalcular() {
+            const t = cotCalcularTotales();
+            const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+            set('cotSubtotal', cotQ(t.subtotal));
+            set('cotDescMonto', t.descuento > 0 ? '- ' + cotQ(t.descuento) : cotQ(0));
+            set('cotIvaMonto', t.aplicaIVA ? cotQ(t.iva) : 'Incluido');
+            set('cotTotal', cotQ(t.total));
+        }
+
+        /* ── Guardar ───────────────────────────────────────────── */
+        function guardarCotizacion() {
+            const btn = document.getElementById('cotSaveBtn');
+            const cliente = (v('cotCliente') || '').trim();
+            if (!cliente) { showToast('El nombre del cliente es requerido', '#FF9F0A'); return; }
+
+            const items = _cotItems
+                .map(it => ({
+                    itemId: it.itemId || '',
+                    tipo: it.tipo === 'Servicio' ? 'Servicio' : 'Producto',
+                    descripcion: String(it.descripcion || '').trim(),
+                    detalle: String(it.detalle || '').trim(),
+                    cantidad: Number(it.cantidad) || 0,
+                    precioUnit: Number(it.precioUnit) || 0,
+                    descuentoPct: Number(it.descuentoPct) || 0
+                }))
+                .filter(it => it.descripcion && it.cantidad > 0);
+
+            if (!items.length) { showToast('Agrega al menos un ítem con descripción y cantidad', '#FF9F0A'); return; }
+
+            const t = cotCalcularTotales();
+            const data = {
+                clienteId:   v('cotClienteSel'),
+                cliente:     cliente,
+                empresa:     v('cotEmpresa'),
+                correo:      v('cotCorreo'),
+                telefono:    v('cotTelefono'),
+                direccion:   v('cotDireccion'),
+                fecha:       v('cotFecha') || cotHoyISO(),
+                validezDias: v('cotValidez') || 15,
+                condiciones: v('cotCondiciones'),
+                notas:       v('cotNotas'),
+                descuentoPct: t.descPct,
+                aplicaIVA:   t.aplicaIVA,
+                estado:      v('cotEstado') || 'Borrador',
+                items:       items
+            };
+
+            const textoOriginal = btn ? btn.textContent : 'Guardar';
+            if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
+
+            const done = function (r) {
+                if (btn) { btn.disabled = false; btn.textContent = textoOriginal; }
+                if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo guardar', '#FF453A'); return; }
+                closeCotBuilder();
+                showToast(_cotEditId ? 'Cotización actualizada' : 'Cotización ' + (r.numero || '') + ' creada', '#30D158');
+                _cotEditId = null;
+                loadCotizaciones();
+                loadActividad();
+            };
+            const fail = function (e) {
+                if (btn) { btn.disabled = false; btn.textContent = textoOriginal; }
+                showToast('Error: ' + e.message, '#FF453A');
+            };
+
+            if (_cotEditId) {
+                data.id = _cotEditId;
+                google.script.run.withSuccessHandler(done).withFailureHandler(fail).updateCotizacion(data);
+            } else {
+                google.script.run.withSuccessHandler(done).withFailureHandler(fail).addCotizacion(data);
+            }
+        }
+
+        /* ── Estado / eliminar ─────────────────────────────────── */
+        function cambiarEstadoCot(id, estado) {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo cambiar el estado', '#FF453A'); loadCotizaciones(); return; }
+                    showToast('Estado actualizado a ' + estado, '#30D158');
+                    loadCotizaciones();
+                })
+                .withFailureHandler(function (e) { showToast('Error: ' + e.message, '#FF453A'); })
+                .updateEstadoCotizacion({id: id, estado: estado});
+        }
+
+        function confirmDeleteCot(id, numero) {
+            _modalMode = {type: 'cotizacion', action: 'delete', id: id};
+            openModal('Eliminar cotización', `<div style="text-align:center;padding:10px 0">
+    <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar ${escHtml(numero)}?</div>
+    <div style="font-size:13px;color:var(--text-secondary)">Se eliminará la cotización y todos sus ítems.<br>Esta acción no se puede deshacer.</div>
+  </div>`);
+            const btn = document.getElementById('modalSaveBtn');
+            btn.textContent = 'Eliminar';
+            btn.style.background = 'var(--danger)';
+        }
+
+        /* ── Documento / PDF ───────────────────────────────────── */
+        function verCotizacion(id) {
+            const win = window.open('', '_blank');
+            if (win) {
+                win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Generando…</title></head>' +
+                    '<body style="font-family:-apple-system,Segoe UI,Arial,sans-serif;padding:40px;color:#555">' +
+                    'Generando la cotización…</body></html>');
+            }
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r || !r.ok) {
+                        if (win) win.close();
+                        showToast((r && r.error) || 'No se pudo generar el documento', '#FF453A');
+                        return;
+                    }
+                    if (!win) { showToast('Permite las ventanas emergentes para ver el PDF', '#FF9F0A'); return; }
+                    const barra =
+                        '<style>@media print{.cot-print-bar{display:none !important}}</style>' +
+                        '<div class="cot-print-bar" style="position:fixed;top:14px;right:14px;display:flex;gap:8px;z-index:99">' +
+                        '<button onclick="window.print()" style="padding:9px 16px;border:0;border-radius:8px;background:#0A84FF;' +
+                        'color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Descargar / Imprimir PDF</button>' +
+                        '<button onclick="window.close()" style="padding:9px 16px;border:1px solid #d1d1d6;border-radius:8px;' +
+                        'background:#fff;font-size:13px;cursor:pointer;font-family:inherit">Cerrar</button></div>';
+                    const html = String(r.html).replace('</body>', barra + '</body>');
+                    win.document.open();
+                    win.document.write(html);
+                    win.document.close();
+                })
+                .withFailureHandler(function (e) {
+                    if (win) win.close();
+                    showToast('Error: ' + e.message, '#FF453A');
+                })
+                .getCotizacionHtml({id: id});
+        }
+
+        /* ── Envío por correo ──────────────────────────────────── */
+        function enviarCotizacionModal(id) {
+            const c = _cotizaciones.find(x => String(x.id) === String(id));
+            if (!c) return;
+            _modalMode = {type: 'cotEmail', action: 'send', id: id};
+            const asunto = 'Cotización ' + c.numero + (_cotEmpresa ? ' · ' + _cotEmpresa.nombre : '');
+            const mensaje = 'Estimado(a) ' + (c.cliente || '') + ',\n\n' +
+                'Adjuntamos la cotización ' + c.numero + ' por un total de ' + cotQ(c.total) +
+                ', válida hasta el ' + c.validaHasta + '.\n\nQuedamos atentos a cualquier consulta.';
+            openModal('Enviar ' + c.numero + ' por correo', `
+    <div class="form-field"><label class="form-label">PARA *</label>
+      <input class="form-input" id="cePara" type="email" value="${escAttr(c.correo || '')}" placeholder="cliente@correo.com"/>
+      <div style="font-size:11.5px;color:var(--text-secondary);margin-top:5px">Puedes escribir varios correos separados por coma.</div>
+    </div>
+    <div class="form-field"><label class="form-label">COPIA (CC)</label>
+      <input class="form-input" id="ceCC" type="email" placeholder="Opcional"/></div>
+    <div class="form-field"><label class="form-label">ASUNTO</label>
+      <input class="form-input" id="ceAsunto" value="${escAttr(asunto)}"/></div>
+    <div class="form-field"><label class="form-label">MENSAJE</label>
+      <textarea class="form-input" id="ceMensaje" rows="5" style="resize:vertical">${escHtml(mensaje)}</textarea></div>
+    <div style="font-size:12px;color:var(--text-secondary);background:var(--accent-bg);padding:10px 12px;border-radius:9px">
+      Se adjuntará la cotización en PDF y se incluirá también en el cuerpo del correo.
+    </div>`);
+            const btn = document.getElementById('modalSaveBtn');
+            btn.textContent = 'Enviar';
+        }
+
+        /* ── Guardado desde el modal genérico ──────────────────── */
+        function _handleModalSaveCotizaciones(m, saveBtn) {
+            function restore(texto, color) {
+                if (!saveBtn) return;
+                saveBtn.disabled = false;
+                saveBtn.textContent = texto || 'Guardar';
+                saveBtn.style.background = color || '';
+            }
+
+            if (m.type === 'cotizacion' && m.action === 'delete') {
+                google.script.run
+                    .withSuccessHandler(function (r) {
+                        restore('Eliminar', 'var(--danger)');
+                        if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo eliminar', '#FF453A'); return; }
+                        closeModal();
+                        showToast('Cotización eliminada', '#FF453A');
+                        loadCotizaciones();
+                    })
+                    .withFailureHandler(function (e) { restore('Eliminar', 'var(--danger)'); showToast('Error: ' + e.message, '#FF453A'); })
+                    .deleteCotizacion({id: m.id});
+                return true;
+            }
+
+            if (m.type === 'cotEmail') {
+                const para = (v('cePara') || '').trim();
+                if (!para) { restore('Enviar'); showToast('Escribe el correo del destinatario', '#FF9F0A'); return true; }
+                if (saveBtn) saveBtn.textContent = 'Enviando…';
+                google.script.run
+                    .withSuccessHandler(function (r) {
+                        restore('Enviar');
+                        if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo enviar', '#FF453A'); return; }
+                        closeModal();
+                        showToast('Cotización enviada correctamente', '#30D158');
+                        loadCotizaciones();
+                        loadActividad();
+                    })
+                    .withFailureHandler(function (e) { restore('Enviar'); showToast('Error: ' + e.message, '#FF453A'); })
+                    .enviarCotizacion({
+                        id: m.id,
+                        para: para,
+                        cc: v('ceCC'),
+                        asunto: v('ceAsunto'),
+                        mensaje: v('ceMensaje')
+                    });
+                return true;
+            }
+
+            return false;
         }
 
     </script>
