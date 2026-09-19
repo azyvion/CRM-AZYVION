@@ -3139,7 +3139,7 @@
             saveBtn.disabled = true;
             saveBtn.textContent = 'Guardando…';
 
-            if (_handleModalSaveContabilidad(m)) { saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; return; }
+            if (_handleModalSaveContabilidad(m, saveBtn)) return;
 
             if (m.type === 'cliente') {
                 if (m.action === 'delete') {
@@ -4119,19 +4119,23 @@
            MODAL SAVE — extender la función modalSave() del dashboard
            Agregar dentro del switch/if de modalSave() existente:
         ═══════════════════════════════════════════════════════════ */
-        function _handleModalSaveContabilidad(m) {
+        function _handleModalSaveContabilidad(m, saveBtn) {
+            function _btnOk()  { if(saveBtn){saveBtn.disabled=false; saveBtn.textContent='Guardar'; saveBtn.style.background='';} }
+            function _btnDel() { if(saveBtn){saveBtn.disabled=false; saveBtn.textContent='Eliminar'; saveBtn.style.background='var(--danger)';} }
+
             // ── Cuenta bancaria ──
             if (m.type === 'cuentaBancaria') {
                 if (m.action === 'delete') {
                     google.script.run
                         .withSuccessHandler(function(r) {
-                            closeModal();
+                            _btnDel();
                             if (!r.ok) { showToast(r.error||'Error al eliminar', '#FF453A'); return; }
+                            closeModal();
                             showToast('Cuenta bancaria eliminada', '#FF453A');
                             closeBankDrawer();
                             loadCuentasBancarias(); loadResumenContable();
                         })
-                        .withFailureHandler(function(e){ showToast('Error: '+e.message,'#FF453A'); })
+                        .withFailureHandler(function(e){ _btnDel(); showToast('Error: '+e.message,'#FF453A'); })
                         .deleteCuentaBancaria(m.id);
                     return true;
                 }
@@ -4146,30 +4150,32 @@
                     rubro:         (document.getElementById('cbRubro')||{}).value||'',
                 };
                 if (!d.nombre||!d.banco||!d.numeroCuenta||!d.aNombreDe) {
-                    showToast('Completa todos los campos requeridos', '#FF9F0A'); return true;
+                    _btnOk(); showToast('Completa todos los campos requeridos', '#FF9F0A'); return true;
                 }
                 if (m.action === 'add') {
                     d.saldoInicial = (document.getElementById('cbSaldoInicial')||{}).value||'0';
                     google.script.run
                         .withSuccessHandler(function(r) {
-                            closeModal();
+                            _btnOk();
                             if (!r.ok) { showToast(r.error||'Error', '#FF453A'); return; }
+                            closeModal();
                             showToast('Cuenta bancaria creada', '#30D158');
                             loadCuentasBancarias(); loadResumenContable();
                         })
-                        .withFailureHandler(function(e){ showToast('Error: '+e.message,'#FF453A'); })
+                        .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
                         .addCuentaBancaria(d);
                 } else {
                     d.activa = (document.getElementById('cbActiva')||{}).value||'true';
                     google.script.run
                         .withSuccessHandler(function(r) {
-                            closeModal();
+                            _btnOk();
                             if (!r.ok) { showToast(r.error||'Error', '#FF453A'); return; }
+                            closeModal();
                             showToast('Cuenta actualizada', '#30D158');
                             loadCuentasBancarias(); loadResumenContable();
                             if (_drawerCuentaId) openBankDrawer(_drawerCuentaId);
                         })
-                        .withFailureHandler(function(e){ showToast('Error: '+e.message,'#FF453A'); })
+                        .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
                         .updateCuentaBancaria(m.id, d);
                 }
                 return true;
@@ -4180,12 +4186,13 @@
                 if (m.action === 'delete') {
                     google.script.run
                         .withSuccessHandler(function(r) {
-                            closeModal();
+                            _btnDel();
                             if (!r.ok) { showToast(r.error||'Error al eliminar', '#FF453A'); return; }
+                            closeModal();
                             showToast('Cuenta contable eliminada', '#FF453A');
                             loadPlanCuentas();
                         })
-                        .withFailureHandler(function(e){ showToast('Error: '+e.message,'#FF453A'); })
+                        .withFailureHandler(function(e){ _btnDel(); showToast('Error: '+e.message,'#FF453A'); })
                         .deleteCuentaContable(m.id);
                     return true;
                 }
@@ -4196,17 +4203,29 @@
                     rubro:       (document.getElementById('ccRubro')||{}).value||'',
                     descripcion: (document.getElementById('ccDescripcion')||{}).value||'',
                 };
-                if (!d.codigo||!d.nombre) { showToast('Código y nombre son requeridos','#FF9F0A'); return true; }
+                if (!d.codigo||!d.nombre) { _btnOk(); showToast('Código y nombre son requeridos','#FF9F0A'); return true; }
                 if (m.action === 'add') {
                     google.script.run
-                        .withSuccessHandler(function(r){ closeModal(); if(!r.ok){showToast(r.error||'Error','#FF453A');return;} showToast('Cuenta contable creada','#30D158'); loadPlanCuentas(); })
-                        .withFailureHandler(function(e){ showToast('Error: '+e.message,'#FF453A'); })
+                        .withSuccessHandler(function(r) {
+                            _btnOk();
+                            if (!r.ok) { showToast(r.error||'Error','#FF453A'); return; }
+                            closeModal();
+                            showToast('Cuenta contable creada','#30D158');
+                            loadPlanCuentas();
+                        })
+                        .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
                         .addCuentaContable(d);
                 } else {
                     d.activa = (document.getElementById('ccActiva')||{}).value||'true';
                     google.script.run
-                        .withSuccessHandler(function(r){ closeModal(); if(!r.ok){showToast(r.error||'Error','#FF453A');return;} showToast('Cuenta actualizada','#30D158'); loadPlanCuentas(); })
-                        .withFailureHandler(function(e){ showToast('Error: '+e.message,'#FF453A'); })
+                        .withSuccessHandler(function(r) {
+                            _btnOk();
+                            if (!r.ok) { showToast(r.error||'Error','#FF453A'); return; }
+                            closeModal();
+                            showToast('Cuenta contable actualizada','#30D158');
+                            loadPlanCuentas();
+                        })
+                        .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
                         .updateCuentaContable(m.id, d);
                 }
                 return true;
@@ -4217,13 +4236,14 @@
                 if (m.action === 'delete') {
                     google.script.run
                         .withSuccessHandler(function(r) {
-                            closeModal();
+                            _btnDel();
                             if (!r.ok) { showToast(r.error||'Error al eliminar', '#FF453A'); return; }
+                            closeModal();
                             showToast('Transacción eliminada y saldo revertido', '#FF9F0A');
                             loadTransacciones(); loadCuentasBancarias(); loadResumenContable();
                             if (_drawerCuentaId) setTimeout(()=>openBankDrawer(_drawerCuentaId), 300);
                         })
-                        .withFailureHandler(function(e){ showToast('Error: '+e.message,'#FF453A'); })
+                        .withFailureHandler(function(e){ _btnDel(); showToast('Error: '+e.message,'#FF453A'); })
                         .deleteTransaccion(m.id);
                     return true;
                 }
@@ -4238,17 +4258,18 @@
                     descripcion:     (document.getElementById('trxDescripcion')||{}).value||'',
                 };
                 if (!d.concepto||!d.monto||!d.cuentaBancariaId||!d.fecha) {
-                    showToast('Completa concepto, monto, cuenta y fecha','#FF9F0A'); return true;
+                    _btnOk(); showToast('Completa concepto, monto, cuenta y fecha','#FF9F0A'); return true;
                 }
                 google.script.run
                     .withSuccessHandler(function(r) {
-                        closeModal();
+                        _btnOk();
                         if (!r.ok) { showToast(r.error||'Error', '#FF453A'); return; }
+                        closeModal();
                         showToast('Transacción registrada', '#30D158');
                         loadTransacciones(); loadCuentasBancarias(); loadResumenContable();
                         if (_drawerCuentaId) setTimeout(()=>openBankDrawer(_drawerCuentaId), 300);
                     })
-                    .withFailureHandler(function(e){ showToast('Error: '+e.message,'#FF453A'); })
+                    .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
                     .addTransaccion(d);
                 return true;
             }
