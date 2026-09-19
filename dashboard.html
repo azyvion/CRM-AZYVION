@@ -2243,17 +2243,17 @@
                 // ── Contabilidad ──
                 getCuentasBancarias:  ()        => ({action: 'getCuentasBancarias'}),
                 addCuentaBancaria:    (d)       => Object.assign({action: 'addCuentaBancaria'}, d),
-                updateCuentaBancaria: (id, d)   => Object.assign({action: 'updateCuentaBancaria', id: id}, d),
-                deleteCuentaBancaria: (id)      => ({action: 'deleteCuentaBancaria', id: id}),
+                updateCuentaBancaria: (d)       => Object.assign({action: 'updateCuentaBancaria'}, d),
+                deleteCuentaBancaria: (d)       => Object.assign({action: 'deleteCuentaBancaria'}, d),
 
                 getPlanCuentas:       ()        => ({action: 'getPlanCuentas'}),
                 addCuentaContable:    (d)       => Object.assign({action: 'addCuentaContable'}, d),
-                updateCuentaContable: (id, d)   => Object.assign({action: 'updateCuentaContable', id: id}, d),
-                deleteCuentaContable: (id)      => ({action: 'deleteCuentaContable', id: id}),
+                updateCuentaContable: (d)       => Object.assign({action: 'updateCuentaContable'}, d),
+                deleteCuentaContable: (d)       => Object.assign({action: 'deleteCuentaContable'}, d),
 
                 getTransacciones:     (f)       => Object.assign({action: 'getTransacciones'}, f || {}),
                 addTransaccion:       (d)       => Object.assign({action: 'addTransaccion'}, d),
-                deleteTransaccion:    (id)      => ({action: 'deleteTransaccion', id: id}),
+                deleteTransaccion:    (d)       => Object.assign({action: 'deleteTransaccion'}, d),
 
                 getResumenContable:   ()        => ({action: 'getResumenContable'})
             };
@@ -3979,6 +3979,8 @@
                 <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar cuenta bancaria?</div>
                 <div style="font-size:13px;color:var(--text-secondary)">Se eliminará <strong>${escHtml(nombre)}</strong>.<br>Solo es posible si no tiene transacciones asociadas.</div>
             </div>`);
+            document.getElementById('modalSaveBtn').textContent = 'Eliminar';
+            document.getElementById('modalSaveBtn').style.background = 'var(--danger)';
         }
         
         /* ═══════════════════════════════════════════════════════════
@@ -4061,6 +4063,8 @@
                 <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar cuenta contable?</div>
                 <div style="font-size:13px;color:var(--text-secondary)">Se eliminará <strong>${escHtml(nombre)}</strong>.<br>Solo posible si no tiene transacciones asociadas.</div>
             </div>`);
+            document.getElementById('modalSaveBtn').textContent = 'Eliminar';
+            document.getElementById('modalSaveBtn').style.background = 'var(--danger)';
         }
         
         /* ═══════════════════════════════════════════════════════════
@@ -4130,6 +4134,8 @@
                 <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar transacción?</div>
                 <div style="font-size:13px;color:var(--text-secondary)">Se revertirá el efecto de <strong>${escHtml(concepto)}</strong> en el saldo de la cuenta.<br>Esta acción no se puede deshacer.</div>
             </div>`);
+            document.getElementById('modalSaveBtn').textContent = 'Eliminar';
+            document.getElementById('modalSaveBtn').style.background = 'var(--danger)';
         }
         
         /* ═══════════════════════════════════════════════════════════
@@ -4153,7 +4159,7 @@
                             loadCuentasBancarias(); loadResumenContable();
                         })
                         .withFailureHandler(function(e){ _btnDel(); showToast('Error: '+e.message,'#FF453A'); })
-                        .deleteCuentaBancaria(m.id);
+                        .deleteCuentaBancaria({id: m.id});
                     return true;
                 }
                 const logoRad = document.querySelector('input[name="cbLogo"]:checked');
@@ -4182,6 +4188,7 @@
                         .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
                         .addCuentaBancaria(d);
                 } else {
+                    d.id = m.id;
                     d.activa = (document.getElementById('cbActiva')||{}).value||'true';
                     google.script.run
                         .withSuccessHandler(function(r) {
@@ -4193,7 +4200,7 @@
                             if (_drawerCuentaId) openBankDrawer(_drawerCuentaId);
                         })
                         .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
-                        .updateCuentaBancaria(m.id, d);
+                        .updateCuentaBancaria(d);
                 }
                 return true;
             }
@@ -4210,7 +4217,7 @@
                             loadPlanCuentas();
                         })
                         .withFailureHandler(function(e){ _btnDel(); showToast('Error: '+e.message,'#FF453A'); })
-                        .deleteCuentaContable(m.id);
+                        .deleteCuentaContable({id: m.id});
                     return true;
                 }
                 const d = {
@@ -4233,6 +4240,7 @@
                         .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
                         .addCuentaContable(d);
                 } else {
+                    d.id = m.id;
                     d.activa = (document.getElementById('ccActiva')||{}).value||'true';
                     google.script.run
                         .withSuccessHandler(function(r) {
@@ -4243,7 +4251,7 @@
                             loadPlanCuentas();
                         })
                         .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
-                        .updateCuentaContable(m.id, d);
+                        .updateCuentaContable(d);
                 }
                 return true;
             }
@@ -4258,10 +4266,10 @@
                             closeModal();
                             showToast('Transacción eliminada y saldo revertido', '#FF9F0A');
                             loadTransacciones(); loadCuentasBancarias(); loadResumenContable();
-                            if (_drawerCuentaId) setTimeout(()=>openBankDrawer(_drawerCuentaId), 300);
+                            if (_drawerCuentaId) setTimeout(function(){ openBankDrawer(_drawerCuentaId); }, 300);
                         })
                         .withFailureHandler(function(e){ _btnDel(); showToast('Error: '+e.message,'#FF453A'); })
-                        .deleteTransaccion(m.id);
+                        .deleteTransaccion({id: m.id});
                     return true;
                 }
                 const d = {
@@ -4277,6 +4285,9 @@
                 if (!d.concepto||!d.monto||!d.cuentaBancariaId||!d.fecha) {
                     _btnOk(); showToast('Completa concepto, monto, cuenta y fecha','#FF9F0A'); return true;
                 }
+                if (isNaN(Number(d.monto)) || Number(d.monto) <= 0) {
+                    _btnOk(); showToast('El monto debe ser un número mayor a 0','#FF9F0A'); return true;
+                }
                 google.script.run
                     .withSuccessHandler(function(r) {
                         _btnOk();
@@ -4284,7 +4295,7 @@
                         closeModal();
                         showToast('Transacción registrada', '#30D158');
                         loadTransacciones(); loadCuentasBancarias(); loadResumenContable();
-                        if (_drawerCuentaId) setTimeout(()=>openBankDrawer(_drawerCuentaId), 300);
+                        if (_drawerCuentaId) setTimeout(function(){ openBankDrawer(_drawerCuentaId); }, 300);
                     })
                     .withFailureHandler(function(e){ _btnOk(); showToast('Error: '+e.message,'#FF453A'); })
                     .addTransaccion(d);
