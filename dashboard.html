@@ -2353,44 +2353,72 @@
            INICIALIZACIÓN
         ═══════════════════════════════════════════════════════ */
         document.addEventListener('DOMContentLoaded', function () {
-            // Verificar sesión en el BACKEND con reintentos ante fallas de red
-            function verificarSesion(intento) {
+            // ── 1. Leer sesión de localStorage de forma inmediata ──
+            var sessLocal = null;
+            try { sessLocal = JSON.parse(localStorage.getItem('azyvion_session') || 'null'); } catch (e) {}
+
+            // Sin token → login de inmediato
+            if (!sessLocal || !sessLocal.token) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Token expirado localmente → login de inmediato
+            if (sessLocal.expira && new Date(sessLocal.expira) <= new Date()) {
+                localStorage.removeItem('azyvion_session');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // ── 2. Inicializar UI con datos locales SIN esperar al backend ──
+            _rol     = sessLocal.rol    || '';
+            _usuario = sessLocal.nombre || '';
+
+            var elName   = document.getElementById('userName');
+            var elRole   = document.getElementById('userRole');
+            var elAvatar = document.getElementById('userAvatar');
+            var elNav    = document.getElementById('nav-usuarios');
+
+            if (elName)   elName.textContent   = sessLocal.nombre || '';
+            if (elRole)   elRole.textContent   = sessLocal.rol    || '';
+            if (elAvatar) elAvatar.textContent = (sessLocal.nombre || '??').substring(0, 2).toUpperCase();
+            if (elNav)    elNav.style.display  = esAdmin() ? 'flex' : 'none';
+
+            // ── 3. Cargar datos del dashboard de inmediato ──
+            loadAll();
+
+            // ── 4. Verificar sesión con el backend en segundo plano ──
+            //    Si el backend la rechaza → cerrar sesión y redirigir.
+            //    Si hay error de red → no redirigir; la siguiente llamada API lo manejará.
+            function verificarConBackend(intento) {
                 intento = intento || 1;
                 google.script.run
                     .withSuccessHandler(function (sess) {
                         if (!sess || !sess.ok) {
+                            // El backend rechazó la sesión: limpiar y redirigir
                             localStorage.removeItem('azyvion_session');
                             window.location.href = 'index.html';
                             return;
                         }
-                        document.getElementById('userName').textContent = sess.nombre;
-                        document.getElementById('userRole').textContent = sess.rol;
-                        _rol = sess.rol || '';
-                        _usuario = sess.nombre || sess.usuario || '';
-                        document.getElementById('userAvatar').textContent =
-                            (sess.nombre || '??').substring(0, 2).toUpperCase();
-
-                        // Mostrar/ocultar módulo de Usuarios según rol
-                        const navUsuarios = document.getElementById('nav-usuarios');
-                        if (navUsuarios) {
-                            navUsuarios.style.display = esAdmin() ? 'flex' : 'none';
-                        }
-
-                        loadAll();
+                        // Actualizar con datos frescos del servidor
+                        _rol     = sess.rol || _rol;
+                        _usuario = sess.nombre || sess.usuario || _usuario;
+                        if (elName)   elName.textContent   = sess.nombre || '';
+                        if (elRole)   elRole.textContent   = sess.rol    || '';
+                        if (elAvatar) elAvatar.textContent = (sess.nombre || '??').substring(0, 2).toUpperCase();
+                        if (elNav)    elNav.style.display  = esAdmin() ? 'flex' : 'none';
                     })
                     .withFailureHandler(function (err) {
-                        console.warn('[Azyvion] checkSession falló (intento ' + intento + '):', err);
+                        console.warn('[Azyvion] checkSession error de red (intento ' + intento + '):', err);
                         if (intento < 3) {
-                            // Reintentar hasta 3 veces antes de redirigir al login
-                            setTimeout(function () { verificarSesion(intento + 1); }, 1500);
-                        } else {
-                            localStorage.removeItem('azyvion_session');
-                            window.location.href = 'index.html';
+                            setTimeout(function () { verificarConBackend(intento + 1); }, 2000);
                         }
+                        // Si la red falla 3 veces, el usuario sigue en el dashboard.
+                        // Cualquier acción posterior que requiera sesión válida lo redirigirá.
                     })
                     .checkSession();
             }
-            verificarSesion();
+            verificarConBackend();
         });
 
         function loadAll() {
