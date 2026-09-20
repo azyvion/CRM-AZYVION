@@ -1253,7 +1253,7 @@
     width: 48px; height: 48px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     font-size: 20px; font-weight: 800; color: #fff;
-    flex-shrink: 0; position: relative; overflow: hidden;
+    flex-shrink: 0; overflow: hidden;
 }
 .bank-logo-Industrial { background: linear-gradient(135deg,#0057A8,#003D7A); }
 .bank-logo-Banrural   { background: linear-gradient(135deg,#1B873B,#0E5225); }
@@ -4341,9 +4341,11 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
                 return `
                 <div class="bank-card" onclick="openBankDrawer(${c.id})">
                     <div class="bank-card-top">
-                        <div class="bank-logo-wrap bank-logo-${escHtml(c.logo)}" title="${escHtml(c.banco)}" style="position:relative;overflow:hidden;">
-                            <img src="logo-banco-${escHtml(c.logo).toLowerCase()}.png" alt="${escHtml(c.banco)}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display='none'">
-                            <span class="bank-logo-text" style="position:relative;z-index:1;">${LOGO_INITIALS[c.logo] || c.logo.substring(0,2)}</span>
+                        <div class="bank-logo-wrap bank-logo-${escHtml(c.logo)}" title="${escHtml(c.banco)}">
+                            <img src="logo-banco-${escHtml(c.logo).toLowerCase()}.png" alt="${escHtml(c.banco)}"
+                                 style="width:100%;height:100%;object-fit:contain;border-radius:inherit;display:block;"
+                                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                            <span class="bank-logo-text" style="display:none;">${LOGO_INITIALS[c.logo] || c.logo.substring(0,2)}</span>
                         </div>
                         <span class="bank-card-badge${activa?'':' inactiva'}">${activa?'Activa':'Inactiva'}</span>
                     </div>
@@ -4615,8 +4617,10 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
                             ${(c&&c.logo===logo)||(!c&&logo==='Industrial')?'checked':''}>
                         <div class="bank-logo-wrap bank-logo-${logo} logo-radio-wrap" style="width:50px;height:50px;border-radius:12px;border:2px solid transparent;font-size:13px"
                              onclick="selectLogo('${logo}')">
-                            <img src="logo-banco-${logo.toLowerCase()}.png" alt="${logo}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display='none'">
-                            <span class="bank-logo-text" style="position:relative;z-index:1;">${LOGO_INITIALS[logo]||logo.substring(0,2)}</span>
+                            <img src="logo-banco-${logo.toLowerCase()}.png" alt="${logo}"
+                                 style="width:100%;height:100%;object-fit:contain;border-radius:inherit;display:block;"
+                                 onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                            <span class="bank-logo-text" style="display:none;">${LOGO_INITIALS[logo]||logo.substring(0,2)}</span>
                         </div>
                         <span style="font-size:10px;color:var(--text-secondary)">${logo}</span>
                     </label>`).join('')}
