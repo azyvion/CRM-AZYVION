@@ -42,7 +42,7 @@
             --radius: 12px;
         }
 
-        html { height: 100%; }
+        html { height: 100%; overflow-x: hidden; width: 100%; }
         body {
             font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
             background: var(--bg);
@@ -52,6 +52,8 @@
             min-height: 100%;
             min-height: 100dvh;
             font-size: 14px;
+            width: 100%;
+            overflow-x: hidden;
             /* Safe areas */
             padding-top: env(safe-area-inset-top, 0px);
         }
@@ -2028,7 +2030,8 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
 
 .crop-stage {
     position: relative;
-    width: 300px; height: 300px;
+    width: min(300px, 100%); height: min(300px, calc(100vw - 64px));
+    aspect-ratio: 1 / 1;
     margin: 0 auto;
     overflow: hidden;
     background: #111;
@@ -2048,7 +2051,7 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
 
 .crop-circle-guide {
     position: absolute;
-    width: 240px; height: 240px;
+    width: 80%; height: 80%;
     border-radius: 50%;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
