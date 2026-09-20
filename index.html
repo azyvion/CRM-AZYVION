@@ -563,125 +563,109 @@
     </div>
 
     <!-- ════════════════════════════════════════════════════════════
-         AZYVION · PUENTE API  (google.script.run  ->  fetch GET)
-         Necesario SOLO cuando el HTML se sirve fuera de Apps Script
-         (GitHub Pages, Netlify, etc.). Debe ir ANTES del script principal.
+         AZYVION CRM — SUPABASE LOGIN
     ═════════════════════════════════════════════════════════════ -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-    /* ════════════════════════════════════════════════════════════
-       AZYVION · PUENTE API v4 — Sesiones reales con token seguro
-       ════════════════════════════════════════════════════════════
-       ⚠️  REEMPLAZA ESTA URL CON LA URL DE TU WEB APP ACTUAL
-    ════════════════════════════════════════════════════════════ */
     (function () {
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzAqGFrg6byPDMOTwA-3R6etNwggLZHTlQUnbnU-7oQQDtCOw4VD9MKZImLp6Dp05Xn/exec';
+        const SUPABASE_URL      = 'https://dwtykzporgjjvdustjfq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable__sKrMJxAHySP1qqHZ5v6mQ_6BTligkc';
+        const { createClient } = supabase;
+        const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const SESSION_KEY = 'azyvion_session';
 
-        // Duración máxima de sesión "Recordarme" en ms (30 días)
-        const REMEMBER_DURATION = 30 * 24 * 60 * 60 * 1000;
-
-        const MAP = {
-            login:            (u, p, r) => ({ action: 'login', usuario: u, contrasena: p, remember: r ? 'true' : 'false' }),
-            logout:           ()        => ({ action: 'logout' }),
-            checkSession:     ()        => ({ action: 'checkSession' }),
-            getResumen:       ()        => ({ action: 'getResumen' }),
-            getActividad:     (n)       => ({ action: 'getActividad', limit: n || 10 }),
-            getClientes:      ()        => ({ action: 'getClientes' }),
-            addCliente:       (d)       => Object.assign({ action: 'addCliente' }, d),
-            updateCliente:    (id, d)   => Object.assign({ action: 'updateCliente', id: id }, d),
-            deleteCliente:    (id)      => ({ action: 'deleteCliente', id: id }),
-            getProspectos:    ()        => ({ action: 'getProspectos' }),
-            addProspecto:     (d)       => Object.assign({ action: 'addProspecto' }, d),
-            updateProspecto:  (id, d)   => Object.assign({ action: 'updateProspecto', id: id }, d),
-            deleteProspecto:  (id)      => ({ action: 'deleteProspecto', id: id }),
-            convertirProspecto:(id,d)   => Object.assign({ action: 'convertirProspecto', id: id }, d || {}),
-            getInventario:    ()        => ({ action: 'getInventario' }),
-            addInventario:    (d)       => Object.assign({ action: 'addInventario' }, d),
-            updateInventario: (id, d)   => Object.assign({ action: 'updateInventario', id: id }, d),
-            deleteInventario: (id)      => ({ action: 'deleteInventario', id: id }),
-            getEncuestas:     ()        => ({ action: 'getEncuestas' }),
-            addEncuesta:      (d)       => Object.assign({ action: 'addEncuesta' }, d),
-            updateEncuesta:   (id, d)   => Object.assign({ action: 'updateEncuesta', id: id }, d),
-            deleteEncuesta:   (id)      => ({ action: 'deleteEncuesta', id: id }),
-            getUsuarios:      ()        => ({ action: 'getUsuarios' }),
-            addUsuario:       (d)       => Object.assign({ action: 'addUsuario' }, d),
-            updateUsuario:    (id, d)   => Object.assign({ action: 'updateUsuario', id: id }, d),
-            deleteUsuario:    (id)      => ({ action: 'deleteUsuario', id: id })
-        };
-
-        function readSession() {
-            try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch (e) { return null; }
+        async function _sha256(v) {
+            const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
+            return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('');
+        }
+        async function _hashPwd(pwd, salt) {
+            let h = await _sha256(salt + pwd);
+            for (let i = 0; i < 9999; i++) h = await _sha256(h + salt + pwd);
+            return h;
+        }
+        function _uuid() {
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
+        }
+        function _prefsUsuario(u) {
+            u = u || {};
+            return {
+                tema: u.tema === 'oscuro' ? 'oscuro' : 'claro',
+                paginaInicio: ['overview','clientes','prospectos','inventario','cotizaciones','encuestas','contabilidad','usuarios'].includes(u.paginaInicio) ? u.paginaInicio : 'overview',
+                densidadTabla: u.densidadTabla === 'compacta' ? 'compacta' : 'comoda',
+                copiarmeCotizaciones: u.copiarmeCotizaciones === true || String(u.copiarmeCotizaciones).toLowerCase() === 'true',
+                alertaStockCritico: u.alertaStockCritico === true || String(u.alertaStockCritico).toLowerCase() === 'true'
+            };
         }
 
-        function getToken() {
-            const s = readSession();
-            return s ? s.token : null;
-        }
+        async function _login(usuario, contrasena, remember) {
+            if (!usuario || !contrasena) return { ok: false, error: 'Usuario y contraseña son requeridos.' };
+            const { data: usr, error: e } = await _sb.from('Usuarios').select('*').eq('usuario', usuario.trim()).single();
+            if (e || !usr) return { ok: false, error: 'Usuario o contraseña incorrectos.' };
+            if (!usr.activo) return { ok: false, error: 'Esta cuenta está desactivada. Contacta al administrador.' };
 
-        function call(name, args, onSuccess, onFailure) {
-            const params = MAP[name].apply(null, args);
-
-            // Adjuntar token en todas las peticiones que no sean login
-            if (name !== 'login') {
-                const token = getToken();
-                if (token) params.token = token;
+            let ok = false;
+            if (usr.passwordMigrated && usr.passwordHash && usr.passwordSalt) {
+                ok = (await _hashPwd(contrasena, usr.passwordSalt)) === usr.passwordHash;
+            } else if (usr.contrasena) {
+                ok = String(usr.contrasena) === String(contrasena);
+                if (ok) {
+                    const s = _uuid() + Date.now().toString(36);
+                    const h = await _hashPwd(contrasena, s);
+                    await _sb.from('Usuarios').update({ passwordHash: h, passwordSalt: s, passwordMigrated: true, contrasena: '' }).eq('id', usr.id);
+                }
             }
+            if (!ok) return { ok: false, error: 'Usuario o contraseña incorrectos.' };
 
-            const qs = new URLSearchParams();
-            Object.keys(params).forEach(function (k) {
-                const val = params[k];
-                if (val !== undefined && val !== null) qs.append(k, val);
-            });
+            const token = _uuid().replace(/-/g,'') + _uuid().replace(/-/g,'');
+            const tokenHash = await _sha256(token);
+            const dur = (remember === 'true' || remember === true) ? 30*24*60*60*1000 : 8*60*60*1000;
+            const expira = new Date(Date.now() + dur).toISOString();
+            await _sb.from('Sesiones').insert({ id: _uuid(), tokenHash, usuario: usr.usuario, rol: usr.rol, expira, activo: true, creado: new Date().toISOString() });
+            localStorage.setItem(SESSION_KEY, JSON.stringify({ token, nombre: usr.nombre, usuario: usr.usuario, rol: usr.rol, expira }));
+            await _sb.from('Actividad').insert({ id: _uuid(), tipo: 'login', usuario: usr.usuario, descripcion: 'Sesión iniciada. Rol: ' + usr.rol, fecha: new Date().toISOString() });
+            return { ok: true, token, nombre: usr.nombre, rol: usr.rol, expira, fotoUrl: usr.fotoUrl || '', preferencias: _prefsUsuario(usr) };
+        }
 
-            fetch(API_URL + '?' + qs.toString(), { method: 'GET', redirect: 'follow' })
-                .then(function (r) {
-                    if (!r.ok) throw new Error('HTTP ' + r.status);
-                    return r.text();
-                })
-                .then(function (txt) {
-                    let data;
-                    try {
-                        data = JSON.parse(txt);
-                    } catch (e) {
-                        throw new Error('El Web App no devolvió JSON. Verifica que esté publicado como "Cualquier persona".');
-                    }
+        async function _checkSession() {
+            const sess = (() => { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; } })();
+            if (!sess || !sess.token) return { ok: false };
+            if (sess.expira && new Date(sess.expira) <= new Date()) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
+            const th = await _sha256(sess.token);
+            const { data: s } = await _sb.from('Sesiones').select('*').eq('tokenHash', th).eq('activo', true).single();
+            if (!s || new Date(s.expira) <= new Date()) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
+            const { data: usr } = await _sb.from('Usuarios').select('*').eq('usuario', s.usuario).single();
+            if (!usr || !usr.activo) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
+            return { ok: true, nombre: usr.nombre, rol: usr.rol, usuario: usr.usuario, expira: s.expira, fotoUrl: usr.fotoUrl || '', preferencias: _prefsUsuario(usr) };
+        }
 
-                    if (name === 'login' && data.ok) {
-                        // Guardar sesión: NUNCA la contraseña, solo el token del servidor
-                        const sess = {
-                            token:  data.token,
-                            nombre: data.nombre,
-                            rol:    data.rol,
-                            expira: data.expira
-                        };
-                        localStorage.setItem(SESSION_KEY, JSON.stringify(sess));
-                    }
+        async function _logout() {
+            const sess = (() => { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; } })();
+            if (sess && sess.token) { const th = await _sha256(sess.token); await _sb.from('Sesiones').update({ activo: false }).eq('tokenHash', th); }
+            localStorage.removeItem(SESSION_KEY);
+            return { ok: true };
+        }
 
-                    if (name === 'logout') {
-                        localStorage.removeItem(SESSION_KEY);
-                    }
-
-                    // Si el servidor dice que la sesión es inválida, limpiar localStorage
-                    if (data && data.ok === false && data.error &&
-                        data.error.includes('Sesión inválida')) {
-                        localStorage.removeItem(SESSION_KEY);
-                    }
-
-                    if (onSuccess) onSuccess(data);
-                })
-                .catch(function (err) {
-                    console.error('[Azyvion API]', name, err);
-                    if (onFailure) onFailure(err);
-                });
+        async function _dispatch(name, args) {
+            switch (name) {
+                case 'login':        return await _login(args[0], args[1], args[2]);
+                case 'checkSession': return await _checkSession();
+                case 'logout':       return await _logout();
+                default:             return { ok: false, error: 'Acción no disponible en login: ' + name };
+            }
         }
 
         function makeRunner(onSuccess, onFailure) {
             const runner = {
-                withSuccessHandler: function (fn) { return makeRunner(fn, onFailure); },
-                withFailureHandler: function (fn) { return makeRunner(onSuccess, fn); }
+                withSuccessHandler: fn => makeRunner(fn, onFailure),
+                withFailureHandler: fn => makeRunner(onSuccess, fn)
             };
-            Object.keys(MAP).forEach(function (name) {
-                runner[name] = function () { call(name, Array.from(arguments), onSuccess, onFailure); };
+            ['login','logout','checkSession'].forEach(name => {
+                runner[name] = function () {
+                    _dispatch(name, Array.from(arguments))
+                        .then(data => { if (onSuccess) onSuccess(data); })
+                        .catch(err => { console.error('[Supabase]', name, err); if (onFailure) onFailure(err); });
+                };
             });
             return runner;
         }
@@ -691,6 +675,7 @@
         window.google.script.run = makeRunner(null, null);
     })();
     </script>
+
     <script>
         /* ---------- Toggle contraseña ---------- */
         let pwdVisible = false;
