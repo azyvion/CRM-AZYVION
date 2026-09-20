@@ -10,6 +10,9 @@
     <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#16171B" media="(prefers-color-scheme: dark)" />
     <title>Azyvion CRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         *,
         *::before,
@@ -20,26 +23,64 @@
         }
 
         :root {
-            --bg: #F2F2F7;
-            --sidebar: #1C1C1E;
-            --sidebar-text: rgba(255, 255, 255, 0.55);
+            --bg: #F0F2F8;
+            --sidebar: #0F1117;
+            --sidebar-text: rgba(255, 255, 255, 0.48);
             --sidebar-active: #FFFFFF;
             --card: #FFFFFF;
-            --text-primary: #1C1C1E;
-            --text-secondary: #8E8E93;
-            --text-muted: #AEAEB2;
-            --border: rgba(60, 60, 67, 0.12);
-            --accent: #0A84FF;
-            --accent-bg: #E3F0FF;
-            --success: #30D158;
-            --success-bg: #E3FAE9;
-            --warning: #FF9F0A;
-            --warning-bg: #FFF4E0;
-            --danger: #FF453A;
-            --danger-bg: #FFE9E8;
-            --purple: #BF5AF2;
-            --purple-bg: #F3E8FF;
-            --radius: 12px;
+            --text-primary: #0D0F14;
+            --text-secondary: #7A7D8A;
+            --text-muted: #B0B3C1;
+            --border: rgba(40, 45, 70, 0.10);
+            --accent: #3B6EF5;
+            --accent-2: #6C47FF;
+            --accent-bg: #EEF2FF;
+            --success: #22C55E;
+            --success-bg: #DCFCE7;
+            --warning: #F59E0B;
+            --warning-bg: #FEF3C7;
+            --danger: #EF4444;
+            --danger-bg: #FEE2E2;
+            --purple: #8B5CF6;
+            --purple-bg: #EDE9FE;
+            --radius: 14px;
+            --shadow-sm: 0 1px 3px rgba(15,17,30,.06), 0 1px 2px rgba(15,17,30,.04);
+            --shadow-md: 0 4px 16px rgba(15,17,30,.08), 0 1px 4px rgba(15,17,30,.06);
+            --shadow-lg: 0 12px 40px rgba(15,17,30,.12), 0 2px 8px rgba(15,17,30,.08);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #0D0F14;
+                --card: #161921;
+                --text-primary: #F0F2F8;
+                --text-secondary: #8B90A4;
+                --text-muted: #555A6E;
+                --border: rgba(255,255,255,0.08);
+                --accent-bg: #1E2A4A;
+                --success-bg: #0E2A1A;
+                --warning-bg: #2A1E06;
+                --danger-bg: #2A0E0E;
+                --purple-bg: #1E1230;
+                --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+                --shadow-md: 0 4px 16px rgba(0,0,0,.35);
+                --shadow-lg: 0 12px 40px rgba(0,0,0,.45);
+            }
+        }
+        :root[data-theme="dark"] {
+            --bg: #0D0F14;
+            --card: #161921;
+            --text-primary: #F0F2F8;
+            --text-secondary: #8B90A4;
+            --text-muted: #555A6E;
+            --border: rgba(255,255,255,0.08);
+            --accent-bg: #1E2A4A;
+            --success-bg: #0E2A1A;
+            --warning-bg: #2A1E06;
+            --danger-bg: #2A0E0E;
+            --purple-bg: #1E1230;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.35);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,.45);
         }
 
         html {
@@ -49,7 +90,7 @@
             width: 100%;
         }
         body {
-            font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            font-family: "Inter", -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
             background: var(--bg);
             color: var(--text-primary);
             display: flex;
@@ -79,10 +120,11 @@
             justify-content: center;
             width: 38px;
             height: 38px;
-            border-radius: 10px;
+            border-radius: 11px;
             overflow: hidden;
             flex-shrink: 0;
-            background: linear-gradient(145deg, #0A84FF, #005cc5);
+            background: linear-gradient(145deg, #3B6EF5 0%, #6C47FF 100%);
+            box-shadow: 0 4px 14px rgba(59,110,245,.45);
         }
         .logo-icon img { width: 100%; height: 100%; object-fit: contain; display: block; }
         .logo-name {
@@ -102,12 +144,12 @@
 
         .nav-section {
             display: block;
-            font-size: 10.5px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.7px;
-            color: rgba(255,255,255,0.28);
-            padding: 16px 20px 6px;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.22);
+            padding: 18px 20px 6px;
         }
 
         .nav-item {
@@ -134,18 +176,18 @@
             stroke-linejoin: round;
             fill: none;
         }
-        .nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
+        .nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.9); border-radius: 0; }
         .nav-item.active {
-            background: rgba(10,132,255,0.18);
+            background: linear-gradient(90deg, rgba(59,110,245,0.25) 0%, rgba(59,110,245,0.08) 100%);
             color: var(--sidebar-active);
         }
         .nav-item.active::before {
             content: '';
             position: absolute;
-            left: 0; top: 8px; bottom: 8px;
+            left: 0; top: 6px; bottom: 6px;
             width: 3px;
-            border-radius: 0 3px 3px 0;
-            background: var(--accent);
+            border-radius: 0 4px 4px 0;
+            background: linear-gradient(180deg, #3B6EF5, #6C47FF);
         }
         .nav-item span:not(.badge) { flex: 1; }
 
@@ -179,6 +221,8 @@
             top: 0; left: 0; bottom: 0;
             width: min(300px, 84vw);
             background: var(--sidebar);
+            background-image: radial-gradient(ellipse at 30% 0%, rgba(59,110,245,.18) 0%, transparent 60%),
+                              radial-gradient(ellipse at 70% 100%, rgba(108,71,255,.12) 0%, transparent 60%);
             padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
             z-index: 400;
             transform: translateX(-100%);
@@ -187,7 +231,7 @@
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
-            box-shadow: 12px 0 40px rgba(0,0,0,.3);
+            box-shadow: 16px 0 60px rgba(0,0,0,.45);
             will-change: transform;
             isolation: isolate;
             contain: layout style;
@@ -229,6 +273,7 @@
             border-radius: 10px;
             cursor: pointer;
             flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
         }
         .hamburger-btn svg {
             width: 18px; height: 18px; stroke: var(--text-primary);
@@ -255,7 +300,7 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #0A84FF, #5e5ce6);
+            background: linear-gradient(135deg, #3B6EF5, #6C47FF);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -329,45 +374,44 @@
            desaparece al hacer scroll dentro de .content
         ═══════════════════════════════════════════════════ */
         .topbar {
-            height: 54px;
-            background: rgba(242, 242, 247, 0.92);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            height: 58px;
+            background: rgba(240, 242, 248, 0.88);
+            backdrop-filter: blur(24px) saturate(200%);
+            -webkit-backdrop-filter: blur(24px) saturate(200%);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            padding: 0 16px;
+            padding: 0 18px;
             gap: 10px;
-            /* Fija en la parte superior de .main, nunca hace scroll */
             position: sticky;
             top: 0;
             z-index: 50;
-            flex-shrink: 0; /* no se encoge aunque el contenido sea largo */
-            /* Sombra sutil que aparece al hacer scroll (JS la activa) */
+            flex-shrink: 0;
             transition: box-shadow .2s ease;
         }
         .topbar.scrolled {
-            box-shadow: 0 1px 12px rgba(0,0,0,.08);
+            box-shadow: 0 2px 16px rgba(15,17,30,.08);
         }
 
         /* Dark mode */
         body.theme-dark .topbar {
-            background: rgba(22, 23, 27, 0.92);
+            background: rgba(13, 15, 20, 0.9);
         }
         body.theme-dark .topbar.scrolled {
-            box-shadow: 0 1px 16px rgba(0,0,0,.35);
+            box-shadow: 0 2px 20px rgba(0,0,0,.5);
         }
 
         /* Logo pequeño en topbar */
         .topbar-logo {
-            width: 28px;
-            height: 28px;
-            background: linear-gradient(145deg, #0A84FF, #005cc5);
-            border-radius: 8px;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #3B6EF5, #6C47FF);
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            box-shadow: 0 3px 8px rgba(59,110,245,.3);
         }
         .topbar-logo svg {
             width: 15px; height: 15px; stroke: #fff; stroke-width: 2;
@@ -389,12 +433,12 @@
 
         .topbar-btn {
             height: 36px;
-            padding: 0 14px;
-            background: var(--accent);
+            padding: 0 16px;
+            background: linear-gradient(135deg, #3B6EF5 0%, #6C47FF 100%);
             color: #fff;
             border: none;
             border-radius: 10px;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 600;
             font-family: inherit;
             cursor: pointer;
@@ -403,13 +447,16 @@
             gap: 6px;
             white-space: nowrap;
             flex-shrink: 0;
+            box-shadow: 0 3px 10px rgba(59,110,245,.35);
+            transition: transform .15s, box-shadow .15s, opacity .15s;
         }
-        .topbar-btn:active { opacity: .78; transform: scale(.97); }
+        .topbar-btn:active { opacity: .85; transform: scale(.97); box-shadow: 0 1px 4px rgba(59,110,245,.25); }
+        .topbar-btn:hover { box-shadow: 0 5px 16px rgba(59,110,245,.45); transform: translateY(-1px); }
         .topbar-btn svg {
             width: 15px; height: 15px; stroke: #fff;
             stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none;
         }
-        .topbar-btn:disabled { opacity: .5; }
+        .topbar-btn:disabled { opacity: .5; box-shadow: none; transform: none; }
 
         /* Texto del botón — se oculta en pantallas muy pequeñas */
         @media (max-width: 360px) {
@@ -428,8 +475,11 @@
             justify-content: center;
             cursor: pointer;
             flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+            transition: background .12s, transform .12s, box-shadow .12s;
         }
-        .icon-btn:active { background: var(--bg); transform: scale(.95); }
+        .icon-btn:hover { box-shadow: var(--shadow-md); }
+        .icon-btn:active { background: var(--bg); transform: scale(.95); box-shadow: none; }
         .icon-btn svg {
             width: 17px; height: 17px; stroke: var(--text-secondary);
             stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none;
@@ -439,14 +489,14 @@
            CONTENT — área scrollable debajo del topbar fijo
         ═══════════════════════════════════════════════════ */
         .content {
-            padding: 16px;
+            padding: 18px;
             flex: 1;
-            min-height: 0;          /* permite que flex shrink funcione */
-            overflow-y: auto;       /* el scroll vertical vive aquí */
+            min-height: 0;
+            overflow-y: auto;
             overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior-y: contain;
-            padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+            padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px));
         }
 
         /* Bottom nav retirado: en móvil ahora se usa el menú
@@ -585,20 +635,31 @@
             background: var(--card);
             border-radius: var(--radius);
             border: 1px solid var(--border);
-            padding: 14px 16px;
+            padding: 16px 18px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow .2s, transform .2s;
         }
+        .kpi-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+        .kpi-grid .kpi-card:nth-child(1) { border-top: 2px solid var(--accent); }
+        .kpi-grid .kpi-card:nth-child(2) { border-top: 2px solid var(--success); }
+        .kpi-grid .kpi-card:nth-child(3) { border-top: 2px solid var(--purple); }
+        .kpi-grid .kpi-card:nth-child(4) { border-top: 2px solid var(--warning); }
 
         .kpi-label {
-            font-size: 12px;
+            font-size: 11.5px;
             color: var(--text-secondary);
-            margin-bottom: 6px;
-            font-weight: 400;
+            margin-bottom: 8px;
+            font-weight: 500;
+            letter-spacing: 0.1px;
         }
 
         .kpi-value {
-            font-size: 26px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
             color: var(--text-primary);
             line-height: 1;
         }
@@ -608,24 +669,24 @@
             align-items: center;
             gap: 3px;
             font-size: 11px;
-            font-weight: 500;
-            margin-top: 6px;
-            padding: 2px 7px;
+            font-weight: 600;
+            margin-top: 8px;
+            padding: 3px 8px;
             border-radius: 20px;
         }
 
         .kpi-delta.up {
             background: var(--success-bg);
-            color: #1a8a3a;
+            color: #16883A;
         }
 
         .kpi-delta.down {
             background: var(--danger-bg);
-            color: #c0392b;
+            color: #C0392B;
         }
 
         .kpi-delta.neu {
-            background: #F2F2F7;
+            background: var(--bg);
             color: var(--text-secondary);
         }
 
@@ -649,8 +710,9 @@
 
         .section-title {
             font-size: 15px;
-            font-weight: 600;
-            letter-spacing: -0.2px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            color: var(--text-primary);
         }
 
         .section-action {
@@ -660,9 +722,12 @@
             border: none;
             cursor: pointer;
             font-family: inherit;
-            font-weight: 500;
+            font-weight: 600;
             padding: 0;
+            opacity: .8;
+            transition: opacity .15s;
         }
+        .section-action:hover { opacity: 1; }
 
         /* Table */
         .table-card {
@@ -671,6 +736,7 @@
             border: 1px solid var(--border);
             overflow: hidden;
             margin-bottom: 16px;
+            box-shadow: var(--shadow-sm);
         }
 
         /* Tabla con scroll horizontal en móvil */
@@ -687,6 +753,7 @@
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            background: var(--bg);
         }
 
         .filter-tabs {
@@ -708,8 +775,9 @@
         }
 
         .filter-tab.active {
-            background: var(--accent-bg);
+            background: linear-gradient(135deg, rgba(59,110,245,.14) 0%, rgba(108,71,255,.1) 100%);
             color: var(--accent);
+            font-weight: 600;
         }
 
         .filter-tab:hover:not(.active) {
@@ -726,14 +794,16 @@
         }
 
         thead th {
-            padding: 9px 12px;
+            padding: 10px 14px;
             text-align: left;
             font-size: 11px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--text-muted);
+            background: var(--bg);
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
-            letter-spacing: 0.1px;
+            letter-spacing: 0.3px;
+            text-transform: none;
         }
 
         tbody tr {
@@ -745,12 +815,16 @@
             border-bottom: none;
         }
 
+        tbody tr:hover {
+            background: var(--bg);
+        }
+
         tbody tr:active {
-            background: #FAFAFA;
+            background: var(--bg);
         }
 
         td {
-            padding: 11px 12px;
+            padding: 12px 14px;
             font-size: 13px;
             color: var(--text-primary);
             white-space: nowrap;
@@ -833,15 +907,15 @@
         .progress-fill {
             height: 100%;
             border-radius: 20px;
-            background: var(--accent);
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
         }
 
         .progress-fill.low {
-            background: var(--danger);
+            background: linear-gradient(90deg, var(--danger), #ff6b6b);
         }
 
         .progress-fill.mid {
-            background: var(--warning);
+            background: linear-gradient(90deg, var(--warning), #fbbf24);
         }
 
         .progress-val {
@@ -864,6 +938,7 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 16px;
+            box-shadow: var(--shadow-sm);
         }
 
         .activity-item {
@@ -924,6 +999,12 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 18px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow .2s, transform .2s;
+        }
+        .survey-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
         }
 
         .survey-name {
@@ -977,6 +1058,7 @@
         .bar-fill {
             height: 100%;
             border-radius: 20px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
         }
 
         /* ── Modal Logout ── */
@@ -1004,13 +1086,13 @@
 
         .logout-modal-box {
             background: var(--card);
-            border-radius: 22px;
+            border-radius: 24px;
             width: 100%;
             max-width: 360px;
             margin: 16px;
-            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.22), 0 0 0 1px var(--border);
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.28), 0 0 0 1px var(--border);
             transform: translateY(16px) scale(0.96);
-            transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+            transition: transform .28s cubic-bezier(.34,1.56,.64,1);
             overflow: hidden;
         }
 
@@ -1599,11 +1681,12 @@
     border-radius: 16px;
     padding: 20px;
     cursor: pointer;
-    transition: box-shadow .2s, transform .15s;
+    transition: box-shadow .2s, transform .2s;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
 }
-.bank-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.1); transform: translateY(-2px); }
+.bank-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); }
 .bank-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
 .bank-logo-wrap {
     width: 48px; height: 48px; border-radius: 12px;
@@ -1676,8 +1759,9 @@
     border-radius: 14px;
     padding: 18px 20px;
     margin-bottom: 16px;
-    background: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 100%);
+    background: linear-gradient(135deg, #0F1117 0%, #1a1d2e 60%, #1e1230 100%);
     color: #fff;
+    box-shadow: 0 8px 24px rgba(59,110,245,.15);
 }
 .bank-saldo-num { font-size: 30px; font-weight: 800; letter-spacing: -0.8px; }
 
