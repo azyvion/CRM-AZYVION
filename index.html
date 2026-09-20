@@ -632,8 +632,16 @@
             if (!sess || !sess.token) return { ok: false };
             if (sess.expira && new Date(sess.expira) <= new Date()) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
             const th = await _sha256(sess.token);
-            const { data: s } = await _sb.from('Sesiones').select('*').eq('tokenHash', th).eq('activo', true).single();
-            if (!s || new Date(s.expira) <= new Date()) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
+            const { data: s, error: sErr } = await _sb.from('Sesiones').select('*').eq('tokenHash', th).eq('activo', true).single();
+            if (sErr || !s) {
+                // Si la tabla Sesiones falla, verificar al menos que el usuario exista y esté activo
+                const usuario = sess.usuario || sess.nombre;
+                if (!usuario) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
+                const { data: usr2 } = await _sb.from('Usuarios').select('*').eq('usuario', usuario).single();
+                if (!usr2 || !usr2.activo) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
+                return { ok: true, nombre: usr2.nombre, rol: usr2.rol, usuario: usr2.usuario, expira: sess.expira, fotoUrl: usr2.fotoUrl || '', preferencias: _prefsUsuario(usr2) };
+            }
+            if (new Date(s.expira) <= new Date()) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
             const { data: usr } = await _sb.from('Usuarios').select('*').eq('usuario', s.usuario).single();
             if (!usr || !usr.activo) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
             return { ok: true, nombre: usr.nombre, rol: usr.rol, usuario: usr.usuario, expira: s.expira, fotoUrl: usr.fotoUrl || '', preferencias: _prefsUsuario(usr) };
