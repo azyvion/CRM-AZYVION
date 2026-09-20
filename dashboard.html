@@ -4483,22 +4483,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             if(!sess||!sess.token) return {ok:false};
             if(sess.expira&&new Date(sess.expira)<=new Date()){localStorage.removeItem(SESSION_KEY);return {ok:false};}
             const th=await _sha256(sess.token);
-            // Intentar verificar contra la tabla Sesiones
-            const {data:s, error:sErr}=await _sb.from('Sesiones').select('*').eq('tokenHash',th).eq('activo',true).single();
-            if(sErr || !s) {
-                // Si la tabla Sesiones falla o no tiene la fila, verificar al menos que el usuario
-                // exista y esté activo usando los datos de la sesión local
-                const usuario = sess.usuario || sess.nombre;
-                if(!usuario) { localStorage.removeItem(SESSION_KEY); return {ok:false}; }
-                const {data:usr2}=await _sb.from('Usuarios').select('*').eq('usuario',usuario).single();
-                if(!usr2||!usr2.activo){localStorage.removeItem(SESSION_KEY);return {ok:false};}
-                // Usuario válido: intentar insertar la sesión si no existía
-                try {
-                    await _sb.from('Sesiones').insert({id:_uuid(),tokenHash:th,usuario:usr2.usuario,rol:usr2.rol,expira:sess.expira,activo:true,creado:new Date().toISOString()});
-                } catch(e) {}
-                return {ok:true,nombre:usr2.nombre,rol:usr2.rol,usuario:usr2.usuario,expira:sess.expira,fotoUrl:usr2.fotoUrl||'',preferencias:_prefsUsuario(usr2)};
-            }
-            if(new Date(s.expira)<=new Date()){localStorage.removeItem(SESSION_KEY);return {ok:false};}
+            const {data:s}=await _sb.from('Sesiones').select('*').eq('tokenHash',th).eq('activo',true).single();
+            if(!s||new Date(s.expira)<=new Date()){localStorage.removeItem(SESSION_KEY);return {ok:false};}
             const {data:usr}=await _sb.from('Usuarios').select('*').eq('usuario',s.usuario).single();
             if(!usr||!usr.activo){localStorage.removeItem(SESSION_KEY);return {ok:false};}
             return {ok:true,nombre:usr.nombre,rol:usr.rol,usuario:usr.usuario,expira:s.expira,fotoUrl:usr.fotoUrl||'',preferencias:_prefsUsuario(usr)};
@@ -4798,27 +4784,16 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             } catch (e) {}
 
             // ── 4. Verificar sesión con el backend en segundo plano ──
-            //    Si el backend la rechaza → solo redirigir si la sesión local también está vencida.
+            //    Si el backend la rechaza → cerrar sesión y redirigir.
             //    Si hay error de red → no redirigir; la siguiente llamada API lo manejará.
             function verificarConBackend(intento) {
                 intento = intento || 1;
                 google.script.run
                     .withSuccessHandler(function (sess) {
                         if (!sess || !sess.ok) {
-                            // El backend rechazó la sesión: solo redirigir si la sesión local
-                            // también está vencida o ya no existe — evita falso logout por
-                            // problemas transitorios de Supabase (tabla Sesiones, RLS, etc.)
-                            var localSess = null;
-                            try { localSess = JSON.parse(localStorage.getItem('azyvion_session') || 'null'); } catch(e) {}
-                            if (!localSess || !localSess.token || (localSess.expira && new Date(localSess.expira) <= new Date())) {
-                                localStorage.removeItem('azyvion_session');
-                                window.location.href = 'index.html';
-                            } else if (intento < 3) {
-                                // Reintentar: puede ser un fallo transitorio de Supabase
-                                setTimeout(function () { verificarConBackend(intento + 1); }, 3000);
-                            }
-                            // Si después de 3 intentos sigue fallando pero la sesión local
-                            // es válida, el usuario permanece en el dashboard.
+                            // El backend rechazó la sesión: limpiar y redirigir
+                            localStorage.removeItem('azyvion_session');
+                            window.location.href = 'index.html';
                             return;
                         }
                         // Actualizar con datos frescos del servidor
