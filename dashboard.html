@@ -2154,6 +2154,125 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
     .pg-btn.pg-next { min-width: 40px; }
 }
 
+/* ════════════════════════════════════════════════════════════
+   MÓVIL — VISTA UNIFICADA CONTACTOS (Clientes + Prospectos)
+════════════════════════════════════════════════════════════ */
+.mob-seg {
+    display: flex;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    padding: 3px;
+    margin-bottom: 12px;
+    gap: 3px;
+}
+.mob-seg-btn {
+    flex: 1; height: 36px; border: none; border-radius: 8px;
+    background: transparent; font-family: inherit; font-size: 13.5px;
+    font-weight: 600; color: var(--text-secondary); cursor: pointer;
+    transition: background .15s, color .15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.mob-seg-btn.active {
+    background: var(--card); color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,.09);
+}
+.mob-seg-badge {
+    font-size: 10px; font-weight: 700; background: var(--accent);
+    color: #fff; border-radius: 20px; padding: 1px 6px;
+    min-width: 16px; text-align: center;
+}
+
+/* KPI summary bar — reemplaza el grid en móvil */
+.mob-kpi-bar {
+    display: flex; background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 12px; overflow: hidden;
+}
+.mob-kpi-cell {
+    flex: 1; padding: 10px 8px; border-right: 1px solid var(--border); text-align: center;
+}
+.mob-kpi-cell:last-child { border-right: 0; }
+.mob-kpi-cell-val { font-size: 17px; font-weight: 700; letter-spacing: -.5px; line-height: 1; }
+.mob-kpi-cell-lbl {
+    font-size: 10px; color: var(--text-secondary); margin-top: 3px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* Lista nativa de contactos */
+.mob-list {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;
+}
+.mob-list-toolbar {
+    display: flex; align-items: center; gap: 6px; padding: 10px 12px;
+    border-bottom: 1px solid var(--border); overflow-x: auto;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.mob-list-toolbar::-webkit-scrollbar { display: none; }
+.mob-list-item {
+    display: flex; align-items: center; gap: 12px; padding: 13px 14px;
+    border-bottom: 1px solid var(--border); cursor: pointer;
+    transition: background .12s; -webkit-tap-highlight-color: transparent;
+}
+.mob-list-item:last-child { border-bottom: 0; }
+.mob-list-item:active { background: var(--bg); }
+.mob-list-item-info { flex: 1; min-width: 0; }
+.mob-list-item-name {
+    font-size: 14px; font-weight: 600;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25;
+}
+.mob-list-item-sub {
+    font-size: 12px; color: var(--text-secondary); margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.mob-list-chevron { color: var(--text-muted); flex-shrink: 0; }
+.mob-list-chevron svg {
+    width: 16px; height: 16px; stroke: currentColor; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round; fill: none; display: block;
+}
+.mob-list-empty { padding: 32px 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
+.mob-list-foot {
+    padding: 9px 14px; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--text-secondary);
+}
+
+/* Botón toggle del embudo */
+.mob-funnel-toggle {
+    width: 100%; display: flex; align-items: center; justify-content: center;
+    gap: 7px; height: 38px; background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); font-family: inherit; font-size: 13px; font-weight: 500;
+    color: var(--text-secondary); cursor: pointer; margin-bottom: 10px; transition: background .15s;
+}
+.mob-funnel-toggle:active { background: var(--bg); }
+.mob-funnel-toggle svg {
+    width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round; transition: transform .25s;
+}
+.mob-funnel-toggle.open svg { transform: rotate(180deg); }
+
+/* Responsive: activar vistas móviles */
+@media (max-width: 767px) {
+    #page-clientes .kpi-grid,
+    #page-prospectos .kpi-grid { display: none !important; }
+    #page-clientes .table-card,
+    #page-prospectos .table-card { display: none !important; }
+    #page-prospectos .funnel-card { display: none; }
+    .mob-only { display: block !important; }
+    /* Ocultar nav-prospectos en móvil (integrado en Contactos) */
+    #nav-prospectos { display: none !important; }
+    /* Texto Clientes → Contactos en el nav sidebar */
+    #navCliLabel::after { content: 'Contactos'; }
+    #navCliLabel { font-size: 0; }
+    #navCliLabel::after { font-size: 13.5px; }
+}
+@media (min-width: 768px) {
+    .mob-only { display: none !important; }
+    .mob-seg, .mob-kpi-bar, .mob-list, .mob-funnel-toggle { display: none !important; }
+    #nav-prospectos { display: flex !important; }
+    #navCliLabel { font-size: inherit; }
+    #navCliLabel::after { content: ''; font-size: 0; }
+}
+
 /* ══════════════════════════════════════════════════════════
    AJUSTES / PERFIL DE USUARIO
 ══════════════════════════════════════════════════════════ */
@@ -2457,9 +2576,11 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
             </svg>
-            Clientes
+            <!-- En móvil se muestra "Contactos" porque incluye también prospectos -->
+            <span id="navCliLabel">Clientes</span>
             <span class="badge" id="badgeClientes">—</span>
         </div>
+        <!-- En móvil este ítem se oculta: los prospectos se acceden desde el segmento en Contactos -->
         <div class="nav-item" id="nav-prospectos" onclick="showPage('prospectos',this)">
             <svg viewBox="0 0 24 24">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -2751,6 +2872,80 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
 
             <!-- ── CLIENTES ── -->
             <div class="page" id="page-clientes">
+
+                <!-- ═══ MÓVIL: Segmento Clientes / Prospectos ═══ -->
+                <div class="mob-only" id="mobContactosWrap" style="display:none">
+                    <!-- Selector Clientes / Prospectos -->
+                    <div class="mob-seg">
+                        <button class="mob-seg-btn active" id="mobSegCli" onclick="mobSwitchSeg('clientes')">
+                            Clientes <span class="mob-seg-badge" id="mobBadgeCli">—</span>
+                        </button>
+                        <button class="mob-seg-btn" id="mobSegPro" onclick="mobSwitchSeg('prospectos')">
+                            Prospectos <span class="mob-seg-badge" id="mobBadgePro">—</span>
+                        </button>
+                    </div>
+
+                    <!-- KPI bar Clientes -->
+                    <div class="mob-kpi-bar" id="mobKpiCli">
+                        <div class="mob-kpi-cell"><div class="mob-kpi-cell-val" id="mkv-cliTotal">—</div><div class="mob-kpi-cell-lbl">Total</div></div>
+                        <div class="mob-kpi-cell"><div class="mob-kpi-cell-val" id="mkv-cliActivos">—</div><div class="mob-kpi-cell-lbl">Activos</div></div>
+                        <div class="mob-kpi-cell"><div class="mob-kpi-cell-val" id="mkv-cliPend">—</div><div class="mob-kpi-cell-lbl">Pendientes</div></div>
+                    </div>
+
+                    <!-- Lista móvil de Clientes -->
+                    <div class="mob-list" id="mobListCli">
+                        <div class="mob-list-toolbar">
+                            <div class="filter-tabs" id="mobCliFilterTabs">
+                                <button class="filter-tab active" onclick="mobFiltrarCli('Todos',this)">Todos</button>
+                                <button class="filter-tab" onclick="mobFiltrarCli('Activo',this)">Activos</button>
+                                <button class="filter-tab" onclick="mobFiltrarCli('Pendiente',this)">Pendientes</button>
+                                <button class="filter-tab" onclick="mobFiltrarCli('Inactivo',this)">Inactivos</button>
+                            </div>
+                        </div>
+                        <div id="mobCliListBody"><div class="mob-list-empty">Cargando…</div></div>
+                        <div class="pagination-wrap" id="mobCliPagination"></div>
+                        <div class="mob-list-foot" id="mobCliFoot"></div>
+                    </div>
+
+                    <!-- KPI bar Prospectos (oculta inicialmente) -->
+                    <div class="mob-kpi-bar" id="mobKpiPro" style="display:none">
+                        <div class="mob-kpi-cell"><div class="mob-kpi-cell-val" id="mkv-proTotal">—</div><div class="mob-kpi-cell-lbl">Total</div></div>
+                        <div class="mob-kpi-cell"><div class="mob-kpi-cell-val" id="mkv-proActivos">—</div><div class="mob-kpi-cell-lbl">Activos</div></div>
+                        <div class="mob-kpi-cell"><div class="mob-kpi-cell-val" id="mkv-proCalif">—</div><div class="mob-kpi-cell-lbl">Calificados</div></div>
+                    </div>
+
+                    <!-- Toggle embudo (oculto inicialmente) -->
+                    <button class="mob-funnel-toggle" id="mobFunnelToggle" style="display:none" onclick="mobToggleFunnel()">
+                        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                        Ver embudo de ventas
+                    </button>
+                    <!-- Embudo colapsable -->
+                    <div id="mobFunnelWrap" style="display:none;margin-bottom:10px">
+                        <div class="table-card funnel-card" id="mobFunnelCard">
+                            <div class="funnel-grid" id="mobFunnelGrid"></div>
+                        </div>
+                    </div>
+
+                    <!-- Lista móvil de Prospectos (oculta inicialmente) -->
+                    <div class="mob-list" id="mobListPro" style="display:none">
+                        <div class="mob-list-toolbar">
+                            <div class="filter-tabs" id="mobProFilterTabs">
+                                <button class="filter-tab active" onclick="mobFiltrarPro('Todos',this)">Todos</button>
+                                <button class="filter-tab" onclick="mobFiltrarPro('Nuevo',this)">Nuevos</button>
+                                <button class="filter-tab" onclick="mobFiltrarPro('Contactado',this)">Contactados</button>
+                                <button class="filter-tab" onclick="mobFiltrarPro('Calificado',this)">Calificados</button>
+                                <button class="filter-tab" onclick="mobFiltrarPro('Propuesta',this)">Propuesta</button>
+                                <button class="filter-tab" onclick="mobFiltrarPro('Negociación',this)">Negociación</button>
+                                <button class="filter-tab" onclick="mobFiltrarPro('Perdido',this)">Perdidos</button>
+                            </div>
+                        </div>
+                        <div id="mobProListBody"><div class="mob-list-empty">Cargando…</div></div>
+                        <div class="pagination-wrap" id="mobProPagination"></div>
+                        <div class="mob-list-foot" id="mobProFoot"></div>
+                    </div>
+                </div>
+                <!-- /mobContactosWrap -->
+
                 <div class="kpi-grid">
                     <div class="kpi-card">
                         <div class="kpi-label">Total clientes</div>
@@ -2833,6 +3028,7 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
             </div>
 
             <!-- ── PROSPECTOS ── -->
+            <!-- En móvil los prospectos se muestran dentro de page-clientes (seg control) -->
             <div class="page" id="page-prospectos">
                 <div class="kpi-grid">
                     <div class="kpi-card">
@@ -8069,6 +8265,275 @@ function _syncBnBadges() {
         }, { passive: true });
     }
 })();
+
+
+/* ════════════════════════════════════════════════════════════
+   MÓDULO MÓVIL — Vista unificada Clientes + Prospectos
+   Solo se activa en pantallas < 768px
+════════════════════════════════════════════════════════════ */
+
+var _mobSeg = 'clientes';   // segmento activo: 'clientes' | 'prospectos'
+var _mobFiltCli = 'Todos';
+var _mobFiltPro = 'Todos';
+var _mobCliPage = 0;
+var _mobProPage = 0;
+var _mobCliData = [];
+var _mobProData = [];
+var _mobFunnelOpen = false;
+var MOB_PAGE_SIZE = 25;
+
+var ETAPA_COLOR_MOB = {
+    'Nuevo':'#8E8E93','Contactado':'#0A84FF','Calificado':'#30D158',
+    'Propuesta':'#BF5AF2','Negociación':'#FF9F0A','Perdido':'#FF453A'
+};
+
+function _isMobile() { return window.innerWidth < 768; }
+
+/* Inicializa la vista móvil — llamado desde loadAll() o init */
+function mobInit() {
+    if (!_isMobile()) return;
+    var wrap = document.getElementById('mobContactosWrap');
+    if (wrap) wrap.style.display = 'block';
+}
+
+/* Actualiza los KPI bars móviles con datos del resumen */
+function mobUpdateKpi(resumen) {
+    if (!resumen) return;
+    var c = resumen.clientes || {};
+    var p = resumen.prospectos || {};
+    _setTxt('mkv-cliTotal',   c.total || 0);
+    _setTxt('mkv-cliActivos', c.activos || 0);
+    _setTxt('mkv-cliPend',    c.pendientes || 0);
+    _setTxt('mkv-proTotal',   p.total || 0);
+    _setTxt('mkv-proActivos', p.activos || 0);
+    _setTxt('mkv-proCalif',   p.calificados || 0);
+    _setTxt('mobBadgeCli',    c.total || 0);
+    _setTxt('mobBadgePro',    p.total || 0);
+}
+function _setTxt(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+
+/* Cambia entre Clientes y Prospectos en el segmento móvil */
+function mobSwitchSeg(seg) {
+    _mobSeg = seg;
+    var btnCli = document.getElementById('mobSegCli');
+    var btnPro = document.getElementById('mobSegPro');
+    var kpiCli = document.getElementById('mobKpiCli');
+    var listCli = document.getElementById('mobListCli');
+    var kpiPro = document.getElementById('mobKpiPro');
+    var listPro = document.getElementById('mobListPro');
+    var funnelBtn = document.getElementById('mobFunnelToggle');
+    var funnelWrap = document.getElementById('mobFunnelWrap');
+
+    if (seg === 'clientes') {
+        if (btnCli) btnCli.classList.add('active');
+        if (btnPro) btnPro.classList.remove('active');
+        if (kpiCli) kpiCli.style.display = '';
+        if (listCli) listCli.style.display = '';
+        if (kpiPro) kpiPro.style.display = 'none';
+        if (listPro) listPro.style.display = 'none';
+        if (funnelBtn) funnelBtn.style.display = 'none';
+        if (funnelWrap) funnelWrap.style.display = 'none';
+        mobRenderCli();
+    } else {
+        if (btnCli) btnCli.classList.remove('active');
+        if (btnPro) btnPro.classList.add('active');
+        if (kpiCli) kpiCli.style.display = 'none';
+        if (listCli) listCli.style.display = 'none';
+        if (kpiPro) kpiPro.style.display = '';
+        if (listPro) listPro.style.display = '';
+        if (funnelBtn) funnelBtn.style.display = '';
+        if (funnelWrap) funnelWrap.style.display = _mobFunnelOpen ? '' : 'none';
+        mobRenderPro();
+        mobRenderFunnel();
+    }
+}
+
+/* Toggle del embudo en móvil */
+function mobToggleFunnel() {
+    _mobFunnelOpen = !_mobFunnelOpen;
+    var btn = document.getElementById('mobFunnelToggle');
+    var wrap = document.getElementById('mobFunnelWrap');
+    if (btn) {
+        btn.classList.toggle('open', _mobFunnelOpen);
+        btn.innerHTML = (_mobFunnelOpen
+            ? '<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> Ocultar embudo'
+            : '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg> Ver embudo de ventas');
+    }
+    if (wrap) wrap.style.display = _mobFunnelOpen ? '' : 'none';
+}
+
+/* Renderiza el embudo en el widget móvil */
+function mobRenderFunnel() {
+    var grid = document.getElementById('mobFunnelGrid');
+    if (!grid || !_prospectos || !_prospectos.length) return;
+    var max = Math.max.apply(null, ['Nuevo','Contactado','Calificado','Propuesta','Negociación','Perdido'].map(function(e) {
+        return _prospectos.filter(function(p) { return p.etapa === e; }).length;
+    }).concat([1]));
+    grid.innerHTML = ['Nuevo','Contactado','Calificado','Propuesta','Negociación','Perdido'].map(function(e) {
+        var grupo = _prospectos.filter(function(p) { return p.etapa === e; });
+        var valor = grupo.reduce(function(s, p) { return s + Number(p.valorEstimado || 0); }, 0);
+        var pct = Math.round(grupo.length / max * 100);
+        return '<div class="bar-group"><div class="bar-label"><span>' + e + ' · ' + grupo.length + '</span><span>Q ' + valor.toLocaleString() + '</span></div>' +
+            '<div class="bar-track"><div class="bar-fill" style="width:' + Math.max(pct, 2) + '%;background:' + (ETAPA_COLOR_MOB[e] || '#8E8E93') + '"></div></div></div>';
+    }).join('');
+}
+
+/* Filtrar y renderizar lista de clientes móvil */
+function mobFiltrarCli(filtro, el) {
+    if (el) { el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(function(t){ t.classList.remove('active'); }); el.classList.add('active'); }
+    _mobFiltCli = filtro;
+    _mobCliPage = 0;
+    mobRenderCli();
+}
+function mobFiltrarPro(filtro, el) {
+    if (el) { el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(function(t){ t.classList.remove('active'); }); el.classList.add('active'); }
+    _mobFiltPro = filtro;
+    _mobProPage = 0;
+    mobRenderPro();
+}
+
+function mobRenderCli() {
+    if (!_clientes) return;
+    var data = _mobFiltCli === 'Todos' ? _clientes.slice() : _clientes.filter(function(c){ return c.estado === _mobFiltCli; });
+    _mobCliData = data;
+    _mobCliPage = 0;
+    _mobRenderCliPage();
+}
+
+function mobGoCliPage(page) {
+    _mobCliPage = page;
+    _mobRenderCliPage();
+    var wrap = document.getElementById('mobListCli');
+    if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function _mobRenderCliPage() {
+    var data = _mobCliData;
+    var total = data.length;
+    var totalPages = Math.max(1, Math.ceil(total / MOB_PAGE_SIZE));
+    var start = _mobCliPage * MOB_PAGE_SIZE;
+    var slice = data.slice(start, start + MOB_PAGE_SIZE);
+    var body = document.getElementById('mobCliListBody');
+    if (!body) return;
+    if (!slice.length) { body.innerHTML = '<div class="mob-list-empty">Sin clientes con estos filtros</div>'; return; }
+    body.innerHTML = slice.map(function(c) {
+        var tagHtml = c.estado === 'Activo' ? '<span class="tag tag-success" style="font-size:11px">Activo</span>'
+            : c.estado === 'Pendiente' ? '<span class="tag tag-warning" style="font-size:11px">Pendiente</span>'
+            : '<span class="tag tag-danger" style="font-size:11px">Inactivo</span>';
+        return '<div class="mob-list-item" onclick="fichaRowClick(event,\'Cliente\',' + c.id + ')">' +
+            '<div class="mini-avatar" style="background:' + (c.color || '#8E8E93') + ';width:36px;height:36px;font-size:13px;flex-shrink:0">' + (typeof initials === 'function' ? initials(c.nombre) : (c.nombre||'').substring(0,2).toUpperCase()) + '</div>' +
+            '<div class="mob-list-item-info"><div class="mob-list-item-name">' + (typeof escHtml === 'function' ? escHtml(c.nombre) : c.nombre) + '</div>' +
+            '<div class="mob-list-item-sub">' + (c.empresa ? (typeof escHtml==='function'?escHtml(c.empresa):c.empresa) : '') + (c.empresa && c.telefono ? ' · ' : '') + (c.telefono ? (typeof escHtml==='function'?escHtml(c.telefono):c.telefono) : '') + '</div></div>' +
+            tagHtml +
+            '<div class="mob-list-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div>';
+    }).join('');
+    var pag = document.getElementById('mobCliPagination');
+    if (pag) pag.innerHTML = totalPages > 1 ? _buildPaginationHtml(_mobCliPage, totalPages, 'mobGoCliPage') : '';
+    var foot = document.getElementById('mobCliFoot');
+    if (foot) foot.textContent = total + ' de ' + _clientes.length + ' clientes';
+}
+
+function mobRenderPro() {
+    if (!_prospectos) return;
+    var data = _mobFiltPro === 'Todos' ? _prospectos.slice() : _prospectos.filter(function(p){ return p.etapa === _mobFiltPro; });
+    _mobProData = data;
+    _mobProPage = 0;
+    _mobRenderProPage();
+}
+
+function mobGoProPage(page) {
+    _mobProPage = page;
+    _mobRenderProPage();
+    var wrap = document.getElementById('mobListPro');
+    if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function _mobRenderProPage() {
+    var data = _mobProData;
+    var total = data.length;
+    var totalPages = Math.max(1, Math.ceil(total / MOB_PAGE_SIZE));
+    var start = _mobProPage * MOB_PAGE_SIZE;
+    var slice = data.slice(start, start + MOB_PAGE_SIZE);
+    var body = document.getElementById('mobProListBody');
+    if (!body) return;
+    if (!slice.length) { body.innerHTML = '<div class="mob-list-empty">Sin prospectos con estos filtros</div>'; return; }
+
+    var ETAPA_TAG = {
+        'Nuevo':'tag-nuevo','Contactado':'tag-contactado','Calificado':'tag-calificado',
+        'Propuesta':'tag-propuesta','Negociación':'tag-negociacion','Perdido':'tag-perdido'
+    };
+    body.innerHTML = slice.map(function(p) {
+        var tagClass = ETAPA_TAG[p.etapa] || 'tag-gray';
+        var tagHtml = '<span class="tag ' + tagClass + '" style="font-size:11px;white-space:nowrap">' + (typeof escHtml==='function'?escHtml(p.etapa):p.etapa) + '</span>';
+        return '<div class="mob-list-item" onclick="fichaRowClick(event,\'Prospecto\',' + p.id + ')">' +
+            '<div class="mini-avatar" style="background:' + (p.color || '#8E8E93') + ';width:36px;height:36px;font-size:13px;flex-shrink:0">' + (typeof initials==='function'?initials(p.nombre):(p.nombre||'').substring(0,2).toUpperCase()) + '</div>' +
+            '<div class="mob-list-item-info"><div class="mob-list-item-name">' + (typeof escHtml==='function'?escHtml(p.nombre):p.nombre) + '</div>' +
+            '<div class="mob-list-item-sub">' + (p.empresa ? (typeof escHtml==='function'?escHtml(p.empresa):p.empresa) : '') + (p.empresa && p.etapa ? ' · ' : '') + (p.etapa ? p.etapa : '') + '</div></div>' +
+            tagHtml +
+            '<div class="mob-list-chevron"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div></div>';
+    }).join('');
+    var pag = document.getElementById('mobProPagination');
+    if (pag) pag.innerHTML = totalPages > 1 ? _buildPaginationHtml(_mobProPage, totalPages, 'mobGoProPage') : '';
+    var foot = document.getElementById('mobProFoot');
+    if (foot) foot.textContent = total + ' de ' + _prospectos.length + ' prospectos';
+}
+
+/* Hook en showPage para iniciar vista móvil al ir a clientes/prospectos */
+(function() {
+    var _prevShowPage = typeof showPage === 'function' ? showPage : null;
+    if (!_prevShowPage) return;
+    showPage = function(page, navEl) {
+        _prevShowPage(page, navEl);
+        if (!_isMobile()) return;
+        /* En móvil, redirigir prospectos a clientes con seg activo */
+        if (page === 'prospectos') {
+            /* Mostrar la página clientes en su lugar y activar seg prospectos */
+            _prevShowPage('clientes', document.getElementById('nav-clientes'));
+            mobInit();
+            mobSwitchSeg('prospectos');
+        } else if (page === 'clientes') {
+            mobInit();
+            mobSwitchSeg('clientes');
+        }
+    };
+})();
+
+/* Actualizar listas móviles cada vez que se cargan datos */
+(function() {
+    var _watchInterval = setInterval(function() {
+        if (typeof _clientes !== 'undefined' && typeof _prospectos !== 'undefined') {
+            clearInterval(_watchInterval);
+            if (_isMobile()) {
+                mobInit();
+                mobUpdateKpi(typeof _resumen !== 'undefined' ? _resumen : null);
+                mobRenderCli();
+                mobRenderPro();
+                mobRenderFunnel();
+            }
+        }
+    }, 400);
+
+    /* También escuchar cuando el resumen se actualiza */
+    var _origUpdateResumen = typeof updateResumen === 'function' ? updateResumen : null;
+    if (_origUpdateResumen) {
+        updateResumen = function(r) {
+            _origUpdateResumen(r);
+            if (_isMobile()) mobUpdateKpi(r);
+        };
+    }
+})();
+
+/* Re-renderizar al rotar pantalla */
+window.addEventListener('resize', function() {
+    var mob = _isMobile();
+    var wrap = document.getElementById('mobContactosWrap');
+    if (wrap) wrap.style.display = mob ? 'block' : 'none';
+    if (mob && typeof _clientes !== 'undefined') {
+        mobRenderCli();
+        mobRenderPro();
+        mobRenderFunnel();
+    }
+});
 
     </script>
 
