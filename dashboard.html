@@ -9742,15 +9742,24 @@ window.addEventListener('resize', function() {
 
     COM.api = function (accion, params) {
         // Usa el mismo _dispatch de Supabase que el resto del CRM
-        if (typeof window._dispatch === 'function') {
-            var tok = token();
-            var p = Object.assign({ token: tok }, params || {});
-            return window._dispatch(accion, [p]).then(function(d) {
-                if (!d || d.ok === false) throw new Error(d && d.error ? d.error : 'Error en ' + accion);
-                return d;
-            });
+        function tryDispatch(intentos) {
+            if (typeof window._dispatch === 'function') {
+                var tok = token();
+                var p = Object.assign({ token: tok }, params || {});
+                return window._dispatch(accion, [p]).then(function(d) {
+                    if (!d) throw new Error('Sin respuesta del servidor para ' + accion);
+                    if (d.ok === false) throw new Error(d.error || 'Error en ' + accion);
+                    return d;
+                });
+            }
+            if (intentos > 0) {
+                return new Promise(function(res, rej) {
+                    setTimeout(function() { tryDispatch(intentos - 1).then(res).catch(rej); }, 300);
+                });
+            }
+            return Promise.reject(new Error('Backend Supabase no disponible todavía.'));
         }
-        return Promise.reject(new Error('Backend Supabase no disponible.'));
+        return tryDispatch(10);
     };
 
     function aviso(msg, color) {
@@ -10047,16 +10056,18 @@ window.addEventListener('resize', function() {
     COM.recargar = function (inicial) {
         pintar('<div class="com-card com-empty">Cargando Comunidad…</div>');
         return COM.api('comGetInicio', {}).then(function (d) {
-            COM.datos    = d;
-            COM.canales  = d.canales || [];
-            COM.chats    = d.chats || [];
-            COM.personas = d.personas || [];
+            COM.datos    = d || {};
+            COM.canales  = (d && d.canales)  || [];
+            COM.chats    = (d && d.chats)    || [];
+            COM.personas = (d && d.personas) || (d && d.usuarios) || [];
+            COM.reuniones= (d && d.reuniones)|| [];
+            var yo = (d && d.yo) || {};
             var saludo = document.getElementById('comSaludo');
             if (saludo) {
-                saludo.textContent = 'Hola ' + (d.yo.nombre || '') + ' · ' +
+                saludo.textContent = 'Hola ' + (yo.nombre || '') + ' · ' +
                     COM.canales.length + ' canales · ' + COM.personas.length + ' colaboradores';
             }
-            actualizarBadge(d.noLeidas || 0);
+            actualizarBadge((d && d.noLeidas) || 0);
             pintarTabs();
             if (inicial) COM.ir('inicio'); else COM.ir(COM.vista);
         }).catch(function (e) {
@@ -10080,7 +10091,7 @@ window.addEventListener('resize', function() {
         var d = COM.datos;
         if (!d) return;
 
-        var canales = COM.canales.slice(0, 6).map(function (c) {
+        var canales = (COM.canales || []).slice(0, 6).map(function (c) {
             return '<div class="com-card" style="cursor:pointer;padding:13px" onclick="COM.abrirCanal(' + c.id + ')">' +
                 '<div style="display:flex;align-items:center;gap:8px">' +
                     '<div class="com-av sm" style="background:' + attr(c.color) + '">#</div>' +
@@ -10093,7 +10104,7 @@ window.addEventListener('resize', function() {
                 '</div></div>';
         }).join('') || vacio('Aún no perteneces a ningún canal.');
 
-        var chats = COM.chats.slice(0, 6).map(function (c) {
+        var chats = (COM.chats || []).slice(0, 6).map(function (c) {
             return '<div class="com-side-item" onclick="COM.abrirChat(' + c.id + ')">' +
                 avatar({ nombre: c.nombre, fotoUrl: c.fotoUrl }, 'sm') +
                 '<div class="com-side-item-body">' +
@@ -10134,7 +10145,7 @@ window.addEventListener('resize', function() {
                     '<div class="com-notif-time">' + relativo(n.fecha) + '</div></div></div>';
         }).join('') || vacio('Sin notificaciones pendientes.');
 
-        var activos = COM.personas.filter(function (p) { return p.estado === 'Disponible'; }).slice(0, 12);
+        var activos = (COM.personas || []).filter(function (p) { return p.estado === 'Disponible'; }).slice(0, 12);
 
         pintar(
             '<div class="com-view active">' +
@@ -10220,10 +10231,10 @@ window.addEventListener('resize', function() {
         f = f.toLowerCase();
         var coincide = function (t) { return !f || String(t).toLowerCase().indexOf(f) !== -1; };
 
-        var canales = COM.canales.filter(function (c) {
+        var canales = (COM.canales || []).filter(function (c) {
             return c.estado === 'Activo' && coincide(c.nombre);
         });
-        var chats = COM.chats.filter(function (c) { return coincide(c.nombre); });
+        var chats = (COM.chats || []).filter(function (c) { return coincide(c.nombre); });
 
         var html = '<div class="com-side-group">Canales' +
             (COM.datos.permisos.crearCanales
@@ -10277,7 +10288,7 @@ window.addEventListener('resize', function() {
     };
 
     COM.abrirChat = function (id, yaEnVista) {
-        var chat = COM.chats.find(function (c) { return String(c.id) === String(id); });
+        var chat = (COM.chats || []).find(function (c) { return String(c.id) === String(id); });
         if (!chat) return;
         COM.actual = { tipo: 'chat', id: chat.id, nombre: chat.nombre, datos: chat };
         if (COM.vista !== 'mensajes' && !yaEnVista) { COM.ir('mensajes', { tipo: 'chat', id: id }); return; }
@@ -10450,7 +10461,7 @@ window.addEventListener('resize', function() {
             }
             cuerpo += pintarMensaje(m, COM.mensajes[i - 1]);
         });
-        if (!COM.mensajes.length) {
+        if (!(COM.mensajes || []).length) {
             cuerpo = vacio(COM.actual.tipo === 'canal'
                 ? 'Este canal todavía no tiene mensajes. Escribe el primero.'
                 : 'Aún no hay mensajes en esta conversación.');
@@ -10501,7 +10512,7 @@ window.addEventListener('resize', function() {
     }
 
     COM.cargarAnteriores = function () {
-        if (!COM.mensajes.length) return;
+        if (!(COM.mensajes || []).length) return;
         var primero = COM.mensajes[0].id;
         COM.api('comGetMensajes', refParams({ antesDeId: primero })).then(function (d) {
             COM.mensajes = (d.data || []).concat(COM.mensajes);
@@ -10582,7 +10593,7 @@ window.addEventListener('resize', function() {
     };
 
     COM.menuReaccion = function (id) {
-        var lista = (COM.datos.reaccionesDisponibles || []).map(function (e) {
+        var lista = (((COM.datos && COM.datos.reaccionesDisponibles) || []) || []).map(function (e) {
             return '<button class="com-btn" style="font-size:19px;height:42px;width:52px;justify-content:center" ' +
                 'onclick="COM.reaccionar(' + id + ',\'' + e + '\',true)">' + e + '</button>';
         }).join('');
@@ -10781,8 +10792,8 @@ window.addEventListener('resize', function() {
     COM.recargarListas = function () {
         return Promise.all([COM.api('comGetCanales', {}), COM.api('comGetChats', {})])
             .then(function (r) {
-                COM.canales = r[0].data || [];
-                COM.chats   = r[1].data || [];
+                COM.canales = (r[0] && r[0].data) || [];
+                COM.chats   = (r[1] && r[1].data) || [];
                 if (COM.actual) {
                     var lista = COM.actual.tipo === 'canal' ? COM.canales : COM.chats;
                     var d = lista.find(function (x) { return String(x.id) === String(COM.actual.id); });
@@ -10799,7 +10810,7 @@ window.addEventListener('resize', function() {
     function vistaCanales() {
         COM.api('comGetCanales', {}).then(function (d) {
             COM.canales = d.data || [];
-            var tarjetas = COM.canales.map(function (c) {
+            var tarjetas = (COM.canales || []).map(function (c) {
                 return '<div class="com-card">' +
                     '<div style="display:flex;align-items:center;gap:10px">' +
                         '<div class="com-av" style="background:' + attr(c.color) + '">#</div>' +
@@ -11035,7 +11046,7 @@ window.addEventListener('resize', function() {
     };
 
     COM.infoGrupo = function (id) {
-        var c = COM.chats.find(function (x) { return String(x.id) === String(id); });
+        var c = (COM.chats || []).find(function (x) { return String(x.id) === String(id); });
         if (!c) return;
         var puede = c.soyAdminGrupo || COM.datos.permisos.esAdmin;
         var yaEstan = c.participantes.map(function (p) { return p.usuario; });
@@ -11083,7 +11094,7 @@ window.addEventListener('resize', function() {
     function vistaPersonas() {
         COM.api('comGetPersonas', {}).then(function (d) {
             COM.personas = d.data || [];
-            var tarjetas = COM.personas.map(function (p) {
+            var tarjetas = (COM.personas || []).map(function (p) {
                 return '<div class="com-person">' + avatar(p, 'lg') +
                     '<div class="com-person-name">' + esc(p.nombre) + '</div>' +
                     '<div class="com-person-role">' + esc(p.cargo || p.rol) +
@@ -11153,7 +11164,7 @@ window.addEventListener('resize', function() {
                         '<div class="form-field"><label class="form-label">REPORTA A</label>' +
                             '<select class="form-select" id="comJefeSel">' +
                                 '<option value="">— Sin jefe (raíz) —</option>' +
-                                COM.personas.filter(function (x) { return x.usuario !== p.usuario; })
+                                (COM.personas || []).filter(function (x) { return x.usuario !== p.usuario; })
                                     .map(function (x) {
                                         return '<option value="' + attr(x.usuario) + '"' +
                                             (x.usuario === p.reportaA ? ' selected' : '') + '>' + esc(x.nombre) + '</option>';
@@ -11236,7 +11247,7 @@ window.addEventListener('resize', function() {
     }
 
     COM.editarJerarquia = function () {
-        var filas = COM.personas.map(function (p) {
+        var filas = (COM.personas || []).map(function (p) {
             return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border)">' +
                 avatar(p, 'sm') +
                 '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">' + esc(p.nombre) + '</div>' +
@@ -11244,7 +11255,7 @@ window.addEventListener('resize', function() {
                 '<select class="form-select" style="width:210px;height:32px;font-size:12.5px" ' +
                     'onchange="COM.cambiarJefe(\'' + attr(p.usuario) + '\', this.value)">' +
                     '<option value="">— Sin jefe —</option>' +
-                    COM.personas.filter(function (x) { return x.usuario !== p.usuario; }).map(function (x) {
+                    (COM.personas || []).filter(function (x) { return x.usuario !== p.usuario; }).map(function (x) {
                         return '<option value="' + attr(x.usuario) + '"' +
                             (x.usuario === p.reportaA ? ' selected' : '') + '>' + esc(x.nombre) + '</option>';
                     }).join('') +
@@ -11485,7 +11496,7 @@ window.addEventListener('resize', function() {
                     '</td></tr>';
             }).join('');
 
-            var canalesOpts = COM.canales.map(function (c) {
+            var canalesOpts = (COM.canales || []).map(function (c) {
                 return '<option value="' + c.id + '">#' + esc(c.nombre) + '</option>';
             }).join('');
 
@@ -11587,7 +11598,7 @@ window.addEventListener('resize', function() {
                         return '<label class="com-pick-row"><input type="checkbox" class="comAnuDest" value="' + r +
                             '"><b>Rol: ' + r + '</b></label>';
                     }).join('') +
-                    COM.personas.map(function (p) {
+                    (COM.personas || []).map(function (p) {
                         return '<label class="com-pick-row"><input type="checkbox" class="comAnuDest" value="' +
                             attr(p.usuario) + '">' + avatar(p, 'sm') + '<span>' + esc(p.nombre) + '</span></label>';
                     }).join('') +
@@ -11944,10 +11955,10 @@ window.addEventListener('resize', function() {
             if (!COM.actual || document.hidden) return;
             if (document.getElementById('page-comunidad') &&
                 !document.getElementById('page-comunidad').classList.contains('active')) return;
-            var ultimo = COM.mensajes.length ? COM.mensajes[COM.mensajes.length - 1].id : 0;
+            var ultimo = (COM.mensajes || []).length ? COM.mensajes[(COM.mensajes || []).length - 1].id : 0;
             COM.api('comGetMensajes', refParams({ desdeId: ultimo })).then(function (d) {
-                if (!d.data || !d.data.length) return;
-                COM.mensajes = COM.mensajes.concat(d.data);
+                if (!d || !d.data || !d.data.length) return;
+                COM.mensajes = (COM.mensajes || []).concat(d.data);
                 var cont = document.getElementById('comMsgs');
                 var abajo = cont && (cont.scrollHeight - cont.scrollTop - cont.clientHeight) < 90;
                 pintarConversacion(!abajo);
