@@ -4483,8 +4483,22 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             if(!sess||!sess.token) return {ok:false};
             if(sess.expira&&new Date(sess.expira)<=new Date()){localStorage.removeItem(SESSION_KEY);return {ok:false};}
             const th=await _sha256(sess.token);
-            const {data:s}=await _sb.from('Sesiones').select('*').eq('tokenHash',th).eq('activo',true).single();
-            if(!s||new Date(s.expira)<=new Date()){localStorage.removeItem(SESSION_KEY);return {ok:false};}
+            // Intentar verificar contra la tabla Sesiones
+            const {data:s, error:sErr}=await _sb.from('Sesiones').select('*').eq('tokenHash',th).eq('activo',true).single();
+            if(sErr || !s) {
+                // Si la tabla Sesiones falla o no tiene la fila, verificar al menos que el usuario
+                // exista y esté activo usando los datos de la sesión local
+                const usuario = sess.usuario || sess.nombre;
+                if(!usuario) { localStorage.removeItem(SESSION_KEY); return {ok:false}; }
+                const {data:usr2}=await _sb.from('Usuarios').select('*').eq('usuario',usuario).single();
+                if(!usr2||!usr2.activo){localStorage.removeItem(SESSION_KEY);return {ok:false};}
+                // Usuario válido: intentar insertar la sesión si no existía
+                try {
+                    await _sb.from('Sesiones').insert({id:_uuid(),tokenHash:th,usuario:usr2.usuario,rol:usr2.rol,expira:sess.expira,activo:true,creado:new Date().toISOString()});
+                } catch(e) {}
+                return {ok:true,nombre:usr2.nombre,rol:usr2.rol,usuario:usr2.usuario,expira:sess.expira,fotoUrl:usr2.fotoUrl||'',preferencias:_prefsUsuario(usr2)};
+            }
+            if(new Date(s.expira)<=new Date()){localStorage.removeItem(SESSION_KEY);return {ok:false};}
             const {data:usr}=await _sb.from('Usuarios').select('*').eq('usuario',s.usuario).single();
             if(!usr||!usr.activo){localStorage.removeItem(SESSION_KEY);return {ok:false};}
             return {ok:true,nombre:usr.nombre,rol:usr.rol,usuario:usr.usuario,expira:s.expira,fotoUrl:usr.fotoUrl||'',preferencias:_prefsUsuario(usr)};
@@ -4784,16 +4798,27 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             } catch (e) {}
 
             // ── 4. Verificar sesión con el backend en segundo plano ──
-            //    Si el backend la rechaza → cerrar sesión y redirigir.
+            //    Si el backend la rechaza → solo redirigir si la sesión local también está vencida.
             //    Si hay error de red → no redirigir; la siguiente llamada API lo manejará.
             function verificarConBackend(intento) {
                 intento = intento || 1;
                 google.script.run
                     .withSuccessHandler(function (sess) {
                         if (!sess || !sess.ok) {
-                            // El backend rechazó la sesión: limpiar y redirigir
-                            localStorage.removeItem('azyvion_session');
-                            window.location.href = 'index.html';
+                            // El backend rechazó la sesión: solo redirigir si la sesión local
+                            // también está vencida o ya no existe — evita falso logout por
+                            // problemas transitorios de Supabase (tabla Sesiones, RLS, etc.)
+                            var localSess = null;
+                            try { localSess = JSON.parse(localStorage.getItem('azyvion_session') || 'null'); } catch(e) {}
+                            if (!localSess || !localSess.token || (localSess.expira && new Date(localSess.expira) <= new Date())) {
+                                localStorage.removeItem('azyvion_session');
+                                window.location.href = 'index.html';
+                            } else if (intento < 3) {
+                                // Reintentar: puede ser un fallo transitorio de Supabase
+                                setTimeout(function () { verificarConBackend(intento + 1); }, 3000);
+                            }
+                            // Si después de 3 intentos sigue fallando pero la sesión local
+                            // es válida, el usuario permanece en el dashboard.
                             return;
                         }
                         // Actualizar con datos frescos del servidor
@@ -5125,8 +5150,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
           <td>Q ${Number(i.precioUnit).toLocaleString()}</td>
           <td>${esServicio ? '<span class="tag tag-servicio">Servicio</span>' : tagEstadoInv(i.estado)}</td>
           <td style="display:flex;gap:6px">
-            <button class="section-action" onclick="editInv(${i.id})">Editar</button>
-            <button class="btn-danger-sm" onclick="confirmDeleteInv(${i.id},'${escAttr(i.producto)}')">Eliminar</button>
+            <button class="section-action" onclick="editInv('${i.id}')">Editar</button>
+            <button class="btn-danger-sm" onclick="confirmDeleteInv('${i.id}','${escAttr(i.producto)}')">Eliminar</button>
           </td>
         </tr>`;
                 }).join('')
@@ -5165,8 +5190,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
       </div>
       ${e.estado === 'Borrador' ? `<div style="background:var(--warning-bg);border-radius:9px;padding:10px 12px;font-size:12.5px;color:#a06000;line-height:1.4;">Completa las preguntas restantes antes de enviar. Faltan ${pTot - pConf} preguntas.</div>` : ''}
       <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="topbar-btn" style="height:30px;font-size:12px;" onclick="editEncuesta(${e.id})">Editar</button>
-        <button class="btn-danger-sm" style="height:30px;" onclick="confirmDeleteEncuesta(${e.id},'${escHtml(e.nombre)}')">Eliminar</button>
+        <button class="topbar-btn" style="height:30px;font-size:12px;" onclick="editEncuesta('${e.id}')">Editar</button>
+        <button class="btn-danger-sm" style="height:30px;" onclick="confirmDeleteEncuesta('${e.id}','${escHtml(e.nombre)}')">Eliminar</button>
       </div>
     </div>`;
             });
@@ -5268,7 +5293,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         function _proRow(p, admin) {
             const prob = Math.max(0, Math.min(100, Number(p.probabilidad || 0)));
             const cls = prob >= 65 ? 'hot' : prob <= 30 ? 'cold' : '';
-            return `<tr class="row-click" title="Ver ficha del prospecto" onclick="fichaRowClick(event,'Prospecto',${p.id})">
+            return `<tr class="row-click" title="Ver ficha del prospecto" onclick="fichaRowClick(event,'Prospecto','${p.id}')">
         <td>
           <div class="client-name">
             <div class="mini-avatar" style="background:${p.color || '#8E8E93'}">${initials(p.nombre)}</div>
@@ -5294,9 +5319,9 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         <td class="cell-num">Q ${Number(p.valorEstimado || 0).toLocaleString()}</td>
         <td>
           <div class="row-actions">
-            ${p.etapa !== 'Perdido' ? `<button class="btn-success-sm" onclick="confirmConvertir(${p.id})">Convertir</button>` : ''}
-            <button class="section-action" onclick="editProspecto(${p.id})">Editar</button>
-            ${admin ? `<button class="btn-danger-sm" onclick="confirmDeleteProspecto(${p.id},'${escAttr(p.nombre)}')">Eliminar</button>` : ''}
+            ${p.etapa !== 'Perdido' ? `<button class="btn-success-sm" onclick="confirmConvertir('${p.id}')">Convertir</button>` : ''}
+            <button class="section-action" onclick="editProspecto('${p.id}')">Editar</button>
+            ${admin ? `<button class="btn-danger-sm" onclick="confirmDeleteProspecto('${p.id}','${escAttr(p.nombre)}')">Eliminar</button>` : ''}
           </div>
         </td>
       </tr>`;
@@ -5416,7 +5441,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             var tbody = document.getElementById('clientesTbody');
             tbody.innerHTML = slice.length
                 ? slice.map(function(c){
-                    return `<tr class="row-click" title="Ver ficha del cliente" onclick="fichaRowClick(event,'Cliente',${c.id})">
+                    return `<tr class="row-click" title="Ver ficha del cliente" onclick="fichaRowClick(event,'Cliente','${c.id}')">
         <td>
           <div class="client-name">
             <div class="mini-avatar" style="background:${c.color || '#8E8E93'}">${initials(c.nombre)}</div>
@@ -5436,8 +5461,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         <td class="cell-num">Q ${Number(c.valorTotal || 0).toLocaleString()}</td>
         <td>
           <div class="row-actions">
-            <button class="section-action" onclick="editCliente(${c.id})">Editar</button>
-            ${admin ? `<button class="btn-danger-sm" onclick="confirmDeleteCliente(${c.id},'${escAttr(c.nombre)}')">Eliminar</button>` : ''}
+            <button class="section-action" onclick="editCliente('${c.id}')">Editar</button>
+            ${admin ? `<button class="btn-danger-sm" onclick="confirmDeleteCliente('${c.id}','${escAttr(c.nombre)}')">Eliminar</button>` : ''}
           </div>
         </td>
       </tr>`;
@@ -5948,8 +5973,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                           ${migrated ? '🔒 Segura' : '⚠️ Migración pendiente'}</span></td>
                       <td>
                         <div class="row-actions">
-                          <button class="section-action" onclick="editUsuario(${u.id})">Editar</button>
-                          <button class="btn-danger-sm" onclick="confirmDeleteUsuario(${u.id},'${escAttr(u.usuario)}')">Eliminar</button>
+                          <button class="section-action" onclick="editUsuario('${u.id}')">Editar</button>
+                          <button class="btn-danger-sm" onclick="confirmDeleteUsuario('${u.id}','${escAttr(u.usuario)}')">Eliminar</button>
                         </div>
                       </td>
                     </tr>`;
@@ -6262,7 +6287,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 const saldoCls = saldo >= 0 ? 'positivo' : 'negativo';
                 const fQ = n => 'Q ' + Number(n).toLocaleString('es-GT', {minimumFractionDigits:2, maximumFractionDigits:2});
                 return `
-                <div class="bank-card" onclick="openBankDrawer(${c.id})">
+                <div class="bank-card" onclick="openBankDrawer('${c.id}')">
                     <div class="bank-card-top">
                         <div class="bank-logo-wrap bank-logo-${escHtml(c.logo)}" title="${escHtml(c.banco)}">
                             <img src="logo-banco-${escHtml(c.logo).toLowerCase()}.png" alt="${escHtml(c.banco)}"
@@ -6278,8 +6303,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     <div class="bank-card-saldo-label">Saldo disponible</div>
                     <div class="bank-card-saldo ${saldoCls}">${fQ(saldo)}</div>
                     <div class="bank-card-cta">
-                        <button class="section-action" onclick="event.stopPropagation();openBankDrawer(${c.id})">Ver detalle</button>
-                        <button class="section-action" onclick="event.stopPropagation();editCuentaBancaria(${c.id})">Editar</button>
+                        <button class="section-action" onclick="event.stopPropagation();openBankDrawer('${c.id}')">Ver detalle</button>
+                        <button class="section-action" onclick="event.stopPropagation();editCuentaBancaria('${c.id}')">Editar</button>
                     </div>
                 </div>`;
             }).join('');
@@ -6352,7 +6377,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     </div>
                     <div>
                         <div class="drawer-trx-amount ${TIPO_CLS[t.tipo]||''}">${SIGN[t.tipo]||''}Q ${Number(t.monto||0).toLocaleString('es-GT',{minimumFractionDigits:2})}</div>
-                        ${esAdmin()?`<button class="btn-danger-sm" style="margin-top:3px;font-size:10px" onclick="confirmDeleteTrx(${t.id},'${escAttr(t.concepto)}')">Eliminar</button>`:''}
+                        ${esAdmin()?`<button class="btn-danger-sm" style="margin-top:3px;font-size:10px" onclick="confirmDeleteTrx('${t.id}','${escAttr(t.concepto)}')">Eliminar</button>`:''}
                     </div>
                 </div>`).join('');
             }
@@ -6401,8 +6426,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     <td><span class="tag ${activa?'tag-success':'tag-danger'}">${activa?'Activa':'Inactiva'}</span></td>
                     <td>
                         <div class="row-actions">
-                            ${(admin||gerente)?`<button class="section-action" onclick="editCuentaContable(${c.id})">Editar</button>`:''}
-                            ${admin?`<button class="btn-danger-sm" onclick="confirmDeleteCuentaContable(${c.id},'${escAttr(c.nombre)}')">Eliminar</button>`:''}
+                            ${(admin||gerente)?`<button class="section-action" onclick="editCuentaContable('${c.id}')">Editar</button>`:''}
+                            ${admin?`<button class="btn-danger-sm" onclick="confirmDeleteCuentaContable('${c.id}','${escAttr(c.nombre)}')">Eliminar</button>`:''}
                         </div>
                     </td>
                     </tr>`;
@@ -6450,7 +6475,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     <td>${cc?`<span style="font-family:monospace;font-size:11px">${escHtml(cc.codigo)}</span> ${escHtml(cc.nombre)}`:'—'}</td>
                     <td>${t.referencia?escHtml(t.referencia):'—'}</td>
                     <td class="cell-num" style="font-weight:700;color:${t.tipo==='Egreso'?'var(--danger)':'var(--success)'}">${sign}${fQ(t.monto)}</td>
-                    <td>${admin?`<button class="btn-danger-sm" onclick="confirmDeleteTrx(${t.id},'${escAttr(t.concepto)}')">Eliminar</button>`:''}</td>
+                    <td>${admin?`<button class="btn-danger-sm" onclick="confirmDeleteTrx('${t.id}','${escAttr(t.concepto)}')">Eliminar</button>`:''}</td>
                     </tr>`;
                 }).join('')
                 : '<tr><td colspan="8" class="empty-cell">Sin transacciones con estos filtros</td></tr>';
@@ -7039,10 +7064,10 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         </td>
         <td>
           <div class="row-actions">
-            <button class="section-action" onclick="verCotizacion(${c.id})">Ver / PDF</button>
-            <button class="btn-success-sm" onclick="enviarCotizacionModal(${c.id})">Correo</button>
-            <button class="section-action" onclick="editarCotizacion(${c.id})">Editar</button>
-            <button class="btn-danger-sm" onclick="confirmDeleteCot(${c.id},'${escAttr(c.numero)}')">Eliminar</button>
+            <button class="section-action" onclick="verCotizacion('${c.id}')">Ver / PDF</button>
+            <button class="btn-success-sm" onclick="enviarCotizacionModal('${c.id}')">Correo</button>
+            <button class="section-action" onclick="editarCotizacion('${c.id}')">Editar</button>
+            <button class="btn-danger-sm" onclick="confirmDeleteCot('${c.id}','${escAttr(c.numero)}')">Eliminar</button>
           </div>
         </td>
       </tr>`).join('')
@@ -7733,8 +7758,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     ${c.notas ? _fdato('Notas', escHtml(c.notas)) : ''}
                     ${_fdato('Registrado', (c.creadoPor ? escHtml(c.creadoPor) + ' · ' : '') + fechaCorta(c.fechaReg))}
                     <div class="row-actions" style="margin-top:12px">
-                      ${puede ? `<button class="section-action" onclick="fichaEditarContacto(${c.id})">Editar</button>` : ''}
-                      ${f.permisos.puedeEliminar ? `<button class="btn-danger-sm" onclick="fichaEliminarContacto(${c.id},'${escAttr(c.nombre)}')">Eliminar</button>` : ''}
+                      ${puede ? `<button class="section-action" onclick="fichaEditarContacto('${c.id}')">Editar</button>` : ''}
+                      ${f.permisos.puedeEliminar ? `<button class="btn-danger-sm" onclick="fichaEliminarContacto('${c.id}','${escAttr(c.nombre)}')">Eliminar</button>` : ''}
                     </div>
                   </div>
                 </div>`).join('') + '</div>';
@@ -7754,7 +7779,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                   <div class="cell-sub">${escHtml(a.fecha)}${a.usuario ? ' · ' + escHtml(a.usuario) : ''}${a.fechaSeguimiento ? ' · seguimiento: ' + escHtml(a.fechaSeguimiento) : ''}</div>
                 </div>
                 ${(a.origen === 'ficha' && _ficha.permisos.puedeEliminar)
-                    ? `<button class="btn-danger-sm" onclick="fichaEliminarActividad(${a.id})">Eliminar</button>` : ''}
+                    ? `<button class="btn-danger-sm" onclick="fichaEliminarActividad('${a.id}')">Eliminar</button>` : ''}
             </div>`;
         }
 
@@ -7787,7 +7812,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                   <td>${tagEtapa(x.etapa)}</td>
                   <td class="cell-num">${Number(x.probabilidad) || 0}%</td>
                   <td class="cell-num">Q ${Number(x.valorEstimado).toLocaleString()}</td>
-                  <td><div class="row-actions"><button class="section-action" onclick="abrirFicha('Prospecto',${x.id})">Ver ficha</button></div></td>
+                  <td><div class="row-actions"><button class="section-action" onclick="abrirFicha('Prospecto','${x.id}')">Ver ficha</button></div></td>
                 </tr>`).join('')}</tbody></table></div></div>`;
         }
 
@@ -7805,7 +7830,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     <div class="ficha-nota-txt">${escHtml(n.contenido)}</div>
                     <div class="ficha-nota-pie">
                       <span class="cell-sub">${escHtml(n.usuario || 'Sistema')} · ${fechaCorta(n.fecha)}</span>
-                      ${f.permisos.puedeEliminar ? `<button class="btn-danger-sm" onclick="fichaEliminarNota(${n.id})">Eliminar</button>` : ''}
+                      ${f.permisos.puedeEliminar ? `<button class="btn-danger-sm" onclick="fichaEliminarNota('${n.id}')">Eliminar</button>` : ''}
                     </div></div>`).join('')
                 : '<div class="ficha-vacio" style="padding:40px">Sin notas registradas.</div>';
             return nueva + '<div class="card ficha-card"><div class="ficha-card-body">' + lista + '</div></div>';
@@ -9177,7 +9202,7 @@ function _mobRenderCliPage() {
         var tagHtml = c.estado === 'Activo' ? '<span class="tag tag-success" style="font-size:11px">Activo</span>'
             : c.estado === 'Pendiente' ? '<span class="tag tag-warning" style="font-size:11px">Pendiente</span>'
             : '<span class="tag tag-danger" style="font-size:11px">Inactivo</span>';
-        return '<div class="mob-list-item" onclick="fichaRowClick(event,\'Cliente\',' + c.id + ')">' +
+        return '<div class="mob-list-item" onclick="fichaRowClick(event,\'Cliente\',' + "'" + c.id + "'" + ')">' +
             '<div class="mini-avatar" style="background:' + (c.color || '#8E8E93') + ';width:36px;height:36px;font-size:13px;flex-shrink:0">' + (typeof initials === 'function' ? initials(c.nombre) : (c.nombre||'').substring(0,2).toUpperCase()) + '</div>' +
             '<div class="mob-list-item-info"><div class="mob-list-item-name">' + (typeof escHtml === 'function' ? escHtml(c.nombre) : c.nombre) + '</div>' +
             '<div class="mob-list-item-sub">' + (c.empresa ? (typeof escHtml==='function'?escHtml(c.empresa):c.empresa) : '') + (c.empresa && c.telefono ? ' · ' : '') + (c.telefono ? (typeof escHtml==='function'?escHtml(c.telefono):c.telefono) : '') + '</div></div>' +
@@ -9222,7 +9247,7 @@ function _mobRenderProPage() {
     body.innerHTML = slice.map(function(p) {
         var tagClass = ETAPA_TAG[p.etapa] || 'tag-gray';
         var tagHtml = '<span class="tag ' + tagClass + '" style="font-size:11px;white-space:nowrap">' + (typeof escHtml==='function'?escHtml(p.etapa):p.etapa) + '</span>';
-        return '<div class="mob-list-item" onclick="fichaRowClick(event,\'Prospecto\',' + p.id + ')">' +
+        return '<div class="mob-list-item" onclick="fichaRowClick(event,\'Prospecto\',' + "'" + p.id + "'" + ')">' +
             '<div class="mini-avatar" style="background:' + (p.color || '#8E8E93') + ';width:36px;height:36px;font-size:13px;flex-shrink:0">' + (typeof initials==='function'?initials(p.nombre):(p.nombre||'').substring(0,2).toUpperCase()) + '</div>' +
             '<div class="mob-list-item-info"><div class="mob-list-item-name">' + (typeof escHtml==='function'?escHtml(p.nombre):p.nombre) + '</div>' +
             '<div class="mob-list-item-sub">' + (p.empresa ? (typeof escHtml==='function'?escHtml(p.empresa):p.empresa) : '') + (p.empresa && p.etapa ? ' · ' : '') + (p.etapa ? p.etapa : '') + '</div></div>' +
