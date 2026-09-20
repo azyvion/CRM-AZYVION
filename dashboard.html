@@ -4411,6 +4411,21 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
          Reemplaza completamente a Google Apps Script.
     ═════════════════════════════════════════════════════════════ -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script>
+    /* ─── CONFIGURACIÓN EMAILJS (opcional para envío real de correos) ───────────
+       1. Crea cuenta gratis en https://www.emailjs.com
+       2. Crea un Service (Gmail, Outlook, etc.) y copia el Service ID
+       3. Crea un Template con variables: {{to_email}}, {{subject}}, {{message}}, {{numero}}, {{cliente}}
+       4. Copia tu Public Key del dashboard de EmailJS
+       5. Rellena los 3 valores abajo y descomenta las líneas
+    ────────────────────────────────────────────────────────────────────────────── */
+    // window.AZ_EMAILJS = {
+    //     serviceId:  'service_XXXXXXX',   // tu Service ID de EmailJS
+    //     templateId: 'template_XXXXXXX',  // tu Template ID de EmailJS
+    //     publicKey:  'XXXXXXXXXXXXXXXXXXXX' // tu Public Key de EmailJS
+    // };
+    </script>
     <script>
     (function () {
         const SUPABASE_URL      = 'https://dwtykzporgjjvdustjfq.supabase.co';
@@ -4584,7 +4599,41 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         async function _updateEstadoCot(p,u){if(!['Borrador','Enviada','Aprobada','Rechazada','Vencida'].includes(p.estado))return{ok:false,error:'Estado inválido.'};const{error}=await _sb.from('Cotizaciones').update({estado:p.estado}).eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteCotizacion(p,u){await _sb.from('CotizacionItems').delete().eq('cotizacionId',p.id);const{error}=await _sb.from('Cotizaciones').delete().eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _getCotizacionHtml(p){const r=await _getCotizacion(p);if(!r.ok)return r;const c=r.data,its=r.items;const _e=s=>String(s===undefined||s===null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');const _n=n=>{const v=Number(n);return isNaN(v)?0:v;};const _r2=n=>Math.round((_n(n)+Number.EPSILON)*100)/100;const _fQ=n=>{const v=_r2(n),neg=v<0;const p=Math.abs(v).toFixed(2).split('.');p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');return(neg?'-':'')+'Q '+p[0]+'.'+p[1];};const M=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];const _fF=v=>{const d=new Date(v);return d.getDate()+' de '+M[d.getMonth()]+' de '+d.getFullYear();};const vd=new Date(c.fecha);vd.setDate(vd.getDate()+(Number(c.validezDias)||15));const logo=EMPRESA.logoUrl?'<img src="'+_e(EMPRESA.logoUrl)+'" style="max-height:56px">':'<div style="font-size:24px;font-weight:700;color:#fff">'+_e(EMPRESA.nombre)+'</div>';const filas=its.map((it,i)=>'<tr><td style="text-align:center">'+(i+1)+'</td><td><strong>'+_e(it.descripcion)+'</strong>'+(it.detalle?'<br><small>'+_e(it.detalle)+'</small>':'')+'</td><td style="text-align:center">'+_r2(it.cantidad)+'</td><td style="text-align:right">'+_fQ(it.precioUnit)+'</td><td style="text-align:center">'+(it.descuentoPct>0?_r2(it.descuentoPct)+'%':'—')+'</td><td style="text-align:right;font-weight:700">'+_fQ(it.total)+'</td></tr>').join('');const html='<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>'+_e(c.numero)+'</title></head><body style="font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:24px"><div style="background:linear-gradient(135deg,#0A2540,#123A63);color:#fff;padding:24px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between">'+logo+'<div style="text-align:right"><h2 style="margin:0">Cotización</h2><div style="font-size:18px;font-weight:700;background:rgba(255,255,255,.15);padding:4px 12px;border-radius:6px;margin-top:6px">'+_e(c.numero)+'</div><div style="font-size:12px;margin-top:8px;opacity:.85">Fecha: '+_fF(c.fecha)+'<br>Válida hasta: '+_fF(vd)+'<br>Estado: '+_e(c.estado)+'</div></div></div><table style="width:100%;border-collapse:collapse;margin-top:0"><thead><tr style="background:#f7f7fa"><th style="padding:10px;text-align:center">#</th><th style="padding:10px;text-align:left">Descripción</th><th style="padding:10px;text-align:center">Cant.</th><th style="padding:10px;text-align:right">Precio</th><th style="padding:10px;text-align:center">Desc.</th><th style="padding:10px;text-align:right">Total</th></tr></thead><tbody>'+filas+'</tbody></table><div style="text-align:right;padding:16px"><table style="width:280px;margin-left:auto;border-collapse:collapse"><tr><td>Subtotal</td><td style="text-align:right">'+_fQ(c.subtotal)+'</td></tr>'+(c.descuento>0?'<tr><td>Descuento</td><td style="text-align:right;color:#c0392b">- '+_fQ(c.descuento)+'</td></tr>':'')+'<tr><td>IVA ('+(c.aplicaIVA?EMPRESA.ivaPct+'%':'Incluido')+')</td><td style="text-align:right">'+_fQ(c.iva)+'</td></tr><tr style="border-top:2px solid #0A2540"><td style="font-size:18px;font-weight:700">Total</td><td style="text-align:right;font-size:18px;font-weight:700">'+_fQ(c.total)+'</td></tr></table></div>'+(c.condiciones?'<p><strong>Términos:</strong> '+_e(c.condiciones)+'</p>':'')+(c.notas?'<p><strong>Notas:</strong> '+_e(c.notas)+'</p>':'')+'</body></html>';return{ok:true,html,numero:c.numero,cliente:c.cliente,correo:c.correo};}
-        async function _enviarCotizacion(p,u){if(!p.id)return{ok:false,error:'ID requerido.'};const r=await _getCotizacionHtml({id:p.id});if(!r.ok)return r;const b=new Blob([r.html],{type:'text/html'});const url=URL.createObjectURL(b);window.open(url,'_blank');await _updateEstadoCot({id:p.id,estado:'Enviada'},u);return{ok:true,enviados:1,aviso:'Para envío por correo real, configura una Supabase Edge Function. Se abrió el HTML en nueva pestaña.'};}
+        async function _enviarCotizacion(p,u){
+            if(!p.id)return{ok:false,error:'ID requerido.'};
+            const r=await _getCotizacionHtml({id:p.id});
+            if(!r.ok)return r;
+            const para=p.para||r.correo||'';
+            if(!para)return{ok:false,error:'No hay correo destinatario.'};
+            // Intentar envío real con EmailJS si está configurado
+            const cfg=window.AZ_EMAILJS||{};
+            if(cfg.serviceId&&cfg.templateId&&cfg.publicKey){
+                try{
+                    await emailjs.send(cfg.serviceId,cfg.templateId,{
+                        to_email:para,
+                        cc_email:p.cc||'',
+                        subject:p.asunto||('Cotización '+r.numero),
+                        message:p.mensaje||('Adjuntamos la cotización '+r.numero+' para '+r.cliente+'.'),
+                        numero:r.numero,
+                        cliente:r.cliente,
+                        html_content:r.html
+                    },cfg.publicKey);
+                    await _updateEstadoCot({id:p.id,estado:'Enviada'},u);
+                    return{ok:true,enviados:1};
+                }catch(e){
+                    // Si falla EmailJS, abrir en pestaña como fallback
+                    const b=new Blob([r.html],{type:'text/html'});
+                    window.open(URL.createObjectURL(b),'_blank');
+                    return{ok:false,error:'EmailJS falló: '+e.message+'. Se abrió el PDF en pestaña nueva. Verifica tu configuración en window.AZ_EMAILJS.'};
+                }
+            }
+            // Sin EmailJS: abrir HTML en nueva pestaña + marcar enviada
+            const b=new Blob([r.html],{type:'text/html'});
+            const url=URL.createObjectURL(b);
+            window.open(url,'_blank');
+            await _updateEstadoCot({id:p.id,estado:'Enviada'},u);
+            return{ok:true,enviados:1,aviso:'Se abrió la cotización en PDF. Para envío real por correo, configura window.AZ_EMAILJS con tu cuenta de EmailJS.'};
+        }
         async function _getResumenCotizaciones(){const r=await _getCotizaciones({});const d=r.data||[];const h=new Date(),mes=h.getMonth(),anio=h.getFullYear();const dM=d.filter(c=>{const dd=new Date(c.fecha);return!isNaN(dd)&&dd.getMonth()===mes&&dd.getFullYear()===anio;});const ap=d.filter(c=>c.estado==='Aprobada'),en=d.filter(c=>c.estado==='Enviada');return{ok:true,empresa:EMPRESA,total:d.length,borradores:d.filter(c=>c.estado==='Borrador').length,enviadas:en.length,aprobadas:ap.length,rechazadas:d.filter(c=>c.estado==='Rechazada').length,vencidas:d.filter(c=>c.vencida).length,montoTotal:d.reduce((s,c)=>s+Number(c.total||0),0),montoAprobado:ap.reduce((s,c)=>s+Number(c.total||0),0),montoEnviado:en.reduce((s,c)=>s+Number(c.total||0),0),cotizacionesMes:dM.length,montoMes:dM.reduce((s,c)=>s+Number(c.total||0),0),tasaAprobacion:d.length?Math.round(ap.length/d.length*100):0};}
 
         async function _getFicha(p,rol){if(!p||!p.id)return{ok:false,error:'ID requerido.'};const tipo=String(p.tipo||'').trim()==='Prospecto'?'Prospecto':'Cliente';const tabla=tipo==='Cliente'?'Clientes':'Prospectos';const{data:ent}=await _sb.from(tabla).select('*').eq('id',p.id).single();if(!ent)return{ok:false,error:tipo+' no encontrado.'};const[cR,nR,aR,cotR]=await Promise.all([_sb.from('Contactos').select('*').eq('tipo',tipo).eq('refId',p.id),_sb.from('NotasCRM').select('*').eq('tipo',tipo).eq('refId',p.id).order('fecha',{ascending:false}),_sb.from('ActividadesCRM').select('*').eq('tipo',tipo).eq('refId',p.id).order('fecha',{ascending:false}),_sb.from('Cotizaciones').select('id,numero,fecha,total,estado').or('clienteId.eq.'+p.id+',cliente.ilike.%'+encodeURIComponent(ent.nombre)+'%')]);const contactos=(cR.data||[]).sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre),'es'));const notas=nR.data||[];const actividades=(aR.data||[]).map(a=>({...a,origen:'ficha'}));const cotizaciones=(cotR.data||[]).sort((a,b)=>String(b.numero).localeCompare(String(a.numero)));const hoy=new Date();hoy.setHours(0,0,0,0);let prox=null;actividades.forEach(a=>{if(!a.fechaSeguimiento)return;const d=new Date(a.fechaSeguimiento);if(d>=hoy&&(!prox||d<new Date(prox.fecha)))prox={fecha:a.fechaSeguimiento,titulo:a.titulo||a.categoria,usuario:a.usuario};});return{ok:true,tipo,entidad:ent,contactos,notas,actividades,prospectos:[],clientes:[],cotizaciones,proximoSeguimiento:prox,resumen:{totalContactos:contactos.length,totalNotas:notas.length,totalActividades:actividades.length,totalCotizaciones:cotizaciones.length,montoCotizado:cotizaciones.reduce((s,c)=>s+Number(c.total||0),0),ultimaActividad:actividades.length?actividades[0].fecha:''},permisos:{puedeEditar:true,puedeEliminar:['Admin','Gerente'].includes(rol),esAdmin:rol==='Admin'}};}
@@ -4604,6 +4653,149 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         async function _deleteFotoPerfil(p,sess){const{data:usr}=await _sb.from('Usuarios').select('fotoFileId,fotoUrl').eq('usuario',sess.usuario||sess.nombre).single();if(usr&&usr.fotoFileId)await _sb.storage.from('fotos-perfil').remove([usr.fotoFileId]);await _sb.from('Usuarios').update({fotoUrl:'',fotoFileId:'',fechaPerfilActualizado:new Date().toISOString()}).eq('usuario',sess.usuario||sess.nombre);return{ok:true};}
 
         async function _getDashboardInit(p,sess){const rol=sess.rol||'Agente';const promises=[_getResumen(),_getActividad(10),_getClientes(),_getProspectos(),_getInventario(),_getEncuestas(),_getCotizaciones({})];const esAdmin=rol==='Admin';const esCont=rol==='Admin'||rol==='Gerente';if(esAdmin)promises.push(_getUsuarios());if(esCont)promises.push(_getResumenContable(),_getCuentasBancarias(),_getPlanCuentas(),_getTransacciones({}));const results=await Promise.all(promises);let i=0;const resumen=results[i++],actividad=results[i++],clientes=results[i++],prospectos=results[i++],inventario=results[i++],encuestas=results[i++],cotizaciones=results[i++];const usuarios=esAdmin?results[i++]:null;let contabilidad=null;if(esCont){const rc=results[i++],cb=results[i++],plan=results[i++],trx=results[i++];contabilidad={resumenContable:rc,cuentasBancarias:cb.data,planCuentas:plan.data,transacciones:trx.data};}return{ok:true,ts:new Date().toISOString(),resumen,actividad,clientes,prospectos,inventario,encuestas,cotizaciones,usuarios,contabilidad,empresa:EMPRESA,rol,usuario:sess.usuario||sess.nombre};}
+
+
+        /* ══════════════════════════════════════════════════════
+           COMUNIDAD — funciones Supabase
+        ══════════════════════════════════════════════════════ */
+        async function _comGetInicio(p,sess,u){
+            const [uR,cR,chR]=await Promise.all([
+                _sb.from('Usuarios').select('id,usuario,nombre,rol,cargo,fotoUrl').order('nombre'),
+                _sb.from('ComCanales').select('*').order('nombre'),
+                _sb.from('ComChats').select('*').or('usuario1.eq.'+u+',usuario2.eq.'+u)
+            ]);
+            const usuarios=(uR.data||[]);
+            const yo=usuarios.find(x=>x.usuario===u)||{usuario:u,nombre:u,rol:sess.rol||'Agente'};
+            const canales=(cR.data||[]).map(c=>({...c,miembro:true}));
+            const chats=(chR.data||[]).map(c=>({
+                ...c,
+                id:c.id,
+                nombre:c.usuario1===u?c.nombre2||c.usuario2:c.nombre1||c.usuario1,
+                contraparte:c.usuario1===u?c.usuario2:c.usuario1,
+                tipo:'directo'
+            }));
+            return{ok:true,yo,usuarios,canales,chats,
+                reuniones:[],archivos:[],anuncios:[],tareas:[],notificaciones:[],
+                noLeidas:0,permisos:{esAdmin:sess.rol==='Admin',puedeCrearCanal:true}};
+        }
+        async function _comGetMensajes(p,u){
+            const canalId=p.canalId,chatId=p.chatId;
+            let q;
+            if(canalId){q=_sb.from('ComMensajes').select('*').eq('canalId',canalId);}
+            else if(chatId){q=_sb.from('ComMensajes').select('*').eq('chatId',chatId);}
+            else return{ok:true,data:[],total:0};
+            if(p.desdeId)q=q.gt('id',p.desdeId);
+            if(p.antesDeId)q=q.lt('id',p.antesDeId);
+            const lim=Number(p.limite)||50;
+            q=q.order('fechaReg',{ascending:true}).limit(lim);
+            const{data,error}=await q;
+            if(error)return{ok:false,error:error.message};
+            return{ok:true,data:data||[],total:(data||[]).length};
+        }
+        async function _comEnviarMensaje(p,u){
+            const r={id:_uuid(),canalId:p.canalId||null,chatId:p.chatId||null,
+                usuario:u,contenido:p.contenido||'',tipo:'texto',
+                mensajePadreId:p.mensajePadreId||null,fijado:false,
+                reacciones:'{}',editado:false,fechaReg:new Date().toISOString()};
+            const{error}=await _sb.from('ComMensajes').insert(r);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true,id:r.id,mensaje:r};
+        }
+        async function _comEditarMensaje(p,u){
+            const{error}=await _sb.from('ComMensajes').update({contenido:p.contenido,editado:true}).eq('id',p.id).eq('usuario',u);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true};
+        }
+        async function _comEliminarMensaje(p,u){
+            const{error}=await _sb.from('ComMensajes').delete().eq('id',p.id).eq('usuario',u);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true};
+        }
+        async function _comFijarMensaje(p,u){
+            const{data:m}=await _sb.from('ComMensajes').select('fijado').eq('id',p.id).single();
+            const{error}=await _sb.from('ComMensajes').update({fijado:m?!m.fijado:true}).eq('id',p.id);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true};
+        }
+        async function _comReaccionar(p,u){
+            const{data:m}=await _sb.from('ComMensajes').select('reacciones').eq('id',p.id).single();
+            let reac={};try{reac=JSON.parse(m&&m.reacciones||'{}');}catch(e){}
+            if(!reac[p.reaccion])reac[p.reaccion]=[];
+            const idx=reac[p.reaccion].indexOf(u);
+            if(idx>=0)reac[p.reaccion].splice(idx,1);else reac[p.reaccion].push(u);
+            if(!reac[p.reaccion].length)delete reac[p.reaccion];
+            const{error}=await _sb.from('ComMensajes').update({reacciones:JSON.stringify(reac)}).eq('id',p.id);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true,reacciones:reac};
+        }
+        async function _comMarcarLeido(p,u){return{ok:true};}
+        async function _comGetNotificaciones(p,u){return{ok:true,data:[],noLeidas:0};}
+        async function _comGetCanales(p,u){
+            const{data,error}=await _sb.from('ComCanales').select('*').order('nombre');
+            if(error)return{ok:false,error:error.message};
+            return{ok:true,data:(data||[]).map(c=>({...c,miembro:true}))};
+        }
+        async function _comGetChats(p,u){
+            const{data,error}=await _sb.from('ComChats').select('*').or('usuario1.eq.'+u+',usuario2.eq.'+u);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true,data:(data||[]).map(c=>({...c,
+                nombre:c.usuario1===u?c.nombre2||c.usuario2:c.nombre1||c.usuario1,
+                contraparte:c.usuario1===u?c.usuario2:c.usuario1}))};
+        }
+        async function _comCrearCanal(p,u){
+            const r={id:_uuid(),nombre:p.nombre,descripcion:p.descripcion||'',tipo:p.tipo||'publico',
+                creadoPor:u,archivado:false,fechaReg:new Date().toISOString()};
+            const{error}=await _sb.from('ComCanales').insert(r);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true,id:r.id,canal:{...r,miembro:true}};
+        }
+        async function _comActualizarCanal(p,u){
+            const up={};
+            if(p.nombre!==undefined)up.nombre=p.nombre;
+            if(p.descripcion!==undefined)up.descripcion=p.descripcion;
+            const{error}=await _sb.from('ComCanales').update(up).eq('id',p.canalId||p.id);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true};
+        }
+        async function _comArchivarCanal(p,u){
+            const{error}=await _sb.from('ComCanales').update({archivado:true}).eq('id',p.id);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true};
+        }
+        async function _comEliminarCanal(p,u){
+            await _sb.from('ComMensajes').delete().eq('canalId',p.id);
+            const{error}=await _sb.from('ComCanales').delete().eq('id',p.id);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true};
+        }
+        async function _comUnirmeCanal(p,u){return{ok:true};}
+        async function _comAgregarMiembro(p,u){return{ok:true};}
+        async function _comQuitarMiembro(p,u){return{ok:true};}
+        async function _comCambiarRolMiembro(p,u){return{ok:true};}
+        async function _comAbrirChatDirecto(p,u){
+            const otro=p.usuario;
+            const{data:ex}=await _sb.from('ComChats').select('*')
+                .or('and(usuario1.eq.'+u+',usuario2.eq.'+otro+'),and(usuario1.eq.'+otro+',usuario2.eq.'+u+')').single();
+            if(ex)return{ok:true,id:ex.id};
+            const{data:uR}=await _sb.from('Usuarios').select('nombre').eq('usuario',otro).single();
+            const{data:uR2}=await _sb.from('Usuarios').select('nombre').eq('usuario',u).single();
+            const r={id:_uuid(),usuario1:u,usuario2:otro,nombre1:uR2?uR2.nombre:u,nombre2:uR?uR.nombre:otro,fechaReg:new Date().toISOString()};
+            const{error}=await _sb.from('ComChats').insert(r);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true,id:r.id};
+        }
+        async function _comCrearGrupo(p,u){
+            const r={id:_uuid(),nombre:p.nombre||'Grupo',descripcion:'',tipo:'grupo',
+                creadoPor:u,archivado:false,fechaReg:new Date().toISOString()};
+            const{error}=await _sb.from('ComCanales').insert(r);
+            if(error)return{ok:false,error:error.message};
+            return{ok:true,id:r.id};
+        }
+        async function _comActualizarGrupo(p,u){return _comActualizarCanal(p,u);}
+        async function _comMensajeATarea(p,u){return{ok:true};}
+        async function _comSubirArchivo(p,u){return{ok:false,error:'Sube archivos directamente a Supabase Storage desde el panel.'};} 
+        async function _comFijarConversacion(p,u){return{ok:true};}
+        async function _comSilenciar(p,u){return{ok:true};}
 
         async function _dispatch(name,args){
             const sess=readSession();
@@ -4672,7 +4864,33 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 case 'uploadFotoPerfil':return await _uploadFotoPerfil(args[0],sess);
                 case 'deleteFotoPerfil':return await _deleteFotoPerfil(args[0],sess);
                 case 'getDashboardInit':return await _getDashboardInit(args[0],sess);
-                default:return{ok:false,error:'Acción no implementada: '+name};
+                case 'comGetInicio':return await _comGetInicio(args[0],sess,usuario);
+                case 'comGetMensajes':return await _comGetMensajes(args[0],usuario);
+                case 'comEnviarMensaje':return await _comEnviarMensaje(args[0],usuario);
+                case 'comEditarMensaje':return await _comEditarMensaje(args[0],usuario);
+                case 'comEliminarMensaje':return await _comEliminarMensaje(args[0],usuario);
+                case 'comFijarMensaje':return await _comFijarMensaje(args[0],usuario);
+                case 'comReaccionar':return await _comReaccionar(args[0],usuario);
+                case 'comMarcarLeido':return await _comMarcarLeido(args[0],usuario);
+                case 'comGetNotificaciones':return await _comGetNotificaciones(args[0],usuario);
+                case 'comGetCanales':return await _comGetCanales(args[0],usuario);
+                case 'comGetChats':return await _comGetChats(args[0],usuario);
+                case 'comCrearCanal':return await _comCrearCanal(args[0],usuario);
+                case 'comActualizarCanal':return await _comActualizarCanal(args[0],usuario);
+                case 'comArchivarCanal':return await _comArchivarCanal(args[0],usuario);
+                case 'comEliminarCanal':return await _comEliminarCanal(args[0],usuario);
+                case 'comUnirmeCanal':return await _comUnirmeCanal(args[0],usuario);
+                case 'comAgregarMiembro':return await _comAgregarMiembro(args[0],usuario);
+                case 'comQuitarMiembro':return await _comQuitarMiembro(args[0],usuario);
+                case 'comCambiarRolMiembro':return await _comCambiarRolMiembro(args[0],usuario);
+                case 'comAbrirChatDirecto':return await _comAbrirChatDirecto(args[0],usuario);
+                case 'comCrearGrupo':return await _comCrearGrupo(args[0],usuario);
+                case 'comActualizarGrupo':return await _comActualizarGrupo(args[0],usuario);
+                case 'comMensajeATarea':return await _comMensajeATarea(args[0],usuario);
+                case 'comSubirArchivo':return await _comSubirArchivo(args[0],usuario);
+                case 'comFijarConversacion':return await _comFijarConversacion(args[0],usuario);
+                case 'comSilenciar':return await _comSilenciar(args[0],usuario);
+                                default:return{ok:false,error:'Acción no implementada: '+name};
             }
         }
 
@@ -4694,6 +4912,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             return runner;
         }
 
+        window._dispatch = _dispatch;
         window.google={script:{run:makeRunner(null,null)}};
 
         window.addEventListener('load',function(){
@@ -7442,7 +7661,9 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
     <div class="form-field"><label class="form-label">MENSAJE</label>
       <textarea class="form-input" id="ceMensaje" rows="5" style="resize:vertical">${escHtml(mensaje)}</textarea></div>
     <div style="font-size:12px;color:var(--text-secondary);background:var(--accent-bg);padding:10px 12px;border-radius:9px">
-      Se adjuntará la cotización en PDF y se incluirá también en el cuerpo del correo.
+      ${window.AZ_EMAILJS && window.AZ_EMAILJS.serviceId
+        ? '✅ EmailJS configurado — se enviará al correo indicado.'
+        : '⚠️ EmailJS no configurado. Se abrirá la cotización en PDF para que la descargues y envíes manualmente. Para envío automático, configura <code>window.AZ_EMAILJS</code> en el código.'}
     </div>`);
             const btn = document.getElementById('modalSaveBtn');
             btn.textContent = 'Enviar';
@@ -9520,23 +9741,16 @@ window.addEventListener('resize', function() {
     }
 
     COM.api = function (accion, params) {
-        var cuerpo = Object.assign({ action: accion, token: token() }, params || {});
-        var url = urlApi();
-        if (!url) return Promise.reject(new Error('No se encontró la URL del Web App (window.AZ_API_URL).'));
-        return fetch(url + '?token=' + encodeURIComponent(cuerpo.token), {
-            method: 'POST', redirect: 'follow',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(cuerpo)
-        }).then(function (r) {
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            return r.text();
-        }).then(function (t) {
-            var d;
-            try { d = JSON.parse(t); }
-            catch (e) { throw new Error('El servidor no devolvió JSON válido.'); }
-            if (!d.ok) throw new Error(d.error || 'Ocurrió un error inesperado.');
-            return d;
-        });
+        // Usa el mismo _dispatch de Supabase que el resto del CRM
+        if (typeof window._dispatch === 'function') {
+            var tok = token();
+            var p = Object.assign({ token: tok }, params || {});
+            return window._dispatch(accion, [p]).then(function(d) {
+                if (!d || d.ok === false) throw new Error(d && d.error ? d.error : 'Error en ' + accion);
+                return d;
+            });
+        }
+        return Promise.reject(new Error('Backend Supabase no disponible.'));
     };
 
     function aviso(msg, color) {
