@@ -2819,7 +2819,8 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
             // Acciones que viajan por POST (payload grande: ítems, mensajes largos)
             const POST_ACTIONS = ['addCotizacion', 'updateCotizacion', 'enviarCotizacion',
                                   'addNotaCRM', 'addActividadCRM', 'addContacto', 'updateContacto',
-                                  'uploadFotoPerfil', 'updatePerfil', 'changePasswordPropio'];
+                                  'uploadFotoPerfil', 'updatePerfil', 'changePasswordPropio',
+                                  'getDashboardInit'];
 
             function readSession() {
                 try {return JSON.parse(localStorage.getItem(SESSION_KEY));} catch (e) {return null;}
@@ -2842,7 +2843,12 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
                 let peticion;
                 if (POST_ACTIONS.indexOf(params.action) !== -1) {
                     // text/plain evita el preflight CORS con Apps Script
-                    peticion = fetch(API_URL, {
+                    // Para getDashboardInit: token también en query string por seguridad
+                    var postUrl = API_URL;
+                    if (params.token) {
+                        postUrl = API_URL + '?token=' + encodeURIComponent(params.token);
+                    }
+                    peticion = fetch(postUrl, {
                         method: 'POST',
                         redirect: 'follow',
                         headers: {'Content-Type': 'text/plain;charset=utf-8'},
@@ -6656,8 +6662,9 @@ loadAll = function() {
     google.script.run
         .withSuccessHandler(function(r) {
             if (!r || !r.ok) {
-                showToast('Error al inicializar: ' + (r && r.error ? r.error : 'sin respuesta'), '#FF453A');
-                // Fallback: cargar módulo a módulo como antes
+                // Mostrar el error real para diagnóstico
+                showToast('Init: ' + (r && r.error ? r.error : 'sin respuesta'), '#FF9F0A');
+                console.warn('[Azyvion] getDashboardInit respondió error:', r);
                 _loadAllFallback();
                 return;
             }
@@ -6665,8 +6672,8 @@ loadAll = function() {
             _aplicarDashboardInit(r);
         })
         .withFailureHandler(function(e) {
-            console.error('[Azyvion] getDashboardInit failed:', e);
-            showToast('Error de conexión, cargando módulo a módulo…', '#FF9F0A');
+            showToast('Red: ' + (e && e.message ? e.message : String(e)), '#FF453A');
+            console.error('[Azyvion] getDashboardInit fallo de red:', e);
             _loadAllFallback();
         })
         .getDashboardInit({});
