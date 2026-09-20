@@ -2072,6 +2072,84 @@ body.densidad-compacta td { padding: 6px 16px; font-size: 12.5px; }
 body.densidad-compacta .cell-sub { margin-top: 1px; }
 
 /* ══════════════════════════════════════════════════════════
+   PAGINACIÓN — estilo botones negros / naranja (clientes y prospectos)
+══════════════════════════════════════════════════════════ */
+.pagination-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 16px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+.pg-btn {
+    min-width: 40px;
+    height: 40px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: none;
+    background: #1C1C1E;
+    color: rgba(255,255,255,0.75);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s, color .15s, transform .1s;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+}
+.pg-btn:hover:not(:disabled) {
+    background: #2C2C2E;
+    color: #fff;
+}
+.pg-btn:active:not(:disabled) {
+    transform: scale(.93);
+}
+.pg-btn.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(10,132,255,.35);
+}
+.pg-btn.pg-next {
+    background: var(--warning);
+    color: #fff;
+    min-width: 56px;
+    box-shadow: 0 2px 10px rgba(255,159,10,.30);
+}
+.pg-btn.pg-next:hover:not(:disabled) {
+    background: #e08900;
+    color: #fff;
+}
+.pg-btn.pg-prev {
+    background: #1C1C1E;
+}
+.pg-btn:disabled {
+    opacity: .35;
+    cursor: default;
+}
+.pg-btn svg {
+    width: 15px; height: 15px;
+    stroke: currentColor; stroke-width: 2.5;
+    stroke-linecap: round; stroke-linejoin: round; fill: none;
+}
+.pg-ellipsis {
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 0 2px;
+    line-height: 40px;
+    user-select: none;
+}
+/* En pantallas muy pequeñas reducimos los botones */
+@media (max-width: 380px) {
+    .pg-btn { min-width: 34px; height: 34px; font-size: 13px; }
+    .pg-btn.pg-next { min-width: 46px; }
+}
+
+/* ══════════════════════════════════════════════════════════
    AJUSTES / PERFIL DE USUARIO
 ══════════════════════════════════════════════════════════ */
 .user-pill { position: relative; }
@@ -2745,6 +2823,7 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
                         </table>
                     </div>
                     <div class="table-foot" id="cliFoot"></div>
+                    <div class="pagination-wrap" id="cliPagination"></div>
                 </div>
             </div>
 
@@ -2838,6 +2917,7 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
                         </table>
                     </div>
                     <div class="table-foot" id="proFoot"></div>
+                    <div class="pagination-wrap" id="proPagination"></div>
                 </div>
             </div>
 
@@ -4021,40 +4101,17 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
                 return String(a.nombre).localeCompare(String(b.nombre), 'es');
             });
 
-            const admin = esAdmin();
-            document.getElementById('clientesTbody').innerHTML = data.length
-                ? data.map(c => `<tr class="row-click" title="Ver ficha del cliente" onclick="fichaRowClick(event,'Cliente',${c.id})">
-        <td>
-          <div class="client-name">
-            <div class="mini-avatar" style="background:${c.color || '#8E8E93'}">${initials(c.nombre)}</div>
-            <div>
-              <div class="cell-main">${escHtml(c.nombre)}</div>
-              <div class="cell-sub">${escHtml(c.empresa) || '—'}</div>
-            </div>
-          </div>
-        </td>
-        <td>
-          <div class="cell-sub" style="margin:0">${c.correo ? `<a class="cell-link" href="mailto:${escHtml(c.correo)}">${escHtml(c.correo)}</a>` : '—'}</div>
-          <div class="cell-sub cell-mono">${c.telefono ? `<a class="cell-link" href="tel:${escHtml(String(c.telefono).replace(/\s/g, ''))}">${escHtml(c.telefono)}</a>` : '—'}</div>
-        </td>
-        <td><div class="cell-clip" title="${escHtml(c.direccion)}">${escHtml(c.direccion) || '—'}</div></td>
-        <td>${tagSegmento(c.segmento)}</td>
-        <td>${tagEstado(c.estado)}</td>
-        <td class="cell-num">Q ${Number(c.valorTotal || 0).toLocaleString()}</td>
-        <td>
-          <div class="row-actions">
-            <button class="section-action" onclick="editCliente(${c.id})">Editar</button>
-            ${admin ? `<button class="btn-danger-sm" onclick="confirmDeleteCliente(${c.id},'${escAttr(c.nombre)}')">Eliminar</button>` : ''}
-          </div>
-        </td>
-      </tr>`).join('')
-                : '<tr><td colspan="7" class="empty-cell">Sin resultados con estos filtros</td></tr>';
-
             const suma = data.reduce((s, c) => s + Number(c.valorTotal || 0), 0);
+            const admin = esAdmin();
             document.getElementById('cliFoot').innerHTML =
                 `<span><strong>${data.length}</strong> de ${_clientes.length} clientes</span>` +
                 `<span>Valor sumado: <strong>Q ${suma.toLocaleString()}</strong></span>` +
                 (admin ? '' : '<span style="color:var(--text-muted)">Eliminar requiere rol Admin</span>');
+
+            /* Guardar dataset filtrado, resetear a página 0 y renderizar */
+            _cliDataPaged = data;
+            _cliPage = 0;
+            _renderCliPagedData();
         }
 
         function exportarClientes() {
@@ -4287,7 +4344,142 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
       </tr>`;
         }
 
-        var _proRenderToken = 0; /* cancela renders anteriores si el filtro cambia */
+        /* ══════════════════════════════════════════════════════
+           UTILIDAD COMPARTIDA — paginación de tablas
+           PAGE_SIZE: filas por página
+           state: { page } — la página actual (0-indexed)
+           renderFn(data, page): renderiza la página dada
+        ══════════════════════════════════════════════════════ */
+        var PAGE_SIZE = 100;
+
+        /**
+         * Construye y devuelve el HTML de los botones de paginación.
+         * Muestra: ‹  1  2  3  …  10  ›
+         * Siempre muestra primera, última, la página actual y sus vecinas.
+         */
+        function _buildPaginationHtml(currentPage, totalPages, onClickFn) {
+            if (totalPages <= 1) return '';
+
+            var pages = [];
+            // Siempre incluir primera y última
+            var show = new Set();
+            show.add(0);
+            show.add(totalPages - 1);
+            // Vecinas de la página actual (±2)
+            for (var i = Math.max(0, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
+                show.add(i);
+            }
+            // Ordenar
+            var sorted = Array.from(show).sort(function(a,b){ return a-b; });
+
+            var html = '';
+            // Botón ‹ anterior
+            html += '<button class="pg-btn pg-prev" ' +
+                (currentPage === 0 ? 'disabled' : 'onclick="' + onClickFn + '(' + (currentPage - 1) + ')"') +
+                ' title="Anterior">' +
+                '<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>' +
+                '</button>';
+
+            var prev = -1;
+            sorted.forEach(function(p) {
+                if (prev !== -1 && p - prev > 1) {
+                    html += '<span class="pg-ellipsis">…</span>';
+                }
+                html += '<button class="pg-btn' + (p === currentPage ? ' active' : '') + '" ' +
+                    'onclick="' + onClickFn + '(' + p + ')">' + (p + 1) + '</button>';
+                prev = p;
+            });
+
+            // Botón › siguiente — siempre naranja
+            html += '<button class="pg-btn pg-next" ' +
+                (currentPage === totalPages - 1 ? 'disabled' : 'onclick="' + onClickFn + '(' + (currentPage + 1) + ')"') +
+                ' title="Siguiente">' +
+                '<svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>' +
+                '</button>';
+
+            return html;
+        }
+
+        /** Sube el scroll de .content hasta la tabla indicada (sin saltar brusco) */
+        function _scrollToTable(tableCardEl) {
+            if (!tableCardEl) return;
+            var content = document.querySelector('.content');
+            if (!content) return;
+            var top = tableCardEl.offsetTop - 12;
+            content.scrollTo({ top: top, behavior: 'smooth' });
+        }
+
+        /* ── Estado de paginación ── */
+        var _proPage = 0;
+        var _cliPage = 0;
+
+        /* Referencia al dataset filtrado actual (para que los botones de página funcionen) */
+        var _proDataPaged = [];
+        var _cliDataPaged = [];
+
+        function goProPage(page) {
+            _proPage = page;
+            _renderProPagedData();
+            _scrollToTable(document.querySelector('#page-prospectos .table-card'));
+        }
+
+        function goCliPage(page) {
+            _cliPage = page;
+            _renderCliPagedData();
+            _scrollToTable(document.querySelector('#page-clientes .table-card'));
+        }
+
+        function _renderProPagedData() {
+            var data = _proDataPaged;
+            var totalPages = Math.ceil(data.length / PAGE_SIZE);
+            var start = _proPage * PAGE_SIZE;
+            var slice = data.slice(start, start + PAGE_SIZE);
+            var admin = esAdmin();
+            var tbody = document.getElementById('prospectosTbody');
+            tbody.innerHTML = slice.length
+                ? slice.map(function(p){ return _proRow(p, admin); }).join('')
+                : '<tr><td colspan="8" class="empty-cell">Sin prospectos con estos filtros</td></tr>';
+            document.getElementById('proPagination').innerHTML = _buildPaginationHtml(_proPage, totalPages, 'goProPage');
+        }
+
+        function _renderCliPagedData() {
+            var data = _cliDataPaged;
+            var totalPages = Math.ceil(data.length / PAGE_SIZE);
+            var start = _cliPage * PAGE_SIZE;
+            var slice = data.slice(start, start + PAGE_SIZE);
+            var admin = esAdmin();
+            var tbody = document.getElementById('clientesTbody');
+            tbody.innerHTML = slice.length
+                ? slice.map(function(c){
+                    return `<tr class="row-click" title="Ver ficha del cliente" onclick="fichaRowClick(event,'Cliente',${c.id})">
+        <td>
+          <div class="client-name">
+            <div class="mini-avatar" style="background:${c.color || '#8E8E93'}">${initials(c.nombre)}</div>
+            <div>
+              <div class="cell-main">${escHtml(c.nombre)}</div>
+              <div class="cell-sub">${escHtml(c.empresa) || '—'}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="cell-sub" style="margin:0">${c.correo ? `<a class="cell-link" href="mailto:${escHtml(c.correo)}">${escHtml(c.correo)}</a>` : '—'}</div>
+          <div class="cell-sub cell-mono">${c.telefono ? `<a class="cell-link" href="tel:${escHtml(String(c.telefono).replace(/\s/g, ''))}">${escHtml(c.telefono)}</a>` : '—'}</div>
+        </td>
+        <td><div class="cell-clip" title="${escHtml(c.direccion)}">${escHtml(c.direccion) || '—'}</div></td>
+        <td>${tagSegmento(c.segmento)}</td>
+        <td>${tagEstado(c.estado)}</td>
+        <td class="cell-num">Q ${Number(c.valorTotal || 0).toLocaleString()}</td>
+        <td>
+          <div class="row-actions">
+            <button class="section-action" onclick="editCliente(${c.id})">Editar</button>
+            ${admin ? `<button class="btn-danger-sm" onclick="confirmDeleteCliente(${c.id},'${escAttr(c.nombre)}')">Eliminar</button>` : ''}
+          </div>
+        </td>
+      </tr>`;
+                }).join('')
+                : '<tr><td colspan="7" class="empty-cell">Sin resultados con estos filtros</td></tr>';
+            document.getElementById('cliPagination').innerHTML = _buildPaginationHtml(_cliPage, totalPages, 'goCliPage');
+        }
 
         function renderProspectos(filtro) {
             _filtroProActual = filtro;
@@ -4318,35 +4510,10 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
                 `<span>Ponderado: <strong>Q ${Math.round(pond).toLocaleString()}</strong></span>` +
                 (esAdmin() ? '' : '<span style="color:var(--text-muted)">Eliminar requiere rol Admin</span>');
 
-            const tbody = document.getElementById('prospectosTbody');
-            if (!data.length) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">Sin prospectos con estos filtros</td></tr>';
-                return;
-            }
-
-            /* ── Render por lotes para no bloquear el hilo principal en móvil ── */
-            const LOTE = 60;          /* filas por lote */
-            const token = ++_proRenderToken;
-            const admin = esAdmin();
-
-            /* Primera tanda: inmediata (el usuario ve contenido al instante) */
-            tbody.innerHTML = data.slice(0, LOTE).map(p => _proRow(p, admin)).join('');
-
-            if (data.length <= LOTE) return;
-
-            /* Tandas siguientes: diferidas con requestAnimationFrame */
-            var idx = LOTE;
-            function renderLote() {
-                if (token !== _proRenderToken) return; /* filtro cambió, cancelar */
-                var fragmento = document.createDocumentFragment();
-                var tmp = document.createElement('tbody');
-                tmp.innerHTML = data.slice(idx, idx + LOTE).map(p => _proRow(p, admin)).join('');
-                while (tmp.firstChild) fragmento.appendChild(tmp.firstChild);
-                tbody.appendChild(fragmento);
-                idx += LOTE;
-                if (idx < data.length) requestAnimationFrame(renderLote);
-            }
-            requestAnimationFrame(renderLote);
+            /* Guardar dataset filtrado, resetear a página 0 y renderizar */
+            _proDataPaged = data;
+            _proPage = 0;
+            _renderProPagedData();
         }
 
         function filtrarProspectos(filtro, el) {
