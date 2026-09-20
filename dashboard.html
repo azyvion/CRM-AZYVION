@@ -2729,6 +2729,454 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
 .ficha-tabs { overflow-x: visible; }
 
     </style>
+<style id="comunidad-styles">
+/* ══════════════════════════════════════════════════════════════
+   AZYVION CRM · MÓDULO COMUNIDAD — estilos
+   Usa exclusivamente las variables de diseño del CRM
+   (--card, --border, --accent, --text-*) para integrarse con
+   los temas claro/oscuro existentes. No modifica nada previo.
+══════════════════════════════════════════════════════════════ */
+
+/* ── Sub-navegación del módulo ─────────────────────────────── */
+.com-tabs {
+    display: flex; gap: 4px; background: var(--card);
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 5px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.com-tab {
+    display: flex; align-items: center; gap: 7px;
+    padding: 7px 13px; border: none; border-radius: 9px;
+    background: transparent; font-family: inherit; font-size: 13px;
+    font-weight: 500; color: var(--text-secondary); cursor: pointer;
+    transition: background .15s, color .15s; position: relative;
+}
+.com-tab:hover { background: var(--bg); color: var(--text-primary); }
+.com-tab.active { background: var(--accent); color: #fff; }
+.com-tab svg {
+    width: 15px; height: 15px; fill: none; stroke: currentColor;
+    stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+}
+.com-tab-badge {
+    background: var(--danger); color: #fff; font-size: 10px; font-weight: 700;
+    border-radius: 20px; padding: 1px 6px; min-width: 17px; text-align: center;
+}
+.com-tab.active .com-tab-badge { background: rgba(255,255,255,.28); }
+
+.com-view { display: none; }
+.com-view.active { display: block; }
+
+/* ── Encabezados de sección ────────────────────────────────── */
+.com-sec { margin-bottom: 18px; }
+.com-sec-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; margin-bottom: 10px;
+}
+.com-sec-title { font-size: 14px; font-weight: 600; letter-spacing: -.1px; }
+.com-sec-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+.com-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px;
+}
+.com-grid { display: grid; gap: 12px; }
+.com-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.com-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.com-grid-auto { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+
+.com-empty {
+    text-align: center; padding: 34px 18px; color: var(--text-muted);
+    font-size: 13px; line-height: 1.6;
+}
+.com-empty svg {
+    width: 34px; height: 34px; stroke: var(--text-muted); stroke-width: 1.4;
+    fill: none; stroke-linecap: round; stroke-linejoin: round;
+    display: block; margin: 0 auto 10px; opacity: .6;
+}
+
+/* ── Avatares y estado de presencia ────────────────────────── */
+.com-av {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0A84FF, #5e5ce6);
+    color: #fff; font-size: 12px; font-weight: 600; overflow: hidden;
+    position: relative;
+}
+.com-av img { width: 100%; height: 100%; object-fit: cover; }
+.com-av.sm { width: 26px; height: 26px; font-size: 10px; }
+.com-av.lg { width: 56px; height: 56px; font-size: 18px; }
+.com-av.xl { width: 84px; height: 84px; font-size: 26px; }
+
+.com-dot {
+    position: absolute; right: -1px; bottom: -1px;
+    width: 10px; height: 10px; border-radius: 50%;
+    border: 2px solid var(--card);
+}
+.com-dot.Disponible  { background: #30D158; }
+.com-dot.Ocupado     { background: #FF9F0A; }
+.com-dot.NoMolestar  { background: #FF453A; }
+.com-dot.Ausente     { background: #8E8E93; }
+
+/* ── Mensajería: layout de dos paneles ─────────────────────── */
+.com-chat-shell {
+    display: grid; grid-template-columns: 290px 1fr;
+    height: calc(100vh - 230px); min-height: 460px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+}
+.com-chat-side {
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; min-height: 0;
+}
+.com-side-head {
+    padding: 12px 14px; border-bottom: 1px solid var(--border);
+    display: flex; gap: 8px; align-items: center; flex-shrink: 0;
+}
+.com-side-search {
+    flex: 1; height: 32px; padding: 0 10px; font-size: 12.5px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--text-primary); font-family: inherit; outline: none;
+}
+.com-side-search:focus { border-color: var(--accent); }
+.com-side-list { flex: 1; overflow-y: auto; min-height: 0; }
+.com-side-group {
+    font-size: 10.5px; letter-spacing: .8px; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 700;
+    padding: 12px 14px 5px; display: flex; justify-content: space-between; align-items: center;
+}
+.com-side-group button {
+    border: none; background: transparent; color: var(--accent);
+    font-size: 15px; line-height: 1; cursor: pointer; padding: 0 2px;
+}
+.com-side-item {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 14px; cursor: pointer; border-left: 2px solid transparent;
+    transition: background .12s;
+}
+.com-side-item:hover { background: var(--bg); }
+.com-side-item.active { background: var(--accent-bg); border-left-color: var(--accent); }
+.com-side-item-body { flex: 1; min-width: 0; }
+.com-side-item-name {
+    font-size: 13px; font-weight: 600; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: 5px;
+}
+.com-side-item-sub {
+    font-size: 11.5px; color: var(--text-secondary); margin-top: 1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.com-side-badge {
+    background: var(--accent); color: #fff; font-size: 10px; font-weight: 700;
+    border-radius: 20px; padding: 1px 6px; min-width: 17px; text-align: center; flex-shrink: 0;
+}
+.com-pin { font-size: 10px; color: var(--text-muted); }
+
+/* ── Panel de conversación ─────────────────────────────────── */
+.com-chat-main { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.com-chat-head {
+    display: flex; align-items: center; gap: 11px;
+    padding: 11px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.com-chat-title { font-size: 14.5px; font-weight: 600; }
+.com-chat-sub { font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+.com-chat-actions { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.com-icon-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--card); cursor: pointer; display: flex;
+    align-items: center; justify-content: center; color: var(--text-secondary);
+    transition: background .15s, color .15s, border-color .15s;
+}
+.com-icon-btn:hover { background: var(--bg); color: var(--text-primary); }
+.com-icon-btn.danger:hover { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-bg); }
+.com-icon-btn svg {
+    width: 15px; height: 15px; fill: none; stroke: currentColor;
+    stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.com-msgs {
+    flex: 1; overflow-y: auto; min-height: 0;
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 2px;
+}
+.com-load-prev { text-align: center; padding: 6px 0 12px; }
+
+.com-msg { display: flex; gap: 10px; padding: 5px 8px; border-radius: 9px; position: relative; }
+.com-msg:hover { background: var(--bg); }
+.com-msg.agrupado { padding-top: 1px; }
+.com-msg.agrupado .com-av { visibility: hidden; height: 0; }
+.com-msg-body { flex: 1; min-width: 0; }
+.com-msg-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.com-msg-name { font-size: 13px; font-weight: 600; }
+.com-msg-time { font-size: 10.5px; color: var(--text-muted); }
+.com-msg-flag { font-size: 10.5px; color: var(--text-muted); font-style: italic; }
+.com-msg-text {
+    font-size: 13.5px; line-height: 1.5; white-space: pre-wrap;
+    word-break: break-word; margin-top: 1px;
+}
+.com-msg.eliminado .com-msg-text { color: var(--text-muted); font-style: italic; }
+.com-msg-sistema {
+    text-align: center; font-size: 11.5px; color: var(--text-muted);
+    padding: 6px 12px; font-style: italic;
+}
+.com-mencion {
+    background: var(--accent-bg); color: #0060df;
+    border-radius: 5px; padding: 0 4px; font-weight: 600;
+}
+body.theme-dark .com-mencion { color: #6cb6ff; }
+
+.com-msg-tools {
+    position: absolute; top: -10px; right: 8px; display: none;
+    gap: 2px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 2px; box-shadow: 0 2px 10px rgba(0,0,0,.1);
+}
+.com-msg:hover .com-msg-tools { display: flex; }
+.com-msg-tools button {
+    border: none; background: transparent; cursor: pointer; font-size: 13px;
+    width: 26px; height: 24px; border-radius: 6px; color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center;
+}
+.com-msg-tools button:hover { background: var(--bg); }
+
+.com-reacts { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+.com-react {
+    display: inline-flex; align-items: center; gap: 4px;
+    border: 1px solid var(--border); background: var(--card);
+    border-radius: 20px; padding: 1px 8px; font-size: 12px; cursor: pointer;
+    transition: background .12s, border-color .12s;
+}
+.com-react:hover { background: var(--bg); }
+.com-react.mia { background: var(--accent-bg); border-color: var(--accent); }
+.com-react-n { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+
+.com-quote {
+    border-left: 3px solid var(--accent); background: var(--bg);
+    padding: 5px 10px; border-radius: 0 7px 7px 0; margin-bottom: 5px;
+    font-size: 12px; color: var(--text-secondary);
+}
+.com-quote b { color: var(--text-primary); }
+
+.com-file {
+    display: flex; align-items: center; gap: 10px; margin-top: 6px;
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 12px; background: var(--card); max-width: 420px;
+    text-decoration: none; color: inherit; transition: background .15s;
+}
+.com-file:hover { background: var(--bg); }
+.com-file-ico {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-bg); color: #0060df; font-size: 11px; font-weight: 700;
+}
+.com-file-name { font-size: 12.5px; font-weight: 600; word-break: break-all; }
+.com-file-meta { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+.com-img-msg { max-width: 320px; max-height: 260px; border-radius: 10px; margin-top: 6px; display: block; }
+.com-audio { margin-top: 6px; max-width: 320px; width: 100%; }
+
+/* ── Compositor ────────────────────────────────────────────── */
+.com-composer {
+    border-top: 1px solid var(--border); padding: 10px 14px; flex-shrink: 0;
+    background: var(--card);
+}
+.com-composer-row { display: flex; gap: 8px; align-items: flex-end; }
+.com-input {
+    flex: 1; min-height: 38px; max-height: 160px; resize: none;
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 9px 12px; font-family: inherit; font-size: 13.5px; line-height: 1.45;
+    color: var(--text-primary); background: var(--card); outline: none;
+}
+.com-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10,132,255,.13); }
+.com-send {
+    height: 38px; padding: 0 16px; border: none; border-radius: 10px;
+    background: var(--accent); color: #fff; font-family: inherit;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.com-send:hover { filter: brightness(1.08); }
+.com-send:disabled { opacity: .5; cursor: default; }
+.com-reply-bar {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    font-size: 12px; color: var(--text-secondary);
+    background: var(--bg); border-radius: 8px; padding: 6px 10px;
+}
+.com-rec-bar {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+    background: var(--danger-bg); border-radius: 8px; padding: 7px 11px; font-size: 12.5px;
+}
+.com-rec-dot {
+    width: 9px; height: 9px; border-radius: 50%; background: var(--danger);
+    animation: com-pulse 1.1s infinite;
+}
+@keyframes com-pulse { 0%,100% { opacity: 1 } 50% { opacity: .25 } }
+
+/* ── Personas ──────────────────────────────────────────────── */
+.com-person {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px; text-align: center;
+    transition: border-color .15s, transform .12s;
+}
+.com-person:hover { border-color: var(--accent); transform: translateY(-1px); }
+.com-person .com-av { margin: 0 auto 9px; }
+.com-person-name { font-size: 13.5px; font-weight: 600; }
+.com-person-role { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; min-height: 15px; }
+.com-person-acts { display: flex; gap: 6px; justify-content: center; margin-top: 11px; }
+
+/* ── Organigrama ───────────────────────────────────────────── */
+.com-org-wrap { overflow-x: auto; padding: 18px 8px 26px; }
+.com-org ul { display: flex; justify-content: center; gap: 16px; padding-top: 22px; position: relative; list-style: none; }
+.com-org li { position: relative; padding-top: 22px; list-style: none; }
+.com-org li::before, .com-org li::after {
+    content: ''; position: absolute; top: 0; right: 50%;
+    border-top: 1.5px solid var(--border); width: 50%; height: 22px;
+}
+.com-org li::after { right: auto; left: 50%; border-left: 1.5px solid var(--border); }
+.com-org li:only-child::after, .com-org li:only-child::before { display: none; }
+.com-org li:only-child { padding-top: 0; }
+.com-org li:first-child::before, .com-org li:last-child::after { border: 0 none; }
+.com-org li:last-child::before { border-right: 1.5px solid var(--border); border-radius: 0 5px 0 0; }
+.com-org li:first-child::after { border-radius: 5px 0 0 0; }
+.com-org ul ul::before {
+    content: ''; position: absolute; top: 0; left: 50%;
+    border-left: 1.5px solid var(--border); width: 0; height: 22px;
+}
+.com-org-node {
+    display: inline-flex; flex-direction: column; align-items: center; gap: 6px;
+    border: 1px solid var(--border); border-radius: 12px; background: var(--card);
+    padding: 11px 14px; min-width: 148px; cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+}
+.com-org-node:hover { border-color: var(--accent); box-shadow: 0 3px 14px rgba(10,132,255,.14); }
+.com-org-name { font-size: 12.5px; font-weight: 600; }
+.com-org-cargo { font-size: 11px; color: var(--text-secondary); }
+.com-org-dep {
+    font-size: 9.5px; letter-spacing: .5px; text-transform: uppercase;
+    color: var(--accent); font-weight: 700;
+}
+
+/* ── Reuniones y calendario ────────────────────────────────── */
+.com-meet {
+    display: flex; gap: 14px; align-items: flex-start;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px; background: var(--card); margin-bottom: 10px;
+}
+.com-meet-date {
+    width: 60px; flex-shrink: 0; text-align: center;
+    border-radius: 10px; background: var(--bg); padding: 8px 4px;
+}
+.com-meet-d { font-size: 20px; font-weight: 700; line-height: 1; }
+.com-meet-m { font-size: 10px; text-transform: uppercase; color: var(--text-secondary); margin-top: 3px; }
+.com-meet-body { flex: 1; min-width: 0; }
+.com-meet-title { font-size: 14px; font-weight: 600; }
+.com-meet-meta { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+.com-meet-acts { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 10px; }
+.com-meet.cancelada { opacity: .55; }
+.com-meet.cancelada .com-meet-title { text-decoration: line-through; }
+
+.com-cal-head {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+    font-size: 10.5px; text-transform: uppercase; letter-spacing: .6px;
+    color: var(--text-secondary); font-weight: 700; margin-bottom: 6px; text-align: center;
+}
+.com-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.com-cal-day {
+    min-height: 88px; border: 1px solid var(--border); border-radius: 10px;
+    padding: 6px 7px; background: var(--card); font-size: 11.5px;
+}
+.com-cal-day.fuera { opacity: .4; }
+.com-cal-day.hoy { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.com-cal-n { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+.com-cal-ev {
+    background: var(--accent-bg); color: #0060df; border-radius: 6px;
+    padding: 2px 5px; margin-bottom: 3px; cursor: pointer;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 10.5px;
+}
+body.theme-dark .com-cal-ev { color: #6cb6ff; }
+
+/* ── Anuncios y notificaciones ─────────────────────────────── */
+.com-anuncio {
+    border: 1px solid var(--border); border-left-width: 4px;
+    border-radius: var(--radius); background: var(--card);
+    padding: 15px 17px; margin-bottom: 11px;
+}
+.com-anuncio.Normal     { border-left-color: var(--accent); }
+.com-anuncio.Importante { border-left-color: var(--warning); }
+.com-anuncio.Urgente    { border-left-color: var(--danger); }
+.com-anuncio-title { font-size: 14.5px; font-weight: 600; }
+.com-anuncio-meta { font-size: 11.5px; color: var(--text-secondary); margin-top: 3px; }
+.com-anuncio-body { font-size: 13.5px; line-height: 1.55; margin-top: 10px; white-space: pre-wrap; }
+.com-anuncio-foot {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--border);
+}
+
+.com-notif {
+    display: flex; gap: 11px; align-items: flex-start;
+    padding: 11px 13px; border-bottom: 1px solid var(--border); cursor: pointer;
+}
+.com-notif:last-child { border-bottom: 0; }
+.com-notif:hover { background: var(--bg); }
+.com-notif.no-leida { background: var(--accent-bg); }
+body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
+.com-notif-txt { font-size: 13px; line-height: 1.45; }
+.com-notif-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Videollamada ──────────────────────────────────────────── */
+.com-call-overlay {
+    position: fixed; inset: 0; background: #0b0b0d; z-index: 950;
+    display: none; flex-direction: column;
+}
+.com-call-overlay.open { display: flex; }
+.com-call-head {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 18px; color: #fff; background: rgba(255,255,255,.05);
+    flex-shrink: 0;
+}
+.com-call-title { font-size: 14px; font-weight: 600; }
+.com-call-sub { font-size: 11.5px; opacity: .6; margin-top: 1px; }
+.com-call-frame { flex: 1; min-height: 0; }
+.com-call-frame iframe, .com-call-frame > div { width: 100%; height: 100%; border: 0; }
+.com-call-end {
+    margin-left: auto; height: 34px; padding: 0 18px; border: none;
+    border-radius: 9px; background: var(--danger); color: #fff;
+    font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+
+/* ── Utilidades del módulo ─────────────────────────────────── */
+.com-btn {
+    height: 32px; padding: 0 13px; border-radius: 9px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text-primary); font-family: inherit;
+    font-size: 12.5px; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px; transition: background .15s;
+}
+.com-btn:hover { background: var(--bg); }
+.com-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.com-btn.primary:hover { filter: brightness(1.08); background: var(--accent); }
+.com-btn.danger { color: var(--danger); }
+.com-btn.danger:hover { background: var(--danger-bg); }
+.com-btn:disabled { opacity: .5; cursor: default; }
+.com-btn svg {
+    width: 14px; height: 14px; fill: none; stroke: currentColor;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.com-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; border-radius: 20px;
+    padding: 2px 9px; background: var(--bg); color: var(--text-secondary);
+}
+.com-chip.ok   { background: var(--success-bg); color: #1b7a3e; }
+.com-chip.warn { background: var(--warning-bg); color: #9a6100; }
+.com-chip.dan  { background: var(--danger-bg);  color: #c0392b; }
+.com-chip.acc  { background: var(--accent-bg);  color: #0060df; }
+.com-kv { display: flex; gap: 8px; font-size: 12.5px; padding: 5px 0; }
+.com-kv span:first-child { color: var(--text-secondary); min-width: 118px; }
+.com-scroll { max-height: 340px; overflow-y: auto; }
+.com-list-pick {
+    max-height: 210px; overflow-y: auto; border: 1px solid var(--border);
+    border-radius: 9px; padding: 5px;
+}
+.com-pick-row {
+    display: flex; align-items: center; gap: 9px; padding: 6px 8px;
+    border-radius: 7px; cursor: pointer; font-size: 13px;
+}
+.com-pick-row:hover { background: var(--bg); }
+.com-pick-row input { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
+
+</style>
 </head>
 
 <body>
@@ -3970,6 +4418,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
         ════════════════════════════════════════════════════════════ */
         (function () {
             const API_URL = 'https://script.google.com/macros/s/AKfycbzAqGFrg6byPDMOTwA-3R6etNwggLZHTlQUnbnU-7oQQDtCOw4VD9MKZImLp6Dp05Xn/exec';
+            window.AZ_API_URL = API_URL; // expuesto para el módulo Comunidad (comunidad.js)
             const SESSION_KEY = 'azyvion_session';
 
             const MAP = {
@@ -8912,6 +9361,2326 @@ window.addEventListener('resize', function() {
 
     </script>
 
+<script id="comunidad-script">
+/* ══════════════════════════════════════════════════════════════
+   AZYVION CRM · MÓDULO COMUNIDAD — frontend v1.0
+   Se inyecta sobre el dashboard existente sin modificar su
+   markup ni sus funciones. Reutiliza: sidebar, topbar, .page,
+   showPage(), showToast(), estilos y variables de tema.
+══════════════════════════════════════════════════════════════ */
+(function () {
+    'use strict';
+
+    var COM = window.COM = {
+        datos:     null,      // respuesta de comGetInicio
+        vista:     'inicio',
+        canales:   [],
+        chats:     [],
+        personas:  [],
+        actual:    null,      // { tipo:'canal'|'chat', id, nombre }
+        mensajes:  [],
+        respondiendo: null,
+        editando:  null,
+        pollTimer: null,
+        notifTimer:null,
+        grabador:  null,
+        audioChunks: [],
+        audioBlob: null,
+        calMes:    new Date().getMonth(),
+        calAnio:   new Date().getFullYear(),
+        cargando:  false,
+        iniciado:  false
+    };
+
+    /* ── API ──────────────────────────────────────────────── */
+
+    function urlApi() {
+        return window.AZ_API_URL || '';
+    }
+    function token() {
+        try { return (JSON.parse(localStorage.getItem('azyvion_session') || '{}') || {}).token || ''; }
+        catch (e) { return ''; }
+    }
+
+    COM.api = function (accion, params) {
+        var cuerpo = Object.assign({ action: accion, token: token() }, params || {});
+        var url = urlApi();
+        if (!url) return Promise.reject(new Error('No se encontró la URL del Web App (window.AZ_API_URL).'));
+        return fetch(url + '?token=' + encodeURIComponent(cuerpo.token), {
+            method: 'POST', redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(cuerpo)
+        }).then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.text();
+        }).then(function (t) {
+            var d;
+            try { d = JSON.parse(t); }
+            catch (e) { throw new Error('El servidor no devolvió JSON válido.'); }
+            if (!d.ok) throw new Error(d.error || 'Ocurrió un error inesperado.');
+            return d;
+        });
+    };
+
+    function aviso(msg, color) {
+        if (typeof window.showToast === 'function') window.showToast(msg, color || '#30D158');
+        else console.log(msg);
+    }
+    function error(e) {
+        aviso((e && e.message) ? e.message : String(e), '#FF453A');
+    }
+
+    /* ── Utilidades ───────────────────────────────────────── */
+
+    function esc(s) {
+        return String(s === undefined || s === null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function attr(s) { return esc(s).replace(/`/g, '&#96;'); }
+
+    function iniciales(n) { return String(n || '??').trim().substring(0, 2).toUpperCase(); }
+
+    function avatar(p, clase) {
+        var c = 'com-av ' + (clase || '');
+        var dot = p && p.estado ? '<span class="com-dot ' + esc(p.estado) + '"></span>' : '';
+        if (p && p.fotoUrl) {
+            return '<div class="' + c + '"><img src="' + attr(p.fotoUrl) + '" alt="" ' +
+                'onerror="this.replaceWith(document.createTextNode(\'' + iniciales(p.nombre) + '\'))">' + dot + '</div>';
+        }
+        return '<div class="' + c + '">' + esc(iniciales(p && (p.nombre || p.usuario))) + dot + '</div>';
+    }
+
+    function hora(f) {
+        var d = new Date(f);
+        if (isNaN(d.getTime())) return '';
+        return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    }
+    function fechaCorta(f) {
+        var d = new Date(f);
+        if (isNaN(d.getTime())) return '';
+        var hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+        var dd = new Date(d); dd.setHours(0, 0, 0, 0);
+        var dif = Math.round((hoy - dd) / 86400000);
+        if (dif === 0) return 'Hoy';
+        if (dif === 1) return 'Ayer';
+        return d.toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+    function relativo(f) {
+        var d = new Date(f); if (isNaN(d.getTime())) return '';
+        var s = Math.floor((Date.now() - d.getTime()) / 1000);
+        if (s < 60) return 'hace un momento';
+        if (s < 3600) return 'hace ' + Math.floor(s / 60) + ' min';
+        if (s < 86400) return 'hace ' + Math.floor(s / 3600) + ' h';
+        if (s < 604800) return 'hace ' + Math.floor(s / 86400) + ' d';
+        return fechaCorta(f);
+    }
+    function pesoArchivo(b) {
+        b = Number(b) || 0;
+        if (b < 1024) return b + ' B';
+        if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+        return (b / 1048576).toFixed(1) + ' MB';
+    }
+    function ext(n) { return String(n || '').split('.').pop().toUpperCase().substring(0, 4); }
+
+    function vacio(texto) {
+        return '<div class="com-empty">' +
+            '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/>' +
+            '<line x1="12" y1="16" x2="12.01" y2="16"/></svg>' + esc(texto) + '</div>';
+    }
+
+    function svg(d, extra) {
+        return '<svg viewBox="0 0 24 24"' + (extra || '') + '>' + d + '</svg>';
+    }
+
+    var ICO = {
+        inicio:   '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+        chat:     '<path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.4 8.4 0 0 1-3.8-.9L3 21l2-4.9A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5z"/>',
+        canal:    '<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
+        personas: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/>',
+        org:      '<rect x="9" y="2" width="6" height="5" rx="1"/><rect x="2" y="16" width="6" height="5" rx="1"/><rect x="16" y="16" width="6" height="5" rx="1"/><path d="M12 7v5M5 16v-2h14v2"/>',
+        video:    '<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>',
+        cal:      '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+        archivo:  '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+        anuncio:  '<path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1z"/><path d="M16 8a5 5 0 0 1 0 8"/>',
+        campana:  '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+        ajustes:  '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 9 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4.6 9a1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/>',
+        buscar:   '<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+        mas:      '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+        clip:     '<path d="M21.4 11.05 12.2 20.2a5 5 0 0 1-7.1-7.1l9.2-9.1a3.3 3.3 0 1 1 4.7 4.7l-9.2 9.1a1.7 1.7 0 0 1-2.4-2.4l8.5-8.4"/>',
+        mic:      '<path d="M12 1a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><line x1="12" y1="18" x2="12" y2="22"/>',
+        tel:      '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.4 2.1L8 9.8a16 16 0 0 0 6 6l1.4-1.3a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.9 2.3z"/>',
+        info:     '<circle cx="12" cy="12" r="9"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'
+    };
+
+    /* ── Modal propio (reutiliza las clases del CRM) ──────── */
+
+    COM.modalCb = null;
+
+    function modal(titulo, html, textoGuardar, cb, ancho) {
+        var ov = document.getElementById('comModal');
+        ov.querySelector('.com-modal-title').textContent = titulo;
+        ov.querySelector('.com-modal-body').innerHTML = html;
+        var box = ov.querySelector('.modal-box');
+        box.style.maxWidth = ancho || '620px';
+        var btn = ov.querySelector('.com-modal-save');
+        if (textoGuardar) {
+            btn.style.display = '';
+            btn.textContent = textoGuardar;
+            btn.disabled = false;
+        } else {
+            btn.style.display = 'none';
+        }
+        COM.modalCb = cb || null;
+        ov.classList.add('open');
+        setTimeout(function () {
+            var el = ov.querySelector('.com-modal-body input, .com-modal-body textarea, .com-modal-body select');
+            if (el) try { el.focus(); } catch (e) {}
+        }, 60);
+    }
+    COM.cerrarModal = function () {
+        document.getElementById('comModal').classList.remove('open');
+        COM.modalCb = null;
+    };
+    COM.guardarModal = function () {
+        if (typeof COM.modalCb === 'function') COM.modalCb();
+    };
+    function botonModal(estado, texto) {
+        var b = document.querySelector('#comModal .com-modal-save');
+        if (!b) return;
+        b.disabled = !!estado;
+        if (texto) b.textContent = texto;
+    }
+    function val(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
+    function chk(id) { var e = document.getElementById(id); return e ? e.checked : false; }
+    function seleccionados(clase) {
+        return Array.prototype.slice.call(document.querySelectorAll('.' + clase + ':checked'))
+            .map(function (e) { return e.value; });
+    }
+
+    /* ── Estructura de la página ──────────────────────────── */
+
+    var TABS = [
+        { id: 'inicio',   nombre: 'Inicio',         ico: ICO.inicio },
+        { id: 'mensajes', nombre: 'Mensajes',       ico: ICO.chat },
+        { id: 'canales',  nombre: 'Canales',        ico: ICO.canal },
+        { id: 'personas', nombre: 'Personas',       ico: ICO.personas },
+        { id: 'org',      nombre: 'Organigrama',    ico: ICO.org },
+        { id: 'reuniones',nombre: 'Reuniones',      ico: ICO.video },
+        { id: 'calendario',nombre:'Calendario',     ico: ICO.cal },
+        { id: 'archivos', nombre: 'Archivos',       ico: ICO.archivo },
+        { id: 'anuncios', nombre: 'Anuncios',       ico: ICO.anuncio },
+        { id: 'notificaciones', nombre: 'Notificaciones', ico: ICO.campana },
+        { id: 'admin',    nombre: 'Configuración',  ico: ICO.ajustes, soloAdmin: true }
+    ];
+
+    function construirPagina() {
+        if (document.getElementById('page-comunidad')) return;
+
+        /* 1 · Ítem en el sidebar existente */
+        var nav = document.getElementById('sidebarNav');
+        if (nav && !document.getElementById('nav-comunidad')) {
+            var sec = document.createElement('div');
+            sec.className = 'nav-section';
+            sec.textContent = 'Comunidad';
+            var item = document.createElement('div');
+            item.className = 'nav-item';
+            item.id = 'nav-comunidad';
+            item.onclick = function () { window.showPage('comunidad', item); };
+            item.innerHTML = svg(ICO.chat) + ' <span>Comunidad</span>' +
+                '<span class="badge" id="badgeComunidad" style="display:none">0</span>';
+            var footer = nav.querySelector('.sidebar-footer');
+            if (footer) { nav.insertBefore(sec, footer); nav.insertBefore(item, footer); }
+            else { nav.appendChild(sec); nav.appendChild(item); }
+        }
+
+        /* 2 · Página dentro del .content existente */
+        var contenido = document.querySelector('.content');
+        var page = document.createElement('div');
+        page.className = 'page';
+        page.id = 'page-comunidad';
+        page.innerHTML =
+            '<div class="com-sec-head" style="margin-bottom:14px">' +
+                '<div>' +
+                    '<div class="com-sec-title" style="font-size:18px">Comunidad</div>' +
+                    '<div class="com-sec-sub" id="comSaludo">Centro de comunicación interna</div>' +
+                '</div>' +
+                '<div style="display:flex;gap:8px;align-items:center">' +
+                    '<input class="com-side-search" id="comBuscarGlobal" style="width:260px;height:34px" ' +
+                        'placeholder="Buscar mensajes, personas, canales, archivos…" ' +
+                        'onkeydown="if(event.key===\'Enter\')COM.buscar()">' +
+                    '<button class="com-btn" onclick="COM.buscar()">' + svg(ICO.buscar) + ' Buscar</button>' +
+                    '<button class="com-btn" onclick="COM.menuEstado()" id="comEstadoBtn">Estado</button>' +
+                '</div>' +
+            '</div>' +
+            '<div class="com-tabs" id="comTabs"></div>' +
+            '<div id="comVistas"></div>';
+        contenido.appendChild(page);
+
+        /* 3 · Modal propio */
+        var mod = document.createElement('div');
+        mod.className = 'modal-overlay';
+        mod.id = 'comModal';
+        mod.onclick = function (e) { if (e.target === mod) COM.cerrarModal(); };
+        mod.innerHTML =
+            '<div class="modal-box">' +
+                '<div class="modal-header">' +
+                    '<div class="modal-title com-modal-title">Comunidad</div>' +
+                    '<button class="modal-close" onclick="COM.cerrarModal()">' +
+                        svg('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>') +
+                    '</button>' +
+                '</div>' +
+                '<div class="modal-body com-modal-body"></div>' +
+                '<div class="modal-footer">' +
+                    '<button class="btn-cancel" onclick="COM.cerrarModal()">Cancelar</button>' +
+                    '<button class="btn-save com-modal-save" onclick="COM.guardarModal()">Guardar</button>' +
+                '</div>' +
+            '</div>';
+        document.body.appendChild(mod);
+
+        /* 4 · Overlay de videollamada */
+        var call = document.createElement('div');
+        call.className = 'com-call-overlay';
+        call.id = 'comCall';
+        call.innerHTML =
+            '<div class="com-call-head">' +
+                '<div>' +
+                    '<div class="com-call-title" id="comCallTitle">Videollamada</div>' +
+                    '<div class="com-call-sub" id="comCallSub">Conectando…</div>' +
+                '</div>' +
+                '<button class="com-call-end" onclick="COM.colgar()">Finalizar llamada</button>' +
+            '</div>' +
+            '<div class="com-call-frame" id="comCallFrame"></div>';
+        document.body.appendChild(call);
+
+        /* 5 · Input de archivo oculto */
+        var file = document.createElement('input');
+        file.type = 'file';
+        file.id = 'comFileInput';
+        file.style.display = 'none';
+        file.onchange = function () { COM.archivoElegido(this.files[0]); this.value = ''; };
+        document.body.appendChild(file);
+
+        /* 6 · Título y CTA del módulo en la topbar existente */
+        try {
+            window.PAGE_TITLES.comunidad = 'Comunidad';
+            window.CTA_LABELS.comunidad = '';
+        } catch (e) {}
+    }
+
+    function pintarTabs() {
+        var esAdmin = COM.datos && COM.datos.permisos && COM.datos.permisos.esAdmin;
+        var noLeidas = COM.datos ? (COM.datos.noLeidas || 0) : 0;
+        document.getElementById('comTabs').innerHTML = TABS
+            .filter(function (t) { return !t.soloAdmin || esAdmin; })
+            .map(function (t) {
+                var badge = (t.id === 'notificaciones' && noLeidas)
+                    ? '<span class="com-tab-badge">' + noLeidas + '</span>' : '';
+                return '<button class="com-tab' + (COM.vista === t.id ? ' active' : '') + '" ' +
+                    'onclick="COM.ir(\'' + t.id + '\')">' + svg(t.ico) + ' ' + esc(t.nombre) + badge + '</button>';
+            }).join('');
+    }
+
+    function pintar(html) {
+        document.getElementById('comVistas').innerHTML = html;
+    }
+
+    /* ── Navegación interna ───────────────────────────────── */
+
+    COM.ir = function (vista, param) {
+        COM.vista = vista;
+        pintarTabs();
+        detenerPoll();
+        switch (vista) {
+            case 'inicio':         vistaInicio(); break;
+            case 'mensajes':       vistaMensajes(param); break;
+            case 'canales':        vistaCanales(); break;
+            case 'personas':       vistaPersonas(); break;
+            case 'org':            vistaOrganigrama(); break;
+            case 'reuniones':      vistaReuniones(); break;
+            case 'calendario':     vistaCalendario(); break;
+            case 'archivos':       vistaArchivos(); break;
+            case 'anuncios':       vistaAnuncios(); break;
+            case 'notificaciones': vistaNotificaciones(); break;
+            case 'admin':          vistaAdmin(); break;
+        }
+    };
+
+    COM.entrar = function () {
+        construirPagina();
+        if (!COM.iniciado) { COM.iniciado = true; COM.recargar(true); }
+        else { COM.ir(COM.vista); }
+        arrancarNotif();
+    };
+
+    COM.recargar = function (inicial) {
+        pintar('<div class="com-card com-empty">Cargando Comunidad…</div>');
+        return COM.api('comGetInicio', {}).then(function (d) {
+            COM.datos    = d;
+            COM.canales  = d.canales || [];
+            COM.chats    = d.chats || [];
+            COM.personas = d.personas || [];
+            var saludo = document.getElementById('comSaludo');
+            if (saludo) {
+                saludo.textContent = 'Hola ' + (d.yo.nombre || '') + ' · ' +
+                    COM.canales.length + ' canales · ' + COM.personas.length + ' colaboradores';
+            }
+            actualizarBadge(d.noLeidas || 0);
+            pintarTabs();
+            if (inicial) COM.ir('inicio'); else COM.ir(COM.vista);
+        }).catch(function (e) {
+            pintar('<div class="com-card com-empty">' + esc(e.message) +
+                '<br><br><button class="com-btn" onclick="COM.recargar(true)">Reintentar</button></div>');
+        });
+    };
+
+    function actualizarBadge(n) {
+        var b = document.getElementById('badgeComunidad');
+        if (!b) return;
+        if (n > 0) { b.textContent = n > 99 ? '99+' : n; b.style.display = ''; }
+        else b.style.display = 'none';
+    }
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · INICIO
+    ══════════════════════════════════════════════════════ */
+
+    function vistaInicio() {
+        var d = COM.datos;
+        if (!d) return;
+
+        var canales = COM.canales.slice(0, 6).map(function (c) {
+            return '<div class="com-card" style="cursor:pointer;padding:13px" onclick="COM.abrirCanal(' + c.id + ')">' +
+                '<div style="display:flex;align-items:center;gap:8px">' +
+                    '<div class="com-av sm" style="background:' + attr(c.color) + '">#</div>' +
+                    '<div style="flex:1;min-width:0">' +
+                        '<div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' +
+                            esc(c.nombre) + '</div>' +
+                        '<div style="font-size:11px;color:var(--text-secondary)">' + c.totalMiembros + ' miembros</div>' +
+                    '</div>' +
+                    (c.noLeidos ? '<span class="com-side-badge">' + c.noLeidos + '</span>' : '') +
+                '</div></div>';
+        }).join('') || vacio('Aún no perteneces a ningún canal.');
+
+        var chats = COM.chats.slice(0, 6).map(function (c) {
+            return '<div class="com-side-item" onclick="COM.abrirChat(' + c.id + ')">' +
+                avatar({ nombre: c.nombre, fotoUrl: c.fotoUrl }, 'sm') +
+                '<div class="com-side-item-body">' +
+                    '<div class="com-side-item-name">' + esc(c.nombre) + '</div>' +
+                    '<div class="com-side-item-sub">' +
+                        (c.ultimoMensaje ? esc(c.ultimoMensaje.nombre + ': ' + c.ultimoMensaje.contenido)
+                                         : 'Sin mensajes todavía') + '</div>' +
+                '</div>' +
+                (c.noLeidos ? '<span class="com-side-badge">' + c.noLeidos + '</span>' : '') +
+            '</div>';
+        }).join('') || vacio('Aún no tienes conversaciones.');
+
+        var reuniones = (d.reuniones || []).map(function (r) {
+            return '<div class="com-side-item" onclick="COM.ir(\'reuniones\')">' +
+                '<div class="com-meet-date" style="width:46px;padding:5px 3px">' +
+                    '<div class="com-meet-d" style="font-size:16px">' + new Date(r.fecha + 'T00:00').getDate() + '</div>' +
+                    '<div class="com-meet-m">' + new Date(r.fecha + 'T00:00')
+                        .toLocaleDateString('es-GT', { month: 'short' }) + '</div>' +
+                '</div>' +
+                '<div class="com-side-item-body">' +
+                    '<div class="com-side-item-name">' + esc(r.titulo) + '</div>' +
+                    '<div class="com-side-item-sub">' + esc(r.hora) + ' · ' + esc(r.nombreOrganizador) + '</div>' +
+                '</div></div>';
+        }).join('') || vacio('No tienes reuniones próximas.');
+
+        var anuncios = (d.anuncios || []).map(function (a) {
+            return '<div class="com-anuncio ' + esc(a.prioridad) + '" style="padding:12px 14px;margin-bottom:9px;cursor:pointer" ' +
+                'onclick="COM.ir(\'anuncios\')">' +
+                '<div class="com-anuncio-title" style="font-size:13.5px">📢 ' + esc(a.titulo) + '</div>' +
+                '<div class="com-anuncio-meta">' + esc(a.nombreAutor) + ' · ' + relativo(a.fecha) +
+                    (a.confirmado ? ' · <span class="com-chip ok">Leído</span>' : '') + '</div>' +
+            '</div>';
+        }).join('') || vacio('No hay anuncios publicados.');
+
+        var notifs = (d.notificaciones || []).slice(0, 6).map(function (n) {
+            return '<div class="com-notif' + (n.leida ? '' : ' no-leida') + '" onclick="COM.ir(\'notificaciones\')">' +
+                '<div class="com-notif-txt">' + esc(n.contenido) +
+                    '<div class="com-notif-time">' + relativo(n.fecha) + '</div></div></div>';
+        }).join('') || vacio('Sin notificaciones pendientes.');
+
+        var activos = COM.personas.filter(function (p) { return p.estado === 'Disponible'; }).slice(0, 12);
+
+        pintar(
+            '<div class="com-view active">' +
+            '<div class="com-sec">' +
+                '<div class="com-sec-head"><div class="com-sec-title">Canales recientes</div>' +
+                    '<button class="com-btn" onclick="COM.ir(\'canales\')">Ver todos</button></div>' +
+                '<div class="com-grid com-grid-auto">' + canales + '</div>' +
+            '</div>' +
+
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">' +
+                '<div class="com-sec">' +
+                    '<div class="com-sec-head"><div class="com-sec-title">Conversaciones recientes</div>' +
+                        '<button class="com-btn" onclick="COM.ir(\'mensajes\')">Abrir mensajes</button></div>' +
+                    '<div class="com-card" style="padding:4px">' + chats + '</div>' +
+                '</div>' +
+                '<div class="com-sec">' +
+                    '<div class="com-sec-head"><div class="com-sec-title">Próximas reuniones</div>' +
+                        '<button class="com-btn" onclick="COM.nuevaReunion()">Nueva</button></div>' +
+                    '<div class="com-card" style="padding:4px">' + reuniones + '</div>' +
+                '</div>' +
+            '</div>' +
+
+            '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">' +
+                '<div class="com-sec">' +
+                    '<div class="com-sec-head"><div class="com-sec-title">Anuncios</div></div>' + anuncios +
+                '</div>' +
+                '<div class="com-sec">' +
+                    '<div class="com-sec-head"><div class="com-sec-title">Notificaciones</div></div>' +
+                    '<div class="com-card" style="padding:0">' + notifs + '</div>' +
+                '</div>' +
+            '</div>' +
+
+            '<div class="com-sec">' +
+                '<div class="com-sec-head"><div class="com-sec-title">Personas disponibles</div>' +
+                    '<button class="com-btn" onclick="COM.ir(\'personas\')">Directorio</button></div>' +
+                '<div class="com-card" style="display:flex;gap:14px;flex-wrap:wrap">' +
+                    (activos.map(function (p) {
+                        return '<div style="text-align:center;cursor:pointer;width:74px" onclick="COM.verPersona(\'' +
+                            attr(p.usuario) + '\')">' + avatar(p) +
+                            '<div style="font-size:11px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' +
+                            esc(p.nombre.split(' ')[0]) + '</div></div>';
+                    }).join('') || vacio('Nadie marcó estado disponible.')) +
+                '</div>' +
+            '</div>' +
+            '</div>'
+        );
+    }
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · MENSAJES (canales + chats)
+    ══════════════════════════════════════════════════════ */
+
+    function vistaMensajes(abrir) {
+        pintar(
+            '<div class="com-chat-shell">' +
+                '<div class="com-chat-side">' +
+                    '<div class="com-side-head">' +
+                        '<input class="com-side-search" id="comFiltroLista" placeholder="Filtrar…" ' +
+                            'oninput="COM.pintarLista()">' +
+                        '<button class="com-icon-btn" title="Nuevo chat o grupo" onclick="COM.nuevoChat()">' +
+                            svg(ICO.mas) + '</button>' +
+                    '</div>' +
+                    '<div class="com-side-list" id="comLista"></div>' +
+                '</div>' +
+                '<div class="com-chat-main" id="comPanel">' +
+                    '<div class="com-empty" style="margin:auto">Selecciona un canal o una conversación para empezar.</div>' +
+                '</div>' +
+            '</div>'
+        );
+        COM.pintarLista();
+        if (abrir && abrir.tipo === 'canal') COM.abrirCanal(abrir.id, true);
+        else if (abrir && abrir.tipo === 'chat') COM.abrirChat(abrir.id, true);
+        else if (COM.actual) {
+            if (COM.actual.tipo === 'canal') COM.abrirCanal(COM.actual.id, true);
+            else COM.abrirChat(COM.actual.id, true);
+        }
+    }
+
+    COM.pintarLista = function () {
+        var cont = document.getElementById('comLista');
+        if (!cont) return;
+        var f = (document.getElementById('comFiltroLista') || {}).value || '';
+        f = f.toLowerCase();
+        var coincide = function (t) { return !f || String(t).toLowerCase().indexOf(f) !== -1; };
+
+        var canales = COM.canales.filter(function (c) {
+            return c.estado === 'Activo' && coincide(c.nombre);
+        });
+        var chats = COM.chats.filter(function (c) { return coincide(c.nombre); });
+
+        var html = '<div class="com-side-group">Canales' +
+            (COM.datos.permisos.crearCanales
+                ? '<button title="Crear canal" onclick="COM.nuevoCanal()">+</button>' : '') +
+            '</div>';
+
+        html += canales.map(function (c) {
+            var activo = COM.actual && COM.actual.tipo === 'canal' && String(COM.actual.id) === String(c.id);
+            return '<div class="com-side-item' + (activo ? ' active' : '') + '" onclick="COM.abrirCanal(' + c.id + ')">' +
+                '<div class="com-av sm" style="background:' + attr(c.color) + '">#</div>' +
+                '<div class="com-side-item-body">' +
+                    '<div class="com-side-item-name">' + esc(c.nombre) +
+                        (c.fijado ? ' <span class="com-pin">📌</span>' : '') +
+                        (c.tipo === 'Privado' ? ' <span class="com-pin">🔒</span>' : '') + '</div>' +
+                    '<div class="com-side-item-sub">' +
+                        (c.ultimoMensaje ? esc(c.ultimoMensaje.nombre + ': ' + c.ultimoMensaje.contenido)
+                                         : esc(c.descripcion || 'Sin mensajes')) + '</div>' +
+                '</div>' +
+                (c.noLeidos ? '<span class="com-side-badge">' + c.noLeidos + '</span>' : '') +
+            '</div>';
+        }).join('') || '<div class="com-empty" style="padding:14px">Sin canales.</div>';
+
+        html += '<div class="com-side-group">Mensajes directos' +
+            '<button title="Nuevo chat" onclick="COM.nuevoChat()">+</button></div>';
+
+        html += chats.map(function (c) {
+            var activo = COM.actual && COM.actual.tipo === 'chat' && String(COM.actual.id) === String(c.id);
+            return '<div class="com-side-item' + (activo ? ' active' : '') + '" onclick="COM.abrirChat(' + c.id + ')">' +
+                avatar({ nombre: c.nombre, fotoUrl: c.fotoUrl }, 'sm') +
+                '<div class="com-side-item-body">' +
+                    '<div class="com-side-item-name">' + esc(c.nombre) +
+                        (c.fijado ? ' <span class="com-pin">📌</span>' : '') +
+                        (c.tipo === 'Grupo' ? ' <span class="com-pin">👥</span>' : '') + '</div>' +
+                    '<div class="com-side-item-sub">' +
+                        (c.ultimoMensaje ? esc(c.ultimoMensaje.contenido) : 'Sin mensajes') + '</div>' +
+                '</div>' +
+                (c.noLeidos ? '<span class="com-side-badge">' + c.noLeidos + '</span>' : '') +
+            '</div>';
+        }).join('') || '<div class="com-empty" style="padding:14px">Sin conversaciones.</div>';
+
+        cont.innerHTML = html;
+    };
+
+    COM.abrirCanal = function (id, yaEnVista) {
+        var canal = COM.canales.find(function (c) { return String(c.id) === String(id); });
+        if (!canal) return;
+        COM.actual = { tipo: 'canal', id: canal.id, nombre: canal.nombre, datos: canal };
+        if (COM.vista !== 'mensajes' && !yaEnVista) { COM.ir('mensajes', { tipo: 'canal', id: id }); return; }
+        COM.pintarLista();
+        cargarConversacion();
+    };
+
+    COM.abrirChat = function (id, yaEnVista) {
+        var chat = COM.chats.find(function (c) { return String(c.id) === String(id); });
+        if (!chat) return;
+        COM.actual = { tipo: 'chat', id: chat.id, nombre: chat.nombre, datos: chat };
+        if (COM.vista !== 'mensajes' && !yaEnVista) { COM.ir('mensajes', { tipo: 'chat', id: id }); return; }
+        COM.pintarLista();
+        cargarConversacion();
+    };
+
+    function refParams(extra) {
+        var p = Object.assign({}, extra || {});
+        if (!COM.actual) return p;
+        if (COM.actual.tipo === 'canal') p.canalId = COM.actual.id;
+        else p.chatId = COM.actual.id;
+        return p;
+    }
+
+    function cargarConversacion() {
+        var panel = document.getElementById('comPanel');
+        if (!panel || !COM.actual) return;
+        panel.innerHTML = '<div class="com-empty" style="margin:auto">Cargando mensajes…</div>';
+
+        COM.api('comGetMensajes', refParams({})).then(function (d) {
+            COM.mensajes = d.data || [];
+            COM.hayMas = d.hayMas;
+            pintarConversacion();
+            COM.api('comMarcarLeido', refParams({})).catch(function () {});
+            arrancarPoll();
+        }).catch(function (e) {
+            panel.innerHTML = '<div class="com-empty" style="margin:auto">' + esc(e.message) + '</div>';
+        });
+    }
+
+    function cabeceraConversacion() {
+        var a = COM.actual, d = a.datos;
+        var sub, acciones = '';
+        if (a.tipo === 'canal') {
+            sub = (d.tipo === 'Privado' ? 'Canal privado · ' : 'Canal público · ') +
+                  d.totalMiembros + ' miembros' + (d.descripcion ? ' · ' + d.descripcion : '');
+            acciones =
+                '<button class="com-icon-btn" title="Videollamada del canal" onclick="COM.llamar(\'canal\')">' + svg(ICO.video) + '</button>' +
+                '<button class="com-icon-btn" title="Programar reunión" onclick="COM.nuevaReunion(' + a.id + ')">' + svg(ICO.cal) + '</button>' +
+                '<button class="com-icon-btn" title="Miembros e información" onclick="COM.infoCanal(' + a.id + ')">' + svg(ICO.info) + '</button>' +
+                '<button class="com-icon-btn" title="' + (d.fijado ? 'Quitar de fijados' : 'Fijar') + '" onclick="COM.fijar()">📌</button>' +
+                '<button class="com-icon-btn" title="Silenciar" onclick="COM.silenciar()">🔕</button>';
+        } else {
+            sub = d.tipo === 'Grupo'
+                ? 'Grupo · ' + d.participantes.length + ' participantes'
+                : 'Mensaje directo con ' + d.nombre;
+            acciones =
+                '<button class="com-icon-btn" title="Llamada de audio" onclick="COM.llamar(\'audio\')">' + svg(ICO.tel) + '</button>' +
+                '<button class="com-icon-btn" title="Videollamada" onclick="COM.llamar(\'video\')">' + svg(ICO.video) + '</button>' +
+                (d.tipo === 'Grupo'
+                    ? '<button class="com-icon-btn" title="Administrar grupo" onclick="COM.infoGrupo(' + a.id + ')">' + svg(ICO.info) + '</button>'
+                    : '<button class="com-icon-btn" title="Ver perfil" onclick="COM.verPersona(\'' + attr(d.contraparte) + '\')">' + svg(ICO.info) + '</button>') +
+                '<button class="com-icon-btn" title="Fijar" onclick="COM.fijar()">📌</button>';
+        }
+        var ico = a.tipo === 'canal'
+            ? '<div class="com-av" style="background:' + attr(d.color || '#0A84FF') + '">#</div>'
+            : avatar({ nombre: d.nombre, fotoUrl: d.fotoUrl });
+
+        return '<div class="com-chat-head">' + ico +
+            '<div><div class="com-chat-title">' + (a.tipo === 'canal' ? '#' : '') + esc(a.nombre) + '</div>' +
+            '<div class="com-chat-sub">' + esc(sub) + '</div></div>' +
+            '<div class="com-chat-actions">' + acciones + '</div></div>';
+    }
+
+    function formatoTexto(t, menciones) {
+        var h = esc(t);
+        h = h.replace(/@([A-Za-z0-9._-]+)/g, function (m, nick) {
+            return '<span class="com-mencion">@' + esc(nick) + '</span>';
+        });
+        h = h.replace(/(https?:\/\/[^\s<]+)/g, function (u) {
+            return '<a href="' + attr(u) + '" target="_blank" rel="noopener" style="color:var(--accent)">' + esc(u) + '</a>';
+        });
+        return h;
+    }
+
+    function pintarMensaje(m, previo) {
+        if (m.tipo === 'Sistema') {
+            return '<div class="com-msg-sistema">' + esc(m.contenido) + '</div>';
+        }
+        var agrupado = previo && previo.usuario === m.usuario && previo.tipo !== 'Sistema' &&
+            (new Date(m.fecha) - new Date(previo.fecha)) < 5 * 60000;
+
+        var padre = m.mensajePadreId
+            ? COM.mensajes.find(function (x) { return String(x.id) === String(m.mensajePadreId); })
+            : null;
+        var cita = padre
+            ? '<div class="com-quote"><b>' + esc(padre.nombre) + ':</b> ' +
+              esc(String(padre.contenido).substring(0, 120)) + '</div>' : '';
+
+        var adjunto = '';
+        if (m.archivo) {
+            if (m.archivo.categoria === 'Imagen') {
+                adjunto = '<a href="' + attr(m.archivo.url) + '" target="_blank" rel="noopener">' +
+                    '<img class="com-img-msg" src="' + attr(m.archivo.url) + '" alt="' + attr(m.archivo.nombre) + '"></a>';
+            } else if (m.archivo.categoria === 'Audio') {
+                adjunto = '<audio class="com-audio" controls preload="none" src="' +
+                    attr('https://drive.google.com/uc?export=download&id=' + m.archivo.driveId) + '"></audio>';
+            } else {
+                adjunto = '<a class="com-file" href="' + attr(m.archivo.url) + '" target="_blank" rel="noopener">' +
+                    '<div class="com-file-ico">' + esc(ext(m.archivo.nombre)) + '</div>' +
+                    '<div><div class="com-file-name">' + esc(m.archivo.nombre) + '</div>' +
+                    '<div class="com-file-meta">' + pesoArchivo(m.archivo.tamano) + '</div></div></a>';
+            }
+        }
+
+        var reacciones = (m.reaccionesAgrupadas || []).map(function (r) {
+            return '<button class="com-react' + (r.mia ? ' mia' : '') + '" ' +
+                'onclick="COM.reaccionar(' + m.id + ',\'' + r.emoji + '\')" title="' +
+                attr(r.usuarios.join(', ')) + '">' + r.emoji +
+                '<span class="com-react-n">' + r.total + '</span></button>';
+        }).join('');
+
+        var hilo = m.respuestas
+            ? '<button class="com-btn" style="height:24px;font-size:11.5px;margin-top:5px" ' +
+              'onclick="COM.verHilo(' + m.id + ')">💬 ' + m.respuestas + ' respuesta' +
+              (m.respuestas === 1 ? '' : 's') + '</button>' : '';
+
+        var cfg = COM.datos.config || {};
+        var herramientas = m.eliminado ? '' :
+            '<div class="com-msg-tools">' +
+                '<button title="Reaccionar" onclick="COM.menuReaccion(' + m.id + ')">😊</button>' +
+                '<button title="Responder" onclick="COM.responder(' + m.id + ')">↩</button>' +
+                (m.propio && cfg.editarMensajes
+                    ? '<button title="Editar" onclick="COM.editar(' + m.id + ')">✏️</button>' : '') +
+                '<button title="Fijar mensaje" onclick="COM.fijarMensaje(' + m.id + ')">📌</button>' +
+                '<button title="Convertir en seguimiento del CRM" onclick="COM.aTarea(' + m.id + ')">✅</button>' +
+                ((m.propio && cfg.eliminarMensajes) || COM.datos.permisos.esAdmin
+                    ? '<button title="Eliminar" onclick="COM.eliminarMensaje(' + m.id + ')">🗑</button>' : '') +
+            '</div>';
+
+        return '<div class="com-msg' + (agrupado ? ' agrupado' : '') + (m.eliminado ? ' eliminado' : '') +
+                '" id="com-msg-' + m.id + '">' +
+            avatar({ nombre: m.nombre, fotoUrl: m.fotoUrl }) +
+            '<div class="com-msg-body">' +
+                (agrupado ? '' : '<div class="com-msg-head"><span class="com-msg-name">' + esc(m.nombre) +
+                    '</span><span class="com-msg-time">' + hora(m.fecha) + '</span>' +
+                    (m.editado ? '<span class="com-msg-flag">editado</span>' : '') +
+                    (m.fijado ? '<span class="com-msg-flag">📌 fijado</span>' : '') + '</div>') +
+                cita +
+                '<div class="com-msg-text">' + formatoTexto(m.contenido) + '</div>' +
+                adjunto +
+                (reacciones ? '<div class="com-reacts">' + reacciones + '</div>' : '') +
+                hilo +
+            '</div>' + herramientas +
+        '</div>';
+    }
+
+    function agruparReacciones(lista) {
+        // El backend ya devuelve las reacciones agregadas dentro de cada mensaje
+        // bajo la forma { emoji, total, usuarios, mia }; se normaliza aquí.
+        lista.forEach(function (m) {
+            if (m.reaccionesAgrupadas) return;
+            m.reaccionesAgrupadas = [];
+        });
+    }
+
+    function pintarConversacion(mantenerScroll) {
+        var panel = document.getElementById('comPanel');
+        if (!panel || !COM.actual) return;
+        agruparReacciones(COM.mensajes);
+
+        var cuerpo = '';
+        var ultimaFecha = '';
+        COM.mensajes.forEach(function (m, i) {
+            var f = fechaCorta(m.fecha);
+            if (f !== ultimaFecha) {
+                cuerpo += '<div class="com-msg-sistema" style="font-style:normal;font-weight:600">' + esc(f) + '</div>';
+                ultimaFecha = f;
+            }
+            cuerpo += pintarMensaje(m, COM.mensajes[i - 1]);
+        });
+        if (!COM.mensajes.length) {
+            cuerpo = vacio(COM.actual.tipo === 'canal'
+                ? 'Este canal todavía no tiene mensajes. Escribe el primero.'
+                : 'Aún no hay mensajes en esta conversación.');
+        }
+
+        var barraRespuesta = COM.respondiendo
+            ? '<div class="com-reply-bar">↩ Respondiendo a <b>' + esc(COM.respondiendo.nombre) + '</b>: ' +
+              esc(String(COM.respondiendo.contenido).substring(0, 70)) +
+              '<button class="com-icon-btn" style="margin-left:auto;width:24px;height:24px" onclick="COM.cancelarRespuesta()">✕</button></div>'
+            : '';
+        var barraEdicion = COM.editando
+            ? '<div class="com-reply-bar">✏️ Editando mensaje' +
+              '<button class="com-icon-btn" style="margin-left:auto;width:24px;height:24px" onclick="COM.cancelarEdicion()">✕</button></div>'
+            : '';
+
+        panel.innerHTML =
+            cabeceraConversacion() +
+            '<div class="com-msgs" id="comMsgs">' +
+                (COM.hayMas ? '<div class="com-load-prev"><button class="com-btn" onclick="COM.cargarAnteriores()">' +
+                    'Cargar mensajes anteriores</button></div>' : '') +
+                cuerpo +
+            '</div>' +
+            '<div class="com-composer">' +
+                barraRespuesta + barraEdicion +
+                '<div id="comRecBar"></div>' +
+                '<div class="com-composer-row">' +
+                    '<button class="com-icon-btn" title="Adjuntar archivo" onclick="COM.elegirArchivo()">' + svg(ICO.clip) + '</button>' +
+                    '<button class="com-icon-btn" id="comMicBtn" title="Grabar audio" onclick="COM.toggleGrabar()">' + svg(ICO.mic) + '</button>' +
+                    '<textarea class="com-input" id="comInput" rows="1" placeholder="Escribe un mensaje…  (@ para mencionar)"></textarea>' +
+                    '<button class="com-send" id="comSendBtn" onclick="COM.enviar()">Enviar</button>' +
+                '</div>' +
+            '</div>';
+
+        var ta = document.getElementById('comInput');
+        if (ta) {
+            ta.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); COM.enviar(); }
+            });
+            ta.addEventListener('input', function () {
+                ta.style.height = 'auto';
+                ta.style.height = Math.min(ta.scrollHeight, 160) + 'px';
+            });
+            if (COM.editando) ta.value = COM.editando.contenido;
+            try { ta.focus(); } catch (e) {}
+        }
+        var cont = document.getElementById('comMsgs');
+        if (cont && !mantenerScroll) cont.scrollTop = cont.scrollHeight;
+    }
+
+    COM.cargarAnteriores = function () {
+        if (!COM.mensajes.length) return;
+        var primero = COM.mensajes[0].id;
+        COM.api('comGetMensajes', refParams({ antesDeId: primero })).then(function (d) {
+            COM.mensajes = (d.data || []).concat(COM.mensajes);
+            COM.hayMas = d.hayMas;
+            pintarConversacion(true);
+        }).catch(error);
+    };
+
+    COM.enviar = function () {
+        var ta = document.getElementById('comInput');
+        if (!ta) return;
+        var texto = ta.value.trim();
+        if (!texto) return;
+        var btn = document.getElementById('comSendBtn');
+        btn.disabled = true;
+
+        var promesa;
+        if (COM.editando) {
+            promesa = COM.api('comEditarMensaje', { id: COM.editando.id, contenido: texto })
+                .then(function () { COM.editando = null; });
+        } else {
+            promesa = COM.api('comEnviarMensaje', refParams({
+                contenido: texto,
+                mensajePadreId: COM.respondiendo ? COM.respondiendo.id : ''
+            })).then(function () { COM.respondiendo = null; });
+        }
+
+        promesa.then(function () {
+            ta.value = '';
+            ta.style.height = 'auto';
+            return refrescarMensajes(true);
+        }).catch(error).then(function () { btn.disabled = false; });
+    };
+
+    function refrescarMensajes(irAlFinal) {
+        if (!COM.actual) return Promise.resolve();
+        return COM.api('comGetMensajes', refParams({})).then(function (d) {
+            COM.mensajes = d.data || [];
+            COM.hayMas = d.hayMas;
+            pintarConversacion(!irAlFinal);
+            if (irAlFinal) {
+                var c = document.getElementById('comMsgs');
+                if (c) c.scrollTop = c.scrollHeight;
+            }
+        });
+    }
+
+    COM.responder = function (id) {
+        var m = COM.mensajes.find(function (x) { return String(x.id) === String(id); });
+        if (!m) return;
+        COM.respondiendo = m; COM.editando = null;
+        pintarConversacion(true);
+    };
+    COM.cancelarRespuesta = function () { COM.respondiendo = null; pintarConversacion(true); };
+    COM.editar = function (id) {
+        var m = COM.mensajes.find(function (x) { return String(x.id) === String(id); });
+        if (!m) return;
+        COM.editando = m; COM.respondiendo = null;
+        pintarConversacion(true);
+    };
+    COM.cancelarEdicion = function () { COM.editando = null; pintarConversacion(true); };
+
+    COM.eliminarMensaje = function (id) {
+        modal('Eliminar mensaje',
+            '<p style="font-size:13.5px;line-height:1.55">El mensaje se marcará como eliminado y mostrará ' +
+            '"Este mensaje fue eliminado". El registro se conserva para auditoría.</p>',
+            'Eliminar', function () {
+                COM.api('comEliminarMensaje', { id: id }).then(function () {
+                    COM.cerrarModal(); aviso('Mensaje eliminado'); refrescarMensajes(false);
+                }).catch(error);
+            }, '440px');
+    };
+
+    COM.fijarMensaje = function (id) {
+        COM.api('comFijarMensaje', { id: id })
+            .then(function (d) { aviso(d.fijado ? 'Mensaje fijado' : 'Mensaje desfijado'); refrescarMensajes(false); })
+            .catch(error);
+    };
+
+    COM.menuReaccion = function (id) {
+        var lista = (COM.datos.reaccionesDisponibles || []).map(function (e) {
+            return '<button class="com-btn" style="font-size:19px;height:42px;width:52px;justify-content:center" ' +
+                'onclick="COM.reaccionar(' + id + ',\'' + e + '\',true)">' + e + '</button>';
+        }).join('');
+        modal('Reaccionar', '<div style="display:flex;gap:8px;flex-wrap:wrap">' + lista + '</div>', '', null, '380px');
+    };
+
+    COM.reaccionar = function (id, emoji, cerrar) {
+        COM.api('comReaccionar', { id: id, reaccion: emoji }).then(function () {
+            if (cerrar) COM.cerrarModal();
+            refrescarMensajes(false);
+        }).catch(error);
+    };
+
+    COM.verHilo = function (id) {
+        var padre = COM.mensajes.find(function (x) { return String(x.id) === String(id); });
+        COM.api('comGetMensajes', refParams({ limite: 100 })).then(function (d) {
+            var hijos = (d.data || []).filter(function (m) { return String(m.mensajePadreId) === String(id); });
+            var html =
+                '<div class="com-quote" style="margin-bottom:14px"><b>' + esc(padre ? padre.nombre : '') + ':</b> ' +
+                esc(padre ? padre.contenido : '') + '</div>' +
+                '<div class="com-scroll">' +
+                (hijos.map(function (m) {
+                    return '<div style="padding:9px 0;border-bottom:1px solid var(--border)">' +
+                        '<div style="font-size:12.5px;font-weight:600">' + esc(m.nombre) +
+                        ' <span style="font-weight:400;color:var(--text-muted);font-size:11px">' + hora(m.fecha) + '</span></div>' +
+                        '<div style="font-size:13px;margin-top:3px">' + formatoTexto(m.contenido) + '</div></div>';
+                }).join('') || vacio('Sin respuestas todavía.')) +
+                '</div>' +
+                '<div class="form-field" style="margin-top:14px">' +
+                    '<label class="form-label">RESPONDER EN EL HILO</label>' +
+                    '<textarea class="form-input" id="comHiloTexto" rows="3"></textarea>' +
+                '</div>';
+            modal('Hilo de conversación', html, 'Responder', function () {
+                var t = val('comHiloTexto');
+                if (!t) return error(new Error('Escribe una respuesta.'));
+                botonModal(true, 'Enviando…');
+                COM.api('comEnviarMensaje', refParams({ contenido: t, mensajePadreId: id }))
+                    .then(function () { COM.cerrarModal(); refrescarMensajes(true); })
+                    .catch(function (e) { botonModal(false, 'Responder'); error(e); });
+            });
+        }).catch(error);
+    };
+
+    /* ── Convertir mensaje en seguimiento del CRM ─────────── */
+
+    COM.aTarea = function (id) {
+        var m = COM.mensajes.find(function (x) { return String(x.id) === String(id); });
+        if (!m) return;
+        var clientes = (window._clientes || []).map(function (c) {
+            return '<option value="Cliente|' + attr(c.id) + '">Cliente · ' + esc(c.nombre) + '</option>';
+        }).join('');
+        var prospectos = (window._prospectos || []).map(function (c) {
+            return '<option value="Prospecto|' + attr(c.id) + '">Prospecto · ' + esc(c.nombre) + '</option>';
+        }).join('');
+
+        modal('Convertir en seguimiento del CRM',
+            '<div class="com-quote" style="margin-bottom:12px"><b>' + esc(m.nombre) + ':</b> ' +
+                esc(String(m.contenido).substring(0, 200)) + '</div>' +
+            '<div class="form-field"><label class="form-label">CLIENTE O PROSPECTO *</label>' +
+                '<select class="form-select" id="comTareaRef">' +
+                    '<option value="">— Selecciona —</option>' + clientes + prospectos +
+                '</select></div>' +
+            '<div class="form-row" style="margin-top:12px">' +
+                '<div class="form-field"><label class="form-label">CATEGORÍA</label>' +
+                    '<select class="form-select" id="comTareaCat">' +
+                        ['Llamada','Correo','Reunión','Visita','Seguimiento','Otro'].map(function (c) {
+                            return '<option' + (c === 'Seguimiento' ? ' selected' : '') + '>' + c + '</option>';
+                        }).join('') + '</select></div>' +
+                '<div class="form-field"><label class="form-label">FECHA DE SEGUIMIENTO</label>' +
+                    '<input class="form-input" type="date" id="comTareaFecha"></div>' +
+            '</div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">TÍTULO</label>' +
+                '<input class="form-input" id="comTareaTitulo" value="' +
+                attr(String(m.contenido).substring(0, 70)) + '"></div>' +
+            '<p style="font-size:11.5px;color:var(--text-secondary);margin-top:10px">' +
+                'Se registra en ActividadesCRM (el sistema de seguimiento que ya usa la ficha de cliente/prospecto), ' +
+                'conservando la referencia al mensaje original.</p>',
+            'Crear seguimiento', function () {
+                var ref = val('comTareaRef');
+                if (!ref) return error(new Error('Selecciona el cliente o prospecto.'));
+                var partes = ref.split('|');
+                botonModal(true, 'Creando…');
+                COM.api('comMensajeATarea', {
+                    id: id, tipoRef: partes[0], refId: partes[1],
+                    categoria: val('comTareaCat'), titulo: val('comTareaTitulo'),
+                    fechaSeguimiento: val('comTareaFecha')
+                }).then(function () {
+                    COM.cerrarModal();
+                    aviso('Seguimiento creado en la ficha del CRM');
+                    refrescarMensajes(false);
+                }).catch(function (e) { botonModal(false, 'Crear seguimiento'); error(e); });
+            });
+    };
+
+    /* ── Archivos y audio ─────────────────────────────────── */
+
+    COM.elegirArchivo = function () { document.getElementById('comFileInput').click(); };
+
+    COM.archivoElegido = function (file) {
+        if (!file || !COM.actual) return;
+        var maxMB = (COM.datos.config || {}).tamanoMaxMB || 20;
+        if (file.size > maxMB * 1048576) {
+            return error(new Error('El archivo es demasiado grande (máx. ' + maxMB + ' MB).'));
+        }
+        aviso('Subiendo ' + file.name + '…', '#FF9F0A');
+        var lector = new FileReader();
+        lector.onload = function () {
+            COM.api('comSubirArchivo', refParams({
+                nombre: file.name, mime: file.type || 'application/octet-stream',
+                contenidoBase64: String(lector.result).split('base64,')[1] || ''
+            })).then(function () {
+                aviso('Archivo compartido');
+                refrescarMensajes(true);
+            }).catch(error);
+        };
+        lector.onerror = function () { error(new Error('No se pudo leer el archivo.')); };
+        lector.readAsDataURL(file);
+    };
+
+    COM.toggleGrabar = function () {
+        if (COM.grabador && COM.grabador.state === 'recording') { COM.grabador.stop(); return; }
+        if (!navigator.mediaDevices || !window.MediaRecorder) {
+            return error(new Error('Tu navegador no permite grabar audio.'));
+        }
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+            var rec = new MediaRecorder(stream);
+            COM.grabador = rec;
+            COM.audioChunks = [];
+            rec.ondataavailable = function (e) { if (e.data.size) COM.audioChunks.push(e.data); };
+            rec.onstop = function () {
+                stream.getTracks().forEach(function (t) { t.stop(); });
+                COM.audioBlob = new Blob(COM.audioChunks, { type: 'audio/webm' });
+                var url = URL.createObjectURL(COM.audioBlob);
+                document.getElementById('comRecBar').innerHTML =
+                    '<div class="com-rec-bar" style="background:var(--bg)">' +
+                        '<audio controls src="' + url + '" style="height:32px;flex:1"></audio>' +
+                        '<button class="com-btn primary" onclick="COM.enviarAudio()">Enviar audio</button>' +
+                        '<button class="com-btn danger" onclick="COM.descartarAudio()">Descartar</button>' +
+                    '</div>';
+            };
+            rec.start();
+            document.getElementById('comRecBar').innerHTML =
+                '<div class="com-rec-bar"><span class="com-rec-dot"></span> Grabando… ' +
+                '<button class="com-btn" style="margin-left:auto" onclick="COM.toggleGrabar()">Detener</button></div>';
+        }).catch(function () {
+            error(new Error('No se pudo acceder al micrófono. Revisa los permisos del navegador.'));
+        });
+    };
+
+    COM.descartarAudio = function () {
+        COM.audioBlob = null;
+        var bar = document.getElementById('comRecBar');
+        if (bar) bar.innerHTML = '';
+    };
+
+    COM.enviarAudio = function () {
+        if (!COM.audioBlob) return;
+        var lector = new FileReader();
+        lector.onload = function () {
+            aviso('Enviando audio…', '#FF9F0A');
+            COM.api('comSubirArchivo', refParams({
+                nombre: 'audio_' + Date.now() + '.webm', mime: 'audio/webm',
+                contenido: '🎤 Mensaje de voz',
+                contenidoBase64: String(lector.result).split('base64,')[1] || ''
+            })).then(function () {
+                COM.descartarAudio();
+                refrescarMensajes(true);
+            }).catch(error);
+        };
+        lector.readAsDataURL(COM.audioBlob);
+    };
+
+    /* ── Fijar / silenciar ────────────────────────────────── */
+
+    COM.fijar = function () {
+        COM.api('comFijarConversacion', refParams({})).then(function () {
+            return COM.recargarListas();
+        }).then(function () { aviso('Actualizado'); }).catch(error);
+    };
+
+    COM.silenciar = function () {
+        var ops = [['1', '1 hora'], ['8', '8 horas'], ['24', '1 día'], ['0', 'Reactivar notificaciones']];
+        modal('Silenciar conversación',
+            '<div style="display:flex;flex-direction:column;gap:8px">' +
+            ops.map(function (o) {
+                return '<button class="com-btn" style="height:38px" onclick="COM.aplicarSilencio(' + o[0] + ')">' + o[1] + '</button>';
+            }).join('') + '</div>', '', null, '380px');
+    };
+    COM.aplicarSilencio = function (h) {
+        COM.api('comSilenciar', refParams({ horas: h })).then(function () {
+            COM.cerrarModal(); aviso(h > 0 ? 'Silenciado por ' + h + ' h' : 'Notificaciones reactivadas');
+            return COM.recargarListas();
+        }).catch(error);
+    };
+
+    COM.recargarListas = function () {
+        return Promise.all([COM.api('comGetCanales', {}), COM.api('comGetChats', {})])
+            .then(function (r) {
+                COM.canales = r[0].data || [];
+                COM.chats   = r[1].data || [];
+                if (COM.actual) {
+                    var lista = COM.actual.tipo === 'canal' ? COM.canales : COM.chats;
+                    var d = lista.find(function (x) { return String(x.id) === String(COM.actual.id); });
+                    if (d) COM.actual.datos = d;
+                }
+                if (COM.vista === 'mensajes') COM.pintarLista();
+            });
+    };
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · CANALES
+    ══════════════════════════════════════════════════════ */
+
+    function vistaCanales() {
+        COM.api('comGetCanales', {}).then(function (d) {
+            COM.canales = d.data || [];
+            var tarjetas = COM.canales.map(function (c) {
+                return '<div class="com-card">' +
+                    '<div style="display:flex;align-items:center;gap:10px">' +
+                        '<div class="com-av" style="background:' + attr(c.color) + '">#</div>' +
+                        '<div style="flex:1;min-width:0">' +
+                            '<div style="font-size:14px;font-weight:600">' + esc(c.nombre) +
+                                (c.tipo === 'Privado' ? ' 🔒' : '') +
+                                (c.estado === 'Archivado' ? ' <span class="com-chip">Archivado</span>' : '') + '</div>' +
+                            '<div style="font-size:11.5px;color:var(--text-secondary)">' +
+                                c.totalMiembros + ' miembros · creado por ' + esc(c.creadoPor) + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="font-size:12.5px;color:var(--text-secondary);margin-top:9px;min-height:32px">' +
+                        esc(c.descripcion || 'Sin descripción.') + '</div>' +
+                    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">' +
+                        '<button class="com-btn primary" onclick="COM.abrirCanal(' + c.id + ')">Abrir</button>' +
+                        (!c.soyMiembro && c.tipo !== 'Privado'
+                            ? '<button class="com-btn" onclick="COM.unirme(' + c.id + ')">Unirme</button>' : '') +
+                        '<button class="com-btn" onclick="COM.infoCanal(' + c.id + ')">Miembros</button>' +
+                        (c.soyAdminCanal || COM.datos.permisos.esAdmin
+                            ? '<button class="com-btn" onclick="COM.editarCanal(' + c.id + ')">Editar</button>' +
+                              '<button class="com-btn" onclick="COM.archivarCanal(' + c.id + ')">' +
+                                (c.estado === 'Archivado' ? 'Reactivar' : 'Archivar') + '</button>' : '') +
+                        (COM.datos.permisos.eliminarCanales && !c.esSistema
+                            ? '<button class="com-btn danger" onclick="COM.eliminarCanal(' + c.id + ')">Eliminar</button>' : '') +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            pintar('<div class="com-sec-head">' +
+                '<div><div class="com-sec-title">Canales</div>' +
+                    '<div class="com-sec-sub">Los canales públicos son visibles para todos; los privados sólo para sus miembros.</div></div>' +
+                (COM.datos.permisos.crearCanales
+                    ? '<button class="com-btn primary" onclick="COM.nuevoCanal()">' + svg(ICO.mas) + ' Crear canal</button>' : '') +
+                '</div>' +
+                '<div class="com-grid com-grid-3">' + (tarjetas || vacio('No hay canales todavía.')) + '</div>');
+        }).catch(error);
+    }
+
+    function selectorUsuarios(claseCheckbox, excluir) {
+        return '<div class="com-list-pick">' + COM.personas
+            .filter(function (p) { return (excluir || []).indexOf(p.usuario) === -1; })
+            .map(function (p) {
+                return '<label class="com-pick-row"><input type="checkbox" class="' + claseCheckbox +
+                    '" value="' + attr(p.usuario) + '">' + avatar(p, 'sm') +
+                    '<span>' + esc(p.nombre) + ' <span style="color:var(--text-muted)">· ' +
+                    esc(p.cargo || p.rol) + '</span></span></label>';
+            }).join('') + '</div>';
+    }
+
+    COM.nuevoCanal = function () {
+        modal('Crear canal',
+            '<div class="form-row">' +
+                '<div class="form-field"><label class="form-label">NOMBRE *</label>' +
+                    '<input class="form-input" id="comCanNombre" placeholder="Ej. Ventas"></div>' +
+                '<div class="form-field"><label class="form-label">TIPO</label>' +
+                    '<select class="form-select" id="comCanTipo">' +
+                        '<option value="Publico">Público — visible para todos</option>' +
+                        (COM.datos.permisos.canalesPrivados
+                            ? '<option value="Privado">Privado — sólo miembros invitados</option>' : '') +
+                    '</select></div>' +
+            '</div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">DESCRIPCIÓN</label>' +
+                '<input class="form-input" id="comCanDesc" placeholder="¿De qué se habla en este canal?"></div>' +
+            '<div class="form-row" style="margin-top:12px">' +
+                '<div class="form-field"><label class="form-label">COLOR</label>' +
+                    '<input class="form-input" type="color" id="comCanColor" value="#0A84FF" style="padding:3px"></div>' +
+                '<div class="form-field"><label class="form-label">ÍCONO</label>' +
+                    '<input class="form-input" id="comCanIcono" value="#" maxlength="2"></div>' +
+            '</div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">MIEMBROS INICIALES</label>' +
+                selectorUsuarios('comCanMiembro', [COM.datos.yo.usuario]) + '</div>',
+            'Crear canal', function () {
+                var nombre = val('comCanNombre');
+                if (!nombre) return error(new Error('El nombre del canal es requerido.'));
+                botonModal(true, 'Creando…');
+                COM.api('comCrearCanal', {
+                    nombre: nombre, descripcion: val('comCanDesc'), tipo: val('comCanTipo'),
+                    color: val('comCanColor'), icono: val('comCanIcono'),
+                    miembros: JSON.stringify(seleccionados('comCanMiembro'))
+                }).then(function () {
+                    COM.cerrarModal(); aviso('Canal creado');
+                    return COM.recargarListas();
+                }).then(function () { COM.ir('canales'); })
+                  .catch(function (e) { botonModal(false, 'Crear canal'); error(e); });
+            });
+    };
+
+    COM.editarCanal = function (id) {
+        var c = COM.canales.find(function (x) { return String(x.id) === String(id); });
+        if (!c) return;
+        modal('Editar canal',
+            '<div class="form-field"><label class="form-label">NOMBRE</label>' +
+                '<input class="form-input" id="comCanNombre" value="' + attr(c.nombre) + '"></div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">DESCRIPCIÓN</label>' +
+                '<input class="form-input" id="comCanDesc" value="' + attr(c.descripcion) + '"></div>' +
+            '<div class="form-row" style="margin-top:12px">' +
+                '<div class="form-field"><label class="form-label">TIPO</label>' +
+                    '<select class="form-select" id="comCanTipo">' +
+                        '<option value="Publico"' + (c.tipo !== 'Privado' ? ' selected' : '') + '>Público</option>' +
+                        '<option value="Privado"' + (c.tipo === 'Privado' ? ' selected' : '') + '>Privado</option>' +
+                    '</select></div>' +
+                '<div class="form-field"><label class="form-label">COLOR</label>' +
+                    '<input class="form-input" type="color" id="comCanColor" value="' + attr(c.color) + '" style="padding:3px"></div>' +
+            '</div>',
+            'Guardar', function () {
+                botonModal(true, 'Guardando…');
+                COM.api('comActualizarCanal', {
+                    id: id, nombre: val('comCanNombre'), descripcion: val('comCanDesc'),
+                    tipo: val('comCanTipo'), color: val('comCanColor')
+                }).then(function () {
+                    COM.cerrarModal(); aviso('Canal actualizado');
+                    return COM.recargarListas();
+                }).then(function () { COM.ir('canales'); })
+                  .catch(function (e) { botonModal(false, 'Guardar'); error(e); });
+            });
+    };
+
+    COM.archivarCanal = function (id) {
+        COM.api('comArchivarCanal', { id: id }).then(function (d) {
+            aviso('Canal ' + (d.estado === 'Archivado' ? 'archivado' : 'reactivado'));
+            return COM.recargarListas();
+        }).then(function () { COM.ir('canales'); }).catch(error);
+    };
+
+    COM.eliminarCanal = function (id) {
+        var c = COM.canales.find(function (x) { return String(x.id) === String(id); });
+        if (!c) return;
+        modal('Eliminar canal',
+            '<p style="font-size:13.5px;line-height:1.55">Esta acción archiva el canal de forma permanente y lo ' +
+            'oculta del CRM. El historial se conserva en la hoja de cálculo para auditoría.</p>' +
+            '<div class="form-field" style="margin-top:14px"><label class="form-label">' +
+                'ESCRIBE "' + attr(c.nombre) + '" PARA CONFIRMAR</label>' +
+                '<input class="form-input" id="comCanConfirmar"></div>',
+            'Eliminar canal', function () {
+                botonModal(true, 'Eliminando…');
+                COM.api('comEliminarCanal', { id: id, confirmar: val('comCanConfirmar') })
+                    .then(function () {
+                        COM.cerrarModal(); aviso('Canal eliminado');
+                        COM.actual = null;
+                        return COM.recargarListas();
+                    }).then(function () { COM.ir('canales'); })
+                      .catch(function (e) { botonModal(false, 'Eliminar canal'); error(e); });
+            }, '460px');
+    };
+
+    COM.unirme = function (id) {
+        COM.api('comUnirmeCanal', { canalId: id }).then(function () {
+            aviso('Te uniste al canal');
+            return COM.recargarListas();
+        }).then(function () { COM.ir('canales'); }).catch(error);
+    };
+
+    COM.infoCanal = function (id) {
+        var c = COM.canales.find(function (x) { return String(x.id) === String(id); });
+        if (!c) return;
+        var puede = c.soyAdminCanal || COM.datos.permisos.esAdmin;
+        var filas = c.miembros.map(function (m) {
+            var p = COM.personas.find(function (x) { return x.usuario === m.usuario; }) || m;
+            return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border)">' +
+                avatar(p, 'sm') +
+                '<div style="flex:1"><div style="font-size:13px;font-weight:600">' + esc(m.nombre) + '</div>' +
+                '<div style="font-size:11px;color:var(--text-secondary)">' + esc(m.rol) + '</div></div>' +
+                (puede ? '<button class="com-btn" onclick="COM.rolMiembro(' + id + ',\'' + attr(m.usuario) + '\',\'' +
+                    (m.rol === 'Admin' ? 'Miembro' : 'Admin') + '\')">' +
+                    (m.rol === 'Admin' ? 'Quitar admin' : 'Hacer admin') + '</button>' +
+                    '<button class="com-btn danger" onclick="COM.quitarMiembro(' + id + ',\'' + attr(m.usuario) + '\')">Quitar</button>' : '') +
+            '</div>';
+        }).join('');
+
+        var yaEstan = c.miembros.map(function (m) { return m.usuario; });
+        modal('#' + c.nombre,
+            '<div class="com-kv"><span>Tipo</span><span>' + esc(c.tipo) + '</span></div>' +
+            '<div class="com-kv"><span>Descripción</span><span>' + esc(c.descripcion || '—') + '</span></div>' +
+            '<div class="com-kv"><span>Creado por</span><span>' + esc(c.creadoPor) + '</span></div>' +
+            '<div class="com-sec-title" style="margin:16px 0 6px">Miembros (' + c.miembros.length + ')</div>' +
+            '<div class="com-scroll">' + filas + '</div>' +
+            (puede ? '<div class="com-sec-title" style="margin:16px 0 6px">Agregar personas</div>' +
+                selectorUsuarios('comAddMiembro', yaEstan) : ''),
+            puede ? 'Agregar seleccionados' : '', puede ? function () {
+                var sel = seleccionados('comAddMiembro');
+                if (!sel.length) return error(new Error('Selecciona al menos una persona.'));
+                botonModal(true, 'Agregando…');
+                COM.api('comAgregarMiembro', { canalId: id, usuarios: JSON.stringify(sel) })
+                    .then(function () {
+                        COM.cerrarModal(); aviso('Miembros agregados');
+                        return COM.recargarListas();
+                    }).catch(function (e) { botonModal(false, 'Agregar seleccionados'); error(e); });
+            } : null);
+    };
+
+    COM.rolMiembro = function (canalId, usuario, rol) {
+        COM.api('comCambiarRolMiembro', { canalId: canalId, usuario: usuario, rol: rol })
+            .then(function () { aviso('Rol actualizado'); return COM.recargarListas(); })
+            .then(function () { COM.infoCanal(canalId); }).catch(error);
+    };
+    COM.quitarMiembro = function (canalId, usuario) {
+        COM.api('comQuitarMiembro', { canalId: canalId, usuario: usuario })
+            .then(function () { aviso('Miembro retirado'); return COM.recargarListas(); })
+            .then(function () { COM.infoCanal(canalId); }).catch(error);
+    };
+
+    /* ── Chats y grupos ───────────────────────────────────── */
+
+    COM.nuevoChat = function () {
+        modal('Nueva conversación',
+            '<div class="form-field"><label class="form-label">TIPO</label>' +
+                '<select class="form-select" id="comChatTipo" onchange="COM.toggleGrupo()">' +
+                    '<option value="Directo">Mensaje directo</option>' +
+                    '<option value="Grupo">Grupo</option>' +
+                '</select></div>' +
+            '<div class="form-field" id="comGrupoNombre" style="display:none;margin-top:12px">' +
+                '<label class="form-label">NOMBRE DEL GRUPO *</label>' +
+                '<input class="form-input" id="comChatNombre" placeholder="Ej. Proyecto Alfa"></div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">PERSONAS</label>' +
+                selectorUsuarios('comChatUsuario', [COM.datos.yo.usuario]) + '</div>',
+            'Crear', function () {
+                var tipo = val('comChatTipo');
+                var sel = seleccionados('comChatUsuario');
+                if (!sel.length) return error(new Error('Selecciona al menos una persona.'));
+                botonModal(true, 'Creando…');
+                var promesa = tipo === 'Grupo'
+                    ? COM.api('comCrearGrupo', { nombre: val('comChatNombre'), usuarios: JSON.stringify(sel) })
+                    : COM.api('comAbrirChatDirecto', { usuario: sel[0] });
+                promesa.then(function (d) {
+                    COM.cerrarModal();
+                    return COM.recargarListas().then(function () { COM.abrirChat(d.id); });
+                }).catch(function (e) { botonModal(false, 'Crear'); error(e); });
+            });
+    };
+    COM.toggleGrupo = function () {
+        document.getElementById('comGrupoNombre').style.display =
+            val('comChatTipo') === 'Grupo' ? '' : 'none';
+    };
+
+    COM.infoGrupo = function (id) {
+        var c = COM.chats.find(function (x) { return String(x.id) === String(id); });
+        if (!c) return;
+        var puede = c.soyAdminGrupo || COM.datos.permisos.esAdmin;
+        var yaEstan = c.participantes.map(function (p) { return p.usuario; });
+        modal('Grupo · ' + c.nombre,
+            (puede ? '<div class="form-field"><label class="form-label">NOMBRE DEL GRUPO</label>' +
+                '<input class="form-input" id="comGrpNombre" value="' + attr(c.nombre) + '"></div>' : '') +
+            '<div class="com-sec-title" style="margin:16px 0 6px">Participantes (' + c.participantes.length + ')</div>' +
+            '<div class="com-scroll">' + c.participantes.map(function (p) {
+                return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border)">' +
+                    avatar(p, 'sm') + '<div style="flex:1;font-size:13px">' + esc(p.nombre) + '</div>' +
+                    (puede && p.usuario !== COM.datos.yo.usuario
+                        ? '<button class="com-btn danger" onclick="COM.quitarGrupo(' + id + ',\'' + attr(p.usuario) + '\')">Quitar</button>' : '') +
+                '</div>';
+            }).join('') + '</div>' +
+            (puede ? '<div class="com-sec-title" style="margin:16px 0 6px">Agregar personas</div>' +
+                selectorUsuarios('comAddGrupo', yaEstan) : '') +
+            '<div style="margin-top:16px"><button class="com-btn danger" onclick="COM.salirGrupo(' + id + ')">Salir del grupo</button></div>',
+            puede ? 'Guardar cambios' : '', puede ? function () {
+                botonModal(true, 'Guardando…');
+                var tareas = [COM.api('comActualizarGrupo', { id: id, nombre: val('comGrpNombre') })];
+                var sel = seleccionados('comAddGrupo');
+                if (sel.length) tareas.push(COM.api('comAgregarAlGrupo', { chatId: id, usuarios: JSON.stringify(sel) }));
+                Promise.all(tareas).then(function () {
+                    COM.cerrarModal(); aviso('Grupo actualizado');
+                    return COM.recargarListas();
+                }).catch(function (e) { botonModal(false, 'Guardar cambios'); error(e); });
+            } : null);
+    };
+    COM.quitarGrupo = function (chatId, usuario) {
+        COM.api('comQuitarDelGrupo', { chatId: chatId, usuario: usuario })
+            .then(function () { aviso('Participante retirado'); return COM.recargarListas(); })
+            .then(function () { COM.infoGrupo(chatId); }).catch(error);
+    };
+    COM.salirGrupo = function (chatId) {
+        COM.api('comSalirDelGrupo', { chatId: chatId }).then(function () {
+            COM.cerrarModal(); aviso('Saliste del grupo'); COM.actual = null;
+            return COM.recargarListas();
+        }).then(function () { COM.ir('mensajes'); }).catch(error);
+    };
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · PERSONAS
+    ══════════════════════════════════════════════════════ */
+
+    function vistaPersonas() {
+        COM.api('comGetPersonas', {}).then(function (d) {
+            COM.personas = d.data || [];
+            var tarjetas = COM.personas.map(function (p) {
+                return '<div class="com-person">' + avatar(p, 'lg') +
+                    '<div class="com-person-name">' + esc(p.nombre) + '</div>' +
+                    '<div class="com-person-role">' + esc(p.cargo || p.rol) +
+                        (p.departamento ? ' · ' + esc(p.departamento) : '') + '</div>' +
+                    (p.estadoTexto ? '<div style="font-size:11px;color:var(--text-muted);margin-top:3px">' +
+                        esc(p.estadoTexto) + '</div>' : '') +
+                    '<div class="com-person-acts">' +
+                        '<button class="com-icon-btn" title="Mensaje" onclick="COM.chatCon(\'' + attr(p.usuario) + '\')">' + svg(ICO.chat) + '</button>' +
+                        '<button class="com-icon-btn" title="Llamada" onclick="COM.llamarA(\'' + attr(p.usuario) + '\',\'audio\')">' + svg(ICO.tel) + '</button>' +
+                        '<button class="com-icon-btn" title="Videollamada" onclick="COM.llamarA(\'' + attr(p.usuario) + '\',\'video\')">' + svg(ICO.video) + '</button>' +
+                        '<button class="com-icon-btn" title="Perfil" onclick="COM.verPersona(\'' + attr(p.usuario) + '\')">' + svg(ICO.info) + '</button>' +
+                    '</div></div>';
+            }).join('');
+            pintar('<div class="com-sec-head"><div><div class="com-sec-title">Directorio de colaboradores</div>' +
+                '<div class="com-sec-sub">' + COM.personas.length + ' personas · los datos provienen de los usuarios del CRM</div></div></div>' +
+                '<div class="com-grid com-grid-auto">' + (tarjetas || vacio('No hay colaboradores.')) + '</div>');
+        }).catch(error);
+    }
+
+    COM.chatCon = function (usuario) {
+        COM.api('comAbrirChatDirecto', { usuario: usuario }).then(function (d) {
+            return COM.recargarListas().then(function () { COM.cerrarModal(); COM.abrirChat(d.id); });
+        }).catch(error);
+    };
+
+    COM.verPersona = function (usuario) {
+        COM.api('comGetPersona', { usuario: usuario }).then(function (d) {
+            var p = d.data;
+            var lista = function (arr, vacioTxt) {
+                return arr.length ? arr.map(function (x) {
+                    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;cursor:pointer" ' +
+                        'onclick="COM.verPersona(\'' + attr(x.usuario) + '\')">' + avatar(x, 'sm') +
+                        '<span style="font-size:12.5px">' + esc(x.nombre) +
+                        ' <span style="color:var(--text-muted)">· ' + esc(x.cargo || x.rol) + '</span></span></div>';
+                }).join('') : '<div style="font-size:12px;color:var(--text-muted);padding:4px 0">' + vacioTxt + '</div>';
+            };
+            var cadena = d.cadena.length
+                ? d.cadena.map(function (x) { return esc(x.nombre); }).join(' ← ')
+                : 'Sin estructura superior registrada.';
+
+            modal('Perfil · ' + p.nombre,
+                '<div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">' +
+                    avatar(p, 'xl') +
+                    '<div><div style="font-size:17px;font-weight:600">' + esc(p.nombre) + '</div>' +
+                    '<div style="font-size:12.5px;color:var(--text-secondary);margin-top:3px">' +
+                        esc(p.cargo || p.rol) + (p.departamento ? ' · ' + esc(p.departamento) : '') + '</div>' +
+                    '<div style="margin-top:8px"><span class="com-chip acc">' + esc(p.estado) + '</span> ' +
+                        (p.estadoTexto ? esc(p.estadoTexto) : '') + '</div>' +
+                    '<div style="display:flex;gap:6px;margin-top:10px">' +
+                        '<button class="com-btn primary" onclick="COM.chatCon(\'' + attr(p.usuario) + '\')">Mensaje</button>' +
+                        '<button class="com-btn" onclick="COM.llamarA(\'' + attr(p.usuario) + '\',\'video\')">Videollamada</button>' +
+                    '</div></div>' +
+                '</div>' +
+                '<div class="com-kv"><span>Usuario</span><span>' + esc(p.usuario) + '</span></div>' +
+                '<div class="com-kv"><span>Rol en el CRM</span><span>' + esc(p.rol) + '</span></div>' +
+                '<div class="com-kv"><span>Correo</span><span>' + esc(p.correo || '—') + '</span></div>' +
+                '<div class="com-kv"><span>Teléfono</span><span>' + esc(p.telefono || '—') + '</span></div>' +
+                '<div class="com-kv"><span>Reporta a</span><span>' + esc(d.jefe ? d.jefe.nombre : '—') + '</span></div>' +
+                '<div class="com-kv"><span>Estructura superior</span><span>' + cadena + '</span></div>' +
+                '<div class="com-sec-title" style="margin:16px 0 4px">Equipo a cargo (' + d.equipo.length + ')</div>' +
+                lista(d.equipo, 'No tiene personas a cargo.') +
+                '<div class="com-sec-title" style="margin:14px 0 4px">Compañeros (' + d.companeros.length + ')</div>' +
+                lista(d.companeros, 'Sin compañeros con el mismo jefe.') +
+                (d.puedeEditarJerarquia
+                    ? '<div class="com-sec-title" style="margin:16px 0 6px">Jerarquía</div>' +
+                      '<div class="form-row">' +
+                        '<div class="form-field"><label class="form-label">REPORTA A</label>' +
+                            '<select class="form-select" id="comJefeSel">' +
+                                '<option value="">— Sin jefe (raíz) —</option>' +
+                                COM.personas.filter(function (x) { return x.usuario !== p.usuario; })
+                                    .map(function (x) {
+                                        return '<option value="' + attr(x.usuario) + '"' +
+                                            (x.usuario === p.reportaA ? ' selected' : '') + '>' + esc(x.nombre) + '</option>';
+                                    }).join('') +
+                            '</select></div>' +
+                        '<div class="form-field"><label class="form-label">DEPARTAMENTO</label>' +
+                            '<input class="form-input" id="comDepInput" value="' + attr(p.departamento) + '"></div>' +
+                      '</div>' : ''),
+                d.puedeEditarJerarquia ? 'Guardar jerarquía' : '',
+                d.puedeEditarJerarquia ? function () {
+                    botonModal(true, 'Guardando…');
+                    Promise.all([
+                        COM.api('comSetJefe', { usuario: p.usuario, reportaA: val('comJefeSel') }),
+                        COM.api('comSetDepartamento', { usuario: p.usuario, departamento: val('comDepInput') })
+                    ]).then(function () {
+                        COM.cerrarModal(); aviso('Jerarquía actualizada');
+                        return COM.api('comGetPersonas', {});
+                    }).then(function (r) {
+                        COM.personas = r.data || [];
+                        if (COM.vista === 'org') COM.ir('org');
+                        if (COM.vista === 'personas') COM.ir('personas');
+                    }).catch(function (e) { botonModal(false, 'Guardar jerarquía'); error(e); });
+                } : null, '660px');
+        }).catch(error);
+    };
+
+    COM.menuEstado = function () {
+        var ops = [['Disponible', '🟢 Disponible'], ['Ocupado', '🟡 Ocupado'],
+                   ['NoMolestar', '🔴 No molestar'], ['Ausente', '⚪ Ausente']];
+        modal('Mi estado',
+            '<div style="display:flex;flex-direction:column;gap:7px">' +
+            ops.map(function (o) {
+                return '<button class="com-btn" style="height:38px;justify-content:flex-start" ' +
+                    'onclick="COM.setEstado(\'' + o[0] + '\')">' + o[1] + '</button>';
+            }).join('') + '</div>' +
+            '<div class="form-field" style="margin-top:14px"><label class="form-label">ESTADO PERSONALIZADO</label>' +
+                '<input class="form-input" id="comEstadoTexto" placeholder="Ej. En reunión hasta las 3:00 PM" value="' +
+                attr(COM.datos.yo.estadoTexto || '') + '"></div>',
+            'Guardar mensaje', function () {
+                COM.setEstado(COM.datos.yo.estado || 'Disponible', val('comEstadoTexto'));
+            }, '420px');
+    };
+    COM.setEstado = function (estado, texto) {
+        COM.api('comSetEstado', { estado: estado, mensaje: texto || val('comEstadoTexto') || '' })
+            .then(function (d) {
+                COM.cerrarModal();
+                COM.datos.yo.estado = d.estado; COM.datos.yo.estadoTexto = d.mensaje;
+                aviso('Estado actualizado');
+            }).catch(error);
+    };
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · ORGANIGRAMA
+    ══════════════════════════════════════════════════════ */
+
+    function nodoOrg(n) {
+        return '<li><div class="com-org-node" onclick="COM.verPersona(\'' + attr(n.usuario) + '\')">' +
+            avatar(n) +
+            '<div class="com-org-name">' + esc(n.nombre) + '</div>' +
+            '<div class="com-org-cargo">' + esc(n.cargo || n.rol) + '</div>' +
+            (n.departamento ? '<div class="com-org-dep">' + esc(n.departamento) + '</div>' : '') +
+            '</div>' +
+            (n.hijos && n.hijos.length ? '<ul>' + n.hijos.map(nodoOrg).join('') + '</ul>' : '') +
+        '</li>';
+    }
+
+    function vistaOrganigrama() {
+        COM.api('comGetOrganigrama', {}).then(function (d) {
+            var arbol = d.raices.length
+                ? '<div class="com-org"><ul>' + d.raices.map(nodoOrg).join('') + '</ul></div>'
+                : vacio('Aún no hay jerarquía configurada.');
+            pintar('<div class="com-sec-head">' +
+                '<div><div class="com-sec-title">Organigrama</div>' +
+                '<div class="com-sec-sub">Se construye automáticamente con el campo "Reporta a" de cada persona. ' +
+                d.personas.length + ' colaboradores · ' + d.sinJefe + ' sin jefe asignado.</div></div>' +
+                (d.puedeEditar ? '<button class="com-btn primary" onclick="COM.editarJerarquia()">Editar jerarquía</button>' : '') +
+                '</div>' +
+                '<div class="com-card com-org-wrap">' + arbol + '</div>');
+        }).catch(function (e) { pintar(vacio(e.message)); });
+    }
+
+    COM.editarJerarquia = function () {
+        var filas = COM.personas.map(function (p) {
+            return '<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border)">' +
+                avatar(p, 'sm') +
+                '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">' + esc(p.nombre) + '</div>' +
+                '<div style="font-size:11px;color:var(--text-secondary)">' + esc(p.cargo || p.rol) + '</div></div>' +
+                '<select class="form-select" style="width:210px;height:32px;font-size:12.5px" ' +
+                    'onchange="COM.cambiarJefe(\'' + attr(p.usuario) + '\', this.value)">' +
+                    '<option value="">— Sin jefe —</option>' +
+                    COM.personas.filter(function (x) { return x.usuario !== p.usuario; }).map(function (x) {
+                        return '<option value="' + attr(x.usuario) + '"' +
+                            (x.usuario === p.reportaA ? ' selected' : '') + '>' + esc(x.nombre) + '</option>';
+                    }).join('') +
+                '</select></div>';
+        }).join('');
+        modal('Editar jerarquía',
+            '<p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:12px">' +
+            'El sistema impide que alguien se reporte a sí mismo y bloquea cualquier cambio que genere un ciclo.</p>' +
+            '<div class="com-scroll" style="max-height:420px">' + filas + '</div>',
+            '', null, '680px');
+    };
+
+    COM.cambiarJefe = function (usuario, jefe) {
+        COM.api('comSetJefe', { usuario: usuario, reportaA: jefe }).then(function () {
+            aviso('Jerarquía actualizada');
+            return COM.api('comGetPersonas', {});
+        }).then(function (r) { COM.personas = r.data || []; }).catch(error);
+    };
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · REUNIONES Y CALENDARIO
+    ══════════════════════════════════════════════════════ */
+
+    function vistaReuniones() {
+        COM.api('comGetReuniones', {}).then(function (d) {
+            COM.reuniones = d.data || [];
+            var hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+            var render = function (r) {
+                var f = new Date(r.fecha + 'T00:00');
+                return '<div class="com-meet' + (r.estado === 'Cancelada' ? ' cancelada' : '') + '">' +
+                    '<div class="com-meet-date"><div class="com-meet-d">' + f.getDate() + '</div>' +
+                    '<div class="com-meet-m">' + f.toLocaleDateString('es-GT', { month: 'short' }) + '</div></div>' +
+                    '<div class="com-meet-body">' +
+                        '<div class="com-meet-title">' + esc(r.titulo) +
+                            (r.estado === 'Cancelada' ? ' <span class="com-chip dan">Cancelada</span>' : '') + '</div>' +
+                        '<div class="com-meet-meta">' + esc(r.hora) + ' · ' + r.duracion + ' min · organiza ' +
+                            esc(r.nombreOrganizador) + ' · ' + r.participantes.length + ' participantes' +
+                            ' · <span class="com-chip">' + esc(r.proveedor) + '</span>' +
+                            (r.invitacionEnviada ? ' <span class="com-chip ok">Invitación enviada</span>' : '') + '</div>' +
+                        (r.descripcion ? '<div style="font-size:12.5px;color:var(--text-secondary);margin-top:6px">' +
+                            esc(r.descripcion) + '</div>' : '') +
+                        '<div class="com-meet-acts">' +
+                            (r.estado !== 'Cancelada'
+                                ? '<button class="com-btn primary" onclick="COM.entrarReunion(' + r.id + ')">Entrar</button>' : '') +
+                            '<button class="com-btn" onclick="COM.verReunion(' + r.id + ')">Detalles</button>' +
+                            (r.soyOrganizador && r.estado !== 'Cancelada'
+                                ? '<button class="com-btn" onclick="COM.invitar(' + r.id + ')">Enviar invitación</button>' +
+                                  '<button class="com-btn danger" onclick="COM.cancelarReunion(' + r.id + ')">Cancelar</button>' : '') +
+                            (!r.soyOrganizador && r.miEstado === 'Pendiente'
+                                ? '<button class="com-btn" onclick="COM.responder2(' + r.id + ',\'Aceptada\')">Aceptar</button>' +
+                                  '<button class="com-btn" onclick="COM.responder2(' + r.id + ',\'Rechazada\')">Rechazar</button>' : '') +
+                        '</div>' +
+                    '</div></div>';
+            };
+            var proximas = COM.reuniones.filter(function (r) { return new Date(r.fecha + 'T00:00') >= hoy; });
+            var pasadas  = COM.reuniones.filter(function (r) { return new Date(r.fecha + 'T00:00') < hoy; }).reverse();
+
+            pintar('<div class="com-sec-head">' +
+                '<div><div class="com-sec-title">Reuniones</div>' +
+                '<div class="com-sec-sub">Las salas se crean con Jitsi Meet (WebRTC gratuito, sin cuota de Apps Script) ' +
+                'o con Google Meet si activas el Servicio Avanzado de Calendar.</div></div>' +
+                (d.puedeCrear ? '<button class="com-btn primary" onclick="COM.nuevaReunion()">' + svg(ICO.mas) +
+                    ' Nueva reunión</button>' : '') + '</div>' +
+                '<div class="com-sec-title" style="margin-bottom:8px">Próximas</div>' +
+                (proximas.map(render).join('') || vacio('No tienes reuniones próximas.')) +
+                (pasadas.length ? '<div class="com-sec-title" style="margin:20px 0 8px">Anteriores</div>' +
+                    pasadas.slice(0, 10).map(render).join('') : ''));
+        }).catch(error);
+    }
+
+    COM.nuevaReunion = function (canalId) {
+        var hoy = new Date().toISOString().substring(0, 10);
+        modal('Nueva reunión',
+            '<div class="form-field"><label class="form-label">TÍTULO *</label>' +
+                '<input class="form-input" id="comReuTitulo" placeholder="Ej. Revisión comercial"></div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">DESCRIPCIÓN</label>' +
+                '<textarea class="form-input" id="comReuDesc" rows="2"></textarea></div>' +
+            '<div class="form-row" style="margin-top:12px">' +
+                '<div class="form-field"><label class="form-label">FECHA *</label>' +
+                    '<input class="form-input" type="date" id="comReuFecha" value="' + hoy + '"></div>' +
+                '<div class="form-field"><label class="form-label">HORA</label>' +
+                    '<input class="form-input" type="time" id="comReuHora" value="09:00"></div>' +
+            '</div>' +
+            '<div class="form-row" style="margin-top:12px">' +
+                '<div class="form-field"><label class="form-label">DURACIÓN (MIN)</label>' +
+                    '<input class="form-input" type="number" id="comReuDur" value="30" min="5" max="480"></div>' +
+                '<div class="form-field"><label class="form-label">PLATAFORMA</label>' +
+                    '<select class="form-select" id="comReuProv">' +
+                        '<option value="jitsi">Jitsi Meet (gratuito, sin configuración)</option>' +
+                        '<option value="meet">Google Meet (requiere Servicio Avanzado de Calendar)</option>' +
+                        '<option value="manual">Pegar un enlace propio</option>' +
+                    '</select></div>' +
+            '</div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">ENLACE (SÓLO SI ELEGISTE "PROPIO")</label>' +
+                '<input class="form-input" id="comReuEnlace" placeholder="https://…"></div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">PARTICIPANTES</label>' +
+                selectorUsuarios('comReuUsuario', [COM.datos.yo.usuario]) + '</div>' +
+            '<label class="com-pick-row" style="margin-top:10px">' +
+                '<input type="checkbox" id="comReuInvitar" checked> Enviar invitación por correo al crear</label>' +
+            '<p style="font-size:11.5px;color:var(--text-secondary);margin-top:8px">' +
+                'El correo se envía con MailApp: la cuota real es de 100 destinatarios/día en cuentas @gmail.com ' +
+                'y 1.500/día en Google Workspace.</p>',
+            'Crear reunión', function () {
+                if (!val('comReuTitulo')) return error(new Error('El título es requerido.'));
+                botonModal(true, 'Creando…');
+                COM.api('comCrearReunion', {
+                    titulo: val('comReuTitulo'), descripcion: val('comReuDesc'),
+                    fecha: val('comReuFecha'), hora: val('comReuHora'),
+                    duracion: val('comReuDur'), proveedor: val('comReuProv'),
+                    enlace: val('comReuEnlace'), canalId: canalId || '',
+                    participantes: JSON.stringify(seleccionados('comReuUsuario')),
+                    enviarInvitacion: chk('comReuInvitar')
+                }).then(function (d) {
+                    COM.cerrarModal();
+                    aviso('Reunión creada' + (d.invitacion && d.invitacion.enviados
+                        ? ' · invitación enviada a ' + d.invitacion.enviados : ''));
+                    if (d.aviso) aviso(d.aviso, '#FF9F0A');
+                    if (d.invitacion && d.invitacion.ok === false) aviso(d.invitacion.error, '#FF9F0A');
+                    COM.ir('reuniones');
+                }).catch(function (e) { botonModal(false, 'Crear reunión'); error(e); });
+            }, '660px');
+    };
+
+    COM.verReunion = function (id) {
+        var r = (COM.reuniones || []).find(function (x) { return String(x.id) === String(id); });
+        if (!r) return;
+        modal('Reunión · ' + r.titulo,
+            '<div class="com-kv"><span>Fecha</span><span>' + esc(r.fecha) + ' · ' + esc(r.hora) + '</span></div>' +
+            '<div class="com-kv"><span>Duración</span><span>' + r.duracion + ' minutos</span></div>' +
+            '<div class="com-kv"><span>Organizador</span><span>' + esc(r.nombreOrganizador) + '</span></div>' +
+            '<div class="com-kv"><span>Plataforma</span><span>' + esc(r.proveedor) + '</span></div>' +
+            '<div class="com-kv"><span>Enlace</span><span style="word-break:break-all">' +
+                '<a href="' + attr(r.enlace) + '" target="_blank" rel="noopener" style="color:var(--accent)">' +
+                esc(r.enlace) + '</a></span></div>' +
+            (r.descripcion ? '<div class="com-kv"><span>Descripción</span><span>' + esc(r.descripcion) + '</span></div>' : '') +
+            '<div class="com-sec-title" style="margin:16px 0 6px">Participantes</div>' +
+            r.participantes.map(function (p) {
+                var clase = p.estado === 'Aceptada' ? 'ok' : p.estado === 'Rechazada' ? 'dan' : '';
+                return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0">' +
+                    '<span style="flex:1;font-size:13px">' + esc(p.nombre) + '</span>' +
+                    '<span class="com-chip ' + clase + '">' + esc(p.estado) + '</span></div>';
+            }).join(''), '', null, '560px');
+    };
+
+    COM.invitar = function (id) {
+        COM.api('comEnviarInvitacion', { id: id, forzar: true }).then(function (d) {
+            aviso(d.yaEnviada ? d.mensaje : 'Invitación enviada a ' + d.enviados + ' destinatarios');
+            COM.ir('reuniones');
+        }).catch(error);
+    };
+    COM.cancelarReunion = function (id) {
+        COM.api('comCancelarReunion', { id: id })
+            .then(function () { aviso('Reunión cancelada'); COM.ir('reuniones'); }).catch(error);
+    };
+    COM.responder2 = function (id, estado) {
+        COM.api('comResponderInvitacion', { id: id, estado: estado })
+            .then(function () { aviso('Respuesta registrada'); COM.ir('reuniones'); }).catch(error);
+    };
+
+    function vistaCalendario() {
+        COM.api('comGetReuniones', {}).then(function (d) {
+            COM.reuniones = d.data || [];
+            pintarCalendario();
+        }).catch(error);
+    }
+
+    COM.mesAnterior = function () {
+        COM.calMes--; if (COM.calMes < 0) { COM.calMes = 11; COM.calAnio--; }
+        pintarCalendario();
+    };
+    COM.mesSiguiente = function () {
+        COM.calMes++; if (COM.calMes > 11) { COM.calMes = 0; COM.calAnio++; }
+        pintarCalendario();
+    };
+
+    function pintarCalendario() {
+        var primero = new Date(COM.calAnio, COM.calMes, 1);
+        var inicio = new Date(primero);
+        inicio.setDate(1 - ((primero.getDay() + 6) % 7));   // lunes como primer día
+        var hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+
+        var celdas = '';
+        for (var i = 0; i < 42; i++) {
+            var d = new Date(inicio); d.setDate(inicio.getDate() + i);
+            var iso = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+            var eventos = (COM.reuniones || []).filter(function (r) {
+                return r.fecha === iso && r.estado !== 'Cancelada';
+            });
+            celdas += '<div class="com-cal-day' + (d.getMonth() !== COM.calMes ? ' fuera' : '') +
+                (d.getTime() === hoy.getTime() ? ' hoy' : '') + '">' +
+                '<div class="com-cal-n">' + d.getDate() + '</div>' +
+                eventos.map(function (r) {
+                    return '<div class="com-cal-ev" onclick="COM.verReunion(' + r.id + ')" title="' +
+                        attr(r.titulo) + '">' + esc(r.hora + ' ' + r.titulo) + '</div>';
+                }).join('') + '</div>';
+        }
+
+        pintar('<div class="com-sec-head">' +
+            '<div><div class="com-sec-title">Calendario</div>' +
+            '<div class="com-sec-sub">Reuniones y eventos de Comunidad</div></div>' +
+            '<div style="display:flex;gap:7px;align-items:center">' +
+                '<button class="com-btn" onclick="COM.mesAnterior()">‹</button>' +
+                '<div style="font-size:13.5px;font-weight:600;min-width:150px;text-align:center">' +
+                    esc(new Date(COM.calAnio, COM.calMes, 1)
+                        .toLocaleDateString('es-GT', { month: 'long', year: 'numeric' })) + '</div>' +
+                '<button class="com-btn" onclick="COM.mesSiguiente()">›</button>' +
+                '<button class="com-btn primary" onclick="COM.nuevaReunion()">Nueva reunión</button>' +
+            '</div></div>' +
+            '<div class="com-card">' +
+                '<div class="com-cal-head"><div>Lun</div><div>Mar</div><div>Mié</div><div>Jue</div>' +
+                '<div>Vie</div><div>Sáb</div><div>Dom</div></div>' +
+                '<div class="com-cal">' + celdas + '</div>' +
+            '</div>');
+    }
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · ARCHIVOS
+    ══════════════════════════════════════════════════════ */
+
+    function vistaArchivos(filtros) {
+        COM.api('comGetArchivos', filtros || {}).then(function (d) {
+            var filas = (d.data || []).map(function (a) {
+                return '<tr>' +
+                    '<td><div style="display:flex;align-items:center;gap:9px">' +
+                        '<div class="com-file-ico">' + esc(ext(a.nombre)) + '</div>' +
+                        '<a href="' + attr(a.url) + '" target="_blank" rel="noopener" ' +
+                            'style="font-weight:600;color:inherit;text-decoration:none">' + esc(a.nombre) + '</a>' +
+                    '</div></td>' +
+                    '<td>' + esc(a.categoria) + '</td>' +
+                    '<td>' + pesoArchivo(a.tamano) + '</td>' +
+                    '<td>' + esc(a.nombreUsuario) + '</td>' +
+                    '<td>' + esc(a.canal ? '#' + a.canal : 'Conversación privada') + '</td>' +
+                    '<td>' + esc(fechaCorta(a.fecha)) + '</td>' +
+                    '<td style="text-align:right">' +
+                        '<a class="com-btn" href="' + attr(a.url) + '" target="_blank" rel="noopener">Abrir</a> ' +
+                        (a.mio || COM.datos.permisos.esAdmin
+                            ? '<button class="com-btn danger" onclick="COM.eliminarArchivo(' + a.id + ')">Eliminar</button>' : '') +
+                    '</td></tr>';
+            }).join('');
+
+            var canalesOpts = COM.canales.map(function (c) {
+                return '<option value="' + c.id + '">#' + esc(c.nombre) + '</option>';
+            }).join('');
+
+            pintar('<div class="com-sec-head">' +
+                '<div><div class="com-sec-title">Archivos compartidos</div>' +
+                '<div class="com-sec-sub">' + d.total + ' archivos · almacenados en Google Drive, ' +
+                'la hoja de cálculo sólo guarda los metadatos.</div></div>' +
+                '<div style="display:flex;gap:7px">' +
+                    '<input class="com-side-search" id="comArchQ" placeholder="Buscar archivo…" style="width:200px;height:32px">' +
+                    '<select class="mini-select" id="comArchCat">' +
+                        '<option value="">Todas las categorías</option>' +
+                        ['Documento','Imagen','Video','Audio','Comprimido','Otro'].map(function (c) {
+                            return '<option>' + c + '</option>'; }).join('') +
+                    '</select>' +
+                    '<select class="mini-select" id="comArchCanal"><option value="">Todos los canales</option>' +
+                        canalesOpts + '</select>' +
+                    '<button class="com-btn" onclick="COM.filtrarArchivos()">Filtrar</button>' +
+                '</div></div>' +
+                '<div class="table-card"><table><thead><tr>' +
+                '<th>Archivo</th><th>Tipo</th><th>Tamaño</th><th>Subido por</th><th>Origen</th><th>Fecha</th><th></th>' +
+                '</tr></thead><tbody>' +
+                (filas || '<tr><td colspan="7">' + vacio('No hay archivos compartidos.') + '</td></tr>') +
+                '</tbody></table></div>');
+        }).catch(error);
+    }
+
+    COM.filtrarArchivos = function () {
+        vistaArchivos({
+            q: val('comArchQ'), categoria: val('comArchCat'), canalId: val('comArchCanal')
+        });
+    };
+    COM.eliminarArchivo = function (id) {
+        COM.api('comEliminarArchivo', { id: id })
+            .then(function () { aviso('Archivo eliminado'); vistaArchivos(); }).catch(error);
+    };
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · ANUNCIOS
+    ══════════════════════════════════════════════════════ */
+
+    function vistaAnuncios() {
+        COM.api('comGetAnuncios', {}).then(function (d) {
+            var html = (d.data || []).map(function (a) {
+                var pct = a.totalUsuarios ? Math.round(a.lecturas / a.totalUsuarios * 100) : 0;
+                return '<div class="com-anuncio ' + esc(a.prioridad) + '">' +
+                    '<div style="display:flex;align-items:flex-start;gap:10px">' +
+                        '<div style="flex:1">' +
+                            '<div class="com-anuncio-title">' + esc(a.titulo) +
+                                (a.prioridad !== 'Normal' ? ' <span class="com-chip ' +
+                                    (a.prioridad === 'Urgente' ? 'dan' : 'warn') + '">' + esc(a.prioridad) + '</span>' : '') +
+                                (a.estado === 'Archivado' ? ' <span class="com-chip">Archivado</span>' : '') +
+                                (a.vencido ? ' <span class="com-chip">Vencido</span>' : '') + '</div>' +
+                            '<div class="com-anuncio-meta">' + esc(a.nombreAutor) + ' · ' + relativo(a.fecha) +
+                                (a.fechaExpiracion ? ' · vence ' + esc(a.fechaExpiracion) : '') + '</div>' +
+                        '</div>' +
+                        (a.autor === COM.datos.yo.usuario || COM.datos.permisos.esAdmin
+                            ? '<button class="com-btn" onclick="COM.archivarAnuncio(' + a.id + ')">' +
+                              (a.estado === 'Archivado' ? 'Reactivar' : 'Archivar') + '</button>' : '') +
+                    '</div>' +
+                    '<div class="com-anuncio-body">' + formatoTexto(a.contenido) + '</div>' +
+                    '<div class="com-anuncio-foot">' +
+                        (a.confirmado
+                            ? '<span class="com-chip ok">✓ Confirmaste la lectura</span>'
+                            : '<button class="com-btn primary" onclick="COM.confirmarLectura(' + a.id + ')">Confirmar lectura</button>') +
+                        '<span style="font-size:12px;color:var(--text-secondary)">' +
+                            a.lecturas + '/' + a.totalUsuarios + ' usuarios han confirmado (' + pct + '%)</span>' +
+                        (a.confirmadoPor.length
+                            ? '<button class="com-btn" onclick="COM.verLecturas(' + a.id + ')">Ver quiénes</button>' : '') +
+                    '</div></div>';
+            }).join('');
+
+            pintar('<div class="com-sec-head">' +
+                '<div><div class="com-sec-title">Anuncios empresariales</div>' +
+                '<div class="com-sec-sub">Comunicados oficiales con confirmación de lectura</div></div>' +
+                (d.puedePublicar ? '<button class="com-btn primary" onclick="COM.nuevoAnuncio()">' + svg(ICO.mas) +
+                    ' Publicar anuncio</button>' : '') + '</div>' +
+                (html || vacio('No hay anuncios publicados.')));
+            COM.anuncios = d.data || [];
+        }).catch(error);
+    }
+
+    COM.nuevoAnuncio = function () {
+        modal('Publicar anuncio',
+            '<div class="form-field"><label class="form-label">TÍTULO *</label>' +
+                '<input class="form-input" id="comAnuTitulo"></div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">CONTENIDO *</label>' +
+                '<textarea class="form-input" id="comAnuContenido" rows="6"></textarea></div>' +
+            '<div class="form-row" style="margin-top:12px">' +
+                '<div class="form-field"><label class="form-label">PRIORIDAD</label>' +
+                    '<select class="form-select" id="comAnuPrioridad">' +
+                        '<option>Normal</option><option>Importante</option><option>Urgente</option></select></div>' +
+                '<div class="form-field"><label class="form-label">VENCE EL (OPCIONAL)</label>' +
+                    '<input class="form-input" type="date" id="comAnuVence"></div>' +
+            '</div>' +
+            '<div class="form-field" style="margin-top:12px"><label class="form-label">' +
+                'DESTINATARIOS (VACÍO = TODA LA EMPRESA)</label>' +
+                '<div class="com-list-pick">' +
+                    ['Admin','Gerente','Agente'].map(function (r) {
+                        return '<label class="com-pick-row"><input type="checkbox" class="comAnuDest" value="' + r +
+                            '"><b>Rol: ' + r + '</b></label>';
+                    }).join('') +
+                    COM.personas.map(function (p) {
+                        return '<label class="com-pick-row"><input type="checkbox" class="comAnuDest" value="' +
+                            attr(p.usuario) + '">' + avatar(p, 'sm') + '<span>' + esc(p.nombre) + '</span></label>';
+                    }).join('') +
+                '</div></div>',
+            'Publicar', function () {
+                if (!val('comAnuTitulo') || !val('comAnuContenido')) {
+                    return error(new Error('El título y el contenido son requeridos.'));
+                }
+                botonModal(true, 'Publicando…');
+                COM.api('comCrearAnuncio', {
+                    titulo: val('comAnuTitulo'), contenido: val('comAnuContenido'),
+                    prioridad: val('comAnuPrioridad'), fechaExpiracion: val('comAnuVence'),
+                    destinatarios: JSON.stringify(seleccionados('comAnuDest'))
+                }).then(function () {
+                    COM.cerrarModal(); aviso('Anuncio publicado'); COM.ir('anuncios');
+                }).catch(function (e) { botonModal(false, 'Publicar'); error(e); });
+            }, '620px');
+    };
+
+    COM.confirmarLectura = function (id) {
+        COM.api('comConfirmarLectura', { id: id })
+            .then(function () { aviso('Lectura confirmada'); COM.ir('anuncios'); }).catch(error);
+    };
+    COM.archivarAnuncio = function (id) {
+        COM.api('comArchivarAnuncio', { id: id })
+            .then(function () { aviso('Anuncio actualizado'); COM.ir('anuncios'); }).catch(error);
+    };
+    COM.verLecturas = function (id) {
+        var a = (COM.anuncios || []).find(function (x) { return String(x.id) === String(id); });
+        if (!a) return;
+        modal('Confirmaciones de lectura',
+            '<div class="com-scroll">' + a.confirmadoPor.map(function (l) {
+                return '<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">' +
+                    '<span style="font-size:13px">' + esc(l.nombre) + '</span>' +
+                    '<span style="font-size:11.5px;color:var(--text-secondary)">' + relativo(l.fecha) + '</span></div>';
+            }).join('') + '</div>', '', null, '460px');
+    };
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · NOTIFICACIONES
+    ══════════════════════════════════════════════════════ */
+
+    function vistaNotificaciones() {
+        COM.api('comGetNotificaciones', { limite: 80 }).then(function (d) {
+            actualizarBadge(d.noLeidas);
+            if (COM.datos) COM.datos.noLeidas = d.noLeidas;
+            pintarTabs();
+            var html = (d.data || []).map(function (n) {
+                return '<div class="com-notif' + (n.leida ? '' : ' no-leida') + '" ' +
+                    'onclick="COM.abrirNotif(' + n.id + ',\'' + attr(n.referenciaTipo) + '\',\'' +
+                    attr(n.referenciaId) + '\')">' +
+                    '<div class="com-notif-txt">' + esc(n.contenido) +
+                        '<div class="com-notif-time">' + relativo(n.fecha) + ' · ' + esc(n.tipo) + '</div></div>' +
+                    (n.leida ? '' : '<span class="com-chip acc">Nueva</span>') +
+                '</div>';
+            }).join('');
+            pintar('<div class="com-sec-head">' +
+                '<div><div class="com-sec-title">Notificaciones</div>' +
+                '<div class="com-sec-sub">' + d.noLeidas + ' sin leer</div></div>' +
+                '<button class="com-btn" onclick="COM.leerTodas()">Marcar todas como leídas</button></div>' +
+                '<div class="com-card" style="padding:0">' + (html || vacio('No tienes notificaciones.')) + '</div>');
+        }).catch(error);
+    }
+
+    COM.abrirNotif = function (id, tipo, refId) {
+        COM.api('comLeerNotificacion', { id: id }).catch(function () {});
+        if (tipo === 'canal') COM.abrirCanal(refId);
+        else if (tipo === 'chat') COM.abrirChat(refId);
+        else if (tipo === 'reunion') COM.ir('reuniones');
+        else if (tipo === 'anuncio') COM.ir('anuncios');
+        else COM.ir('notificaciones');
+    };
+    COM.leerTodas = function () {
+        COM.api('comLeerTodas', {}).then(function (d) {
+            aviso(d.marcadas + ' notificaciones marcadas como leídas');
+            actualizarBadge(0);
+            COM.ir('notificaciones');
+        }).catch(error);
+    };
+
+    /* ══════════════════════════════════════════════════════
+       VISTA · CONFIGURACIÓN (Admin)
+    ══════════════════════════════════════════════════════ */
+
+    function campoRoles(id, valor, etiqueta) {
+        var roles = ['Admin', 'Gerente', 'Agente'];
+        var actuales = String(valor || '').split(',').map(function (s) { return s.trim(); });
+        return '<div class="form-field"><label class="form-label">' + esc(etiqueta) + '</label>' +
+            '<div style="display:flex;gap:12px;padding:7px 0">' + roles.map(function (r) {
+                return '<label style="display:flex;align-items:center;gap:5px;font-size:12.5px;cursor:pointer">' +
+                    '<input type="checkbox" class="' + id + '" value="' + r + '"' +
+                    (actuales.indexOf(r) !== -1 ? ' checked' : '') + '> ' + r + '</label>';
+            }).join('') + '</div></div>';
+    }
+    function campoBool(id, valor, etiqueta) {
+        return '<label class="com-pick-row" style="padding:8px"><input type="checkbox" id="' + id + '"' +
+            (valor ? ' checked' : '') + '> ' + esc(etiqueta) + '</label>';
+    }
+
+    function vistaAdmin() {
+        Promise.all([COM.api('comGetConfig', {}), COM.api('comGetAuditoria', { limite: 60 })])
+        .then(function (r) {
+            var c = r[0].data;
+            var aud = r[1].data;
+
+            var auditoria = aud.map(function (a) {
+                return '<tr><td>' + esc(fechaCorta(a.fecha)) + ' ' + hora(a.fecha) + '</td>' +
+                    '<td>' + esc(a.nombre) + '</td><td>' + esc(a.accion) + '</td>' +
+                    '<td>' + esc(a.entidad) + ' ' + esc(a.entidadId) + '</td>' +
+                    '<td style="font-size:11.5px;color:var(--text-secondary)">' + esc(a.detalles) + '</td></tr>';
+            }).join('');
+
+            pintar('<div class="com-sec-head"><div><div class="com-sec-title">Configuración de Comunidad</div>' +
+                '<div class="com-sec-sub">Los cambios se guardan en la hoja COM_Config y se aplican de inmediato.</div></div>' +
+                '<button class="com-btn primary" onclick="COM.guardarConfig()">Guardar configuración</button></div>' +
+
+                '<div class="com-grid" style="grid-template-columns:1fr 1fr">' +
+                '<div class="com-card">' +
+                    '<div class="com-sec-title" style="margin-bottom:10px">Canales</div>' +
+                    campoRoles('cfgCrearCanales', c.permitirCrearCanales, 'QUIÉN PUEDE CREAR CANALES') +
+                    campoRoles('cfgEditarCanales', c.permitirEditarCanales, 'QUIÉN PUEDE EDITAR CANALES') +
+                    campoRoles('cfgEliminarCanales', c.permitirEliminarCanales, 'QUIÉN PUEDE ELIMINAR CANALES') +
+                    campoBool('cfgPrivados', c.permitirCanalesPrivados, 'Permitir canales privados') +
+                '</div>' +
+
+                '<div class="com-card">' +
+                    '<div class="com-sec-title" style="margin-bottom:10px">Mensajería</div>' +
+                    campoBool('cfgEditarMsg', c.permitirEditarMensajes, 'Permitir editar mensajes propios') +
+                    campoBool('cfgEliminarMsg', c.permitirEliminarMensajes, 'Permitir eliminar mensajes propios') +
+                    '<div class="form-field" style="margin-top:10px"><label class="form-label">' +
+                        'RETENCIÓN DE HISTORIAL (DÍAS · 0 = SIN LÍMITE)</label>' +
+                        '<input class="form-input" type="number" id="cfgRetencion" value="' + Number(c.retencionHistorialDias) + '"></div>' +
+                    '<div class="form-field" style="margin-top:10px"><label class="form-label">EXTENSIONES PERMITIDAS</label>' +
+                        '<input class="form-input" id="cfgExt" value="' + attr(c.extensionesPermitidas) + '"></div>' +
+                    '<div class="form-field" style="margin-top:10px"><label class="form-label">TAMAÑO MÁXIMO (MB)</label>' +
+                        '<input class="form-input" type="number" id="cfgTam" value="' + Number(c.tamanoMaxMB) + '" max="20"></div>' +
+                '</div>' +
+
+                '<div class="com-card">' +
+                    '<div class="com-sec-title" style="margin-bottom:10px">Reuniones</div>' +
+                    campoRoles('cfgCrearReuniones', c.permitirCrearReuniones, 'QUIÉN PUEDE CREAR REUNIONES') +
+                    '<div class="form-field"><label class="form-label">DURACIÓN MÁXIMA (MINUTOS)</label>' +
+                        '<input class="form-input" type="number" id="cfgDurMax" value="' + Number(c.duracionMaxReunionMin) + '"></div>' +
+                    '<div class="form-field" style="margin-top:10px"><label class="form-label">PLATAFORMA POR DEFECTO</label>' +
+                        '<select class="form-select" id="cfgProveedor">' +
+                            ['jitsi','meet','manual'].map(function (p) {
+                                return '<option value="' + p + '"' + (c.proveedorReuniones === p ? ' selected' : '') + '>' +
+                                    (p === 'jitsi' ? 'Jitsi Meet (gratuito)' : p === 'meet' ? 'Google Meet' : 'Enlace manual') +
+                                '</option>'; }).join('') +
+                        '</select></div>' +
+                    campoBool('cfgCalendar', c.integrarCalendar, 'Integrar con Google Calendar (requiere Servicio Avanzado)') +
+                '</div>' +
+
+                '<div class="com-card">' +
+                    '<div class="com-sec-title" style="margin-bottom:10px">Organización y avisos</div>' +
+                    campoRoles('cfgJerarquia', c.permitirModificarJerarquia, 'QUIÉN PUEDE MODIFICAR LA JERARQUÍA') +
+                    campoRoles('cfgVerOrg', c.permitirVerOrganigrama, 'QUIÉN PUEDE VER EL ORGANIGRAMA') +
+                    campoRoles('cfgAnuncios', c.permitirAnuncios, 'QUIÉN PUEDE PUBLICAR ANUNCIOS') +
+                    campoBool('cfgNotifInterna', c.notificacionInterna, 'Notificaciones internas') +
+                    campoBool('cfgNotifCorreo', c.notificarPorCorreo, 'Notificaciones por correo (consume cuota de MailApp)') +
+                '</div>' +
+                '</div>' +
+
+                '<div class="com-sec-title" style="margin:22px 0 8px">Auditoría (últimos ' + aud.length + ' registros)</div>' +
+                '<div class="table-card"><table><thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th>' +
+                '<th>Entidad</th><th>Detalles</th></tr></thead><tbody>' +
+                (auditoria || '<tr><td colspan="5">' + vacio('Sin registros todavía.') + '</td></tr>') +
+                '</tbody></table></div>');
+        }).catch(error);
+    }
+
+    COM.guardarConfig = function () {
+        var roles = function (clase) { return seleccionados(clase).join(','); };
+        COM.api('comSetConfig', {
+            config: JSON.stringify({
+                permitirCrearCanales:       roles('cfgCrearCanales'),
+                permitirEditarCanales:      roles('cfgEditarCanales'),
+                permitirEliminarCanales:    roles('cfgEliminarCanales'),
+                permitirCanalesPrivados:    chk('cfgPrivados'),
+                permitirEditarMensajes:     chk('cfgEditarMsg'),
+                permitirEliminarMensajes:   chk('cfgEliminarMsg'),
+                retencionHistorialDias:     val('cfgRetencion'),
+                extensionesPermitidas:      val('cfgExt'),
+                tamanoMaxMB:                val('cfgTam'),
+                permitirCrearReuniones:     roles('cfgCrearReuniones'),
+                duracionMaxReunionMin:      val('cfgDurMax'),
+                proveedorReuniones:         val('cfgProveedor'),
+                integrarCalendar:           chk('cfgCalendar'),
+                permitirModificarJerarquia: roles('cfgJerarquia'),
+                permitirVerOrganigrama:     roles('cfgVerOrg'),
+                permitirAnuncios:           roles('cfgAnuncios'),
+                notificacionInterna:        chk('cfgNotifInterna'),
+                notificarPorCorreo:         chk('cfgNotifCorreo')
+            })
+        }).then(function () {
+            aviso('Configuración guardada');
+            return COM.recargar(false);
+        }).catch(error);
+    };
+
+    /* ══════════════════════════════════════════════════════
+       BÚSQUEDA GLOBAL
+    ══════════════════════════════════════════════════════ */
+
+    COM.buscar = function () {
+        var q = (document.getElementById('comBuscarGlobal') || {}).value || '';
+        if (q.trim().length < 2) return error(new Error('Escribe al menos 2 caracteres.'));
+        COM.api('comBuscar', { q: q }).then(function (d) {
+            var bloque = function (titulo, items, render) {
+                return '<div class="com-sec"><div class="com-sec-title" style="margin-bottom:8px">' +
+                    titulo + ' (' + items.length + ')</div>' +
+                    '<div class="com-card" style="padding:6px">' +
+                    (items.length ? items.map(render).join('') : vacio('Sin resultados.')) + '</div></div>';
+            };
+            pintar('<div class="com-sec-head"><div><div class="com-sec-title">Resultados para "' + esc(d.q) + '"</div>' +
+                '<div class="com-sec-sub">Sólo se muestran contenidos a los que tienes acceso.</div></div>' +
+                '<button class="com-btn" onclick="COM.ir(\'inicio\')">Volver</button></div>' +
+
+                bloque('Mensajes', d.mensajes, function (m) {
+                    return '<div class="com-side-item" onclick="COM.' +
+                        (m.canalId ? 'abrirCanal(' + m.canalId + ')' : 'abrirChat(' + m.chatId + ')') + '">' +
+                        '<div class="com-side-item-body"><div class="com-side-item-name">' +
+                        esc(m.nombre) + (m.canal ? ' · #' + esc(m.canal) : ' · directo') + '</div>' +
+                        '<div class="com-side-item-sub">' + esc(m.contenido) + '</div></div>' +
+                        '<span style="font-size:11px;color:var(--text-muted)">' + relativo(m.fecha) + '</span></div>';
+                }) +
+                bloque('Personas', d.personas, function (p) {
+                    return '<div class="com-side-item" onclick="COM.verPersona(\'' + attr(p.usuario) + '\')">' +
+                        avatar(p, 'sm') + '<div class="com-side-item-body">' +
+                        '<div class="com-side-item-name">' + esc(p.nombre) + '</div>' +
+                        '<div class="com-side-item-sub">' + esc(p.cargo || p.rol) + '</div></div></div>';
+                }) +
+                bloque('Canales', d.canales, function (c) {
+                    return '<div class="com-side-item" onclick="COM.abrirCanal(' + c.id + ')">' +
+                        '<div class="com-av sm">#</div><div class="com-side-item-body">' +
+                        '<div class="com-side-item-name">' + esc(c.nombre) + '</div>' +
+                        '<div class="com-side-item-sub">' + esc(c.descripcion) + '</div></div></div>';
+                }) +
+                bloque('Archivos', d.archivos, function (a) {
+                    return '<div class="com-side-item" onclick="window.open(\'' + attr(a.url) + '\',\'_blank\')">' +
+                        '<div class="com-file-ico">' + esc(ext(a.nombre)) + '</div>' +
+                        '<div class="com-side-item-body"><div class="com-side-item-name">' + esc(a.nombre) + '</div>' +
+                        '<div class="com-side-item-sub">' + esc(a.nombreUsuario) + ' · ' + pesoArchivo(a.tamano) + '</div></div></div>';
+                }) +
+                bloque('Reuniones', d.reuniones, function (r) {
+                    return '<div class="com-side-item" onclick="COM.verReunion(' + r.id + ')">' +
+                        '<div class="com-side-item-body"><div class="com-side-item-name">' + esc(r.titulo) + '</div>' +
+                        '<div class="com-side-item-sub">' + esc(r.fecha + ' ' + r.hora) + '</div></div></div>';
+                }) +
+                bloque('Anuncios', d.anuncios, function (a) {
+                    return '<div class="com-side-item" onclick="COM.ir(\'anuncios\')">' +
+                        '<div class="com-side-item-body"><div class="com-side-item-name">' + esc(a.titulo) + '</div>' +
+                        '<div class="com-side-item-sub">' + esc(String(a.contenido).substring(0, 90)) + '</div></div></div>';
+                }));
+        }).catch(error);
+    };
+
+    /* ══════════════════════════════════════════════════════
+       VIDEOLLAMADAS (Jitsi · WebRTC real, gratuito)
+    ══════════════════════════════════════════════════════ */
+
+    function cargarJitsi() {
+        return new Promise(function (ok, fail) {
+            if (window.JitsiMeetExternalAPI) return ok();
+            var s = document.createElement('script');
+            s.src = 'https://meet.jit.si/external_api.js';
+            s.onload = function () { ok(); };
+            s.onerror = function () { fail(new Error('No se pudo cargar Jitsi. Revisa tu conexión.')); };
+            document.head.appendChild(s);
+        });
+    }
+
+    function salaDe(nombre) {
+        return 'azyvion-' + String(nombre || 'sala').toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').substring(0, 40);
+    }
+
+    function abrirSala(sala, titulo, soloAudio) {
+        var ov = document.getElementById('comCall');
+        document.getElementById('comCallTitle').textContent = titulo;
+        document.getElementById('comCallSub').textContent =
+            'Sala ' + sala + ' · cámara, micrófono y pantalla compartida se controlan dentro de la llamada';
+        document.getElementById('comCallFrame').innerHTML = '';
+        ov.classList.add('open');
+
+        cargarJitsi().then(function () {
+            COM.jitsi = new window.JitsiMeetExternalAPI('meet.jit.si', {
+                roomName: sala,
+                parentNode: document.getElementById('comCallFrame'),
+                userInfo: {
+                    displayName: (COM.datos && COM.datos.yo.nombre) || 'Usuario',
+                    email: (COM.datos && COM.datos.yo.correo) || ''
+                },
+                configOverwrite: { startWithAudioMuted: false, startWithVideoMuted: !!soloAudio },
+                interfaceConfigOverwrite: { SHOW_JITSI_WATERMARK: false, DEFAULT_BACKGROUND: '#0b0b0d' }
+            });
+            COM.jitsi.addEventListener('readyToClose', function () { COM.colgar(); });
+        }).catch(function (e) {
+            document.getElementById('comCallFrame').innerHTML =
+                '<div class="com-empty" style="color:#fff;margin-top:60px">' + esc(e.message) +
+                '<br><br><a href="https://meet.jit.si/' + attr(sala) + '" target="_blank" rel="noopener" ' +
+                'style="color:#0A84FF">Abrir la sala en una pestaña nueva</a></div>';
+        });
+    }
+
+    COM.llamar = function (modo) {
+        if (!COM.actual) return;
+        var sala = salaDe((COM.actual.tipo === 'canal' ? 'canal-' : 'chat-') +
+            COM.actual.id + '-' + COM.actual.nombre);
+        abrirSala(sala, (COM.actual.tipo === 'canal' ? '#' : '') + COM.actual.nombre, modo === 'audio');
+        /* Aviso en la conversación para que los demás puedan entrar */
+        COM.api('comEnviarMensaje', refParams({
+            contenido: '📹 ' + COM.datos.yo.nombre + ' inició una ' +
+                (modo === 'audio' ? 'llamada de audio' : 'videollamada') +
+                ': https://meet.jit.si/' + sala
+        })).then(function () { refrescarMensajes(true); }).catch(function () {});
+    };
+
+    COM.llamarA = function (usuario, modo) {
+        COM.api('comAbrirChatDirecto', { usuario: usuario }).then(function (d) {
+            return COM.recargarListas().then(function () {
+                COM.cerrarModal();
+                COM.abrirChat(d.id);
+                setTimeout(function () { COM.llamar(modo); }, 350);
+            });
+        }).catch(error);
+    };
+
+    COM.entrarReunion = function (id) {
+        var r = (COM.reuniones || []).find(function (x) { return String(x.id) === String(id); });
+        if (!r) return;
+        if (r.proveedor === 'jitsi' && r.enlace.indexOf('meet.jit.si/') !== -1) {
+            abrirSala(r.enlace.split('meet.jit.si/')[1], r.titulo, false);
+        } else {
+            window.open(r.enlace, '_blank', 'noopener');
+        }
+    };
+
+    COM.colgar = function () {
+        try { if (COM.jitsi) COM.jitsi.dispose(); } catch (e) {}
+        COM.jitsi = null;
+        document.getElementById('comCallFrame').innerHTML = '';
+        document.getElementById('comCall').classList.remove('open');
+    };
+
+    /* ══════════════════════════════════════════════════════
+       POLLING (Apps Script no soporta websockets)
+    ══════════════════════════════════════════════════════ */
+
+    function arrancarPoll() {
+        detenerPoll();
+        COM.pollTimer = setInterval(function () {
+            if (!COM.actual || document.hidden) return;
+            if (document.getElementById('page-comunidad') &&
+                !document.getElementById('page-comunidad').classList.contains('active')) return;
+            var ultimo = COM.mensajes.length ? COM.mensajes[COM.mensajes.length - 1].id : 0;
+            COM.api('comGetMensajes', refParams({ desdeId: ultimo })).then(function (d) {
+                if (!d.data || !d.data.length) return;
+                COM.mensajes = COM.mensajes.concat(d.data);
+                var cont = document.getElementById('comMsgs');
+                var abajo = cont && (cont.scrollHeight - cont.scrollTop - cont.clientHeight) < 90;
+                pintarConversacion(!abajo);
+                COM.api('comMarcarLeido', refParams({})).catch(function () {});
+            }).catch(function () {});
+        }, 8000);
+    }
+    function detenerPoll() {
+        if (COM.pollTimer) { clearInterval(COM.pollTimer); COM.pollTimer = null; }
+    }
+
+    function arrancarNotif() {
+        if (COM.notifTimer) return;
+        COM.notifTimer = setInterval(function () {
+            if (document.hidden) return;
+            COM.api('comGetNotificaciones', { limite: 1 }).then(function (d) {
+                actualizarBadge(d.noLeidas || 0);
+                if (COM.datos) COM.datos.noLeidas = d.noLeidas || 0;
+                if (COM.vista === 'notificaciones') return;
+                pintarTabs();
+            }).catch(function () {});
+        }, 45000);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       ENGANCHE CON EL CRM EXISTENTE
+    ══════════════════════════════════════════════════════ */
+
+    function engancharShowPage() {
+        if (typeof window.showPage !== 'function') return setTimeout(engancharShowPage, 400);
+        var original = window.showPage;
+        window.showPage = function (id, navEl) {
+            if (id === 'comunidad') construirPagina();
+            original(id, navEl);
+            if (id === 'comunidad') {
+                var cta = document.getElementById('mainCta');
+                if (cta) cta.style.display = 'none';
+                COM.entrar();
+            } else {
+                detenerPoll();
+            }
+        };
+    }
+
+    function iniciar() {
+        construirPagina();
+        engancharShowPage();
+        /* Badge de notificaciones desde el arranque, sin abrir el módulo */
+        setTimeout(function () {
+            if (!token()) return;
+            COM.api('comGetNotificaciones', { limite: 1 })
+                .then(function (d) { actualizarBadge(d.noLeidas || 0); arrancarNotif(); })
+                .catch(function () { /* el módulo aún no está instalado en el backend */ });
+        }, 2500);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', iniciar);
+    } else {
+        iniciar();
+    }
+})();
+
+</script>
 </body>
 
 </html>
