@@ -62,15 +62,74 @@
         button, a { touch-action: manipulation; }
 
         /* ═══════════════════════════════════════════════════
-           SIDEBAR — oculta en móvil, se reemplaza por bottom nav
+           SIDEBAR — en móvil es un menú hamburguesa (drawer)
+           que se desliza desde la izquierda; en escritorio
+           es la barra fija de siempre.
         ═══════════════════════════════════════════════════ */
-        .sidebar { display: none; }
-        .sidebar-logo, .nav-section, .sidebar-footer { display: none; }
+        .sidebar {
+            display: flex !important;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            width: min(300px, 84vw);
+            background: var(--sidebar);
+            padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+            z-index: 400;
+            transform: translateX(-100%);
+            transition: transform .3s cubic-bezier(0.32, 0.72, 0, 1);
+            overflow-y: auto;
+            box-shadow: 12px 0 40px rgba(0,0,0,.3);
+        }
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-drawer-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.45);
+            z-index: 399;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .28s;
+        }
+        .sidebar-drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+        .sidebar-close-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.08);
+            margin: 4px 16px 0 auto;
+            cursor: pointer;
+        }
+        .sidebar-close-btn svg {
+            width: 16px; height: 16px; stroke: #fff; stroke-width: 2;
+            stroke-linecap: round; stroke-linejoin: round; fill: none;
+        }
+
+        .sidebar-logo, .nav-section, .sidebar-footer { display: flex; }
+        .nav-section { display: block; }
+
+        /* Botón hamburguesa (topbar móvil) */
+        .hamburger-btn {
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .hamburger-btn svg {
+            width: 18px; height: 18px; stroke: var(--text-primary);
+            stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; fill: none;
+        }
+        .hamburger-btn:active { background: var(--bg); transform: scale(.95); }
 
         /* Elementos que el JS referencia pero no se muestran */
-        .logo-icon { display: none; }
-        .logo-name { display: none; }
-        .logo-sub  { display: none; }
+        .logo-icon { display: flex; }
+        .logo-name { display: block; }
+        .logo-sub  { display: block; }
 
         /* Badge de nav item (usado por JS) */
         .nav-item .badge {
@@ -100,9 +159,9 @@
             overflow: hidden;
         }
         .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-        .user-info { display: none; }
-        .user-name { display: none; }
-        .user-role { display: none; }
+        .user-info { display: block; }
+        .user-name { display: block; }
+        .user-role { display: block; }
 
         /* logout-btn referenciado por JS */
         .logout-btn {
@@ -127,7 +186,8 @@
         }
 
         /* ═══════════════════════════════════════════════════
-           MAIN — full width en móvil (sin sidebar)
+           MAIN — full width en móvil (sidebar es un drawer, no
+           ocupa espacio en el layout)
         ═══════════════════════════════════════════════════ */
         .main {
             margin-left: 0 !important;
@@ -239,9 +299,14 @@
         .content {
             padding: 16px;
             flex: 1;
-            /* Espacio para el bottom nav */
-            padding-bottom: calc(64px + env(safe-area-inset-bottom, 16px) + 8px);
+            padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
         }
+
+        /* Bottom nav retirado: en móvil ahora se usa el menú
+           hamburguesa (drawer) para tener paridad total con
+           el menú de escritorio. Se mantiene el markup por
+           compatibilidad con el JS existente, pero oculto. */
+        .bottom-nav, .bn-more-sheet, .bn-more-overlay { display: none !important; }
 
         /* ═══════════════════════════════════════════════════
            BOTTOM NAVIGATION BAR
@@ -1174,9 +1239,10 @@
             .survey-grid { grid-template-columns: 1fr 1fr; }
             .content { padding: 24px; padding-bottom: 24px; }
             .bottom-nav { display: none; }
-            .sidebar { display: flex !important; flex-direction: column; width: 220px; padding: 28px 0 24px; background: var(--sidebar); position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
-            .sidebar-logo, .nav-section, .sidebar-footer { display: flex; }
-            .nav-section { display: block; }
+            .sidebar { width: 220px; padding: 28px 0 24px; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transform: none; box-shadow: none; }
+            .sidebar-close-btn { display: none; }
+            .sidebar-drawer-overlay { display: none !important; }
+            .hamburger-btn { display: none; }
             .main { margin-left: 220px !important; }
             .topbar { padding: 0 24px; }
             .topbar-logo { display: none; }
@@ -2126,7 +2192,11 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
         <div class="az-splash-version">v5.2</div>
     </div>
     <!-- /splash -->
-    <nav class="sidebar">
+    <div class="sidebar-drawer-overlay" id="sidebarOverlay" onclick="_closeSidebarDrawer()"></div>
+    <nav class="sidebar" id="sidebarNav">
+        <div class="sidebar-close-btn" onclick="_closeSidebarDrawer()" title="Cerrar menú">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
         <div class="sidebar-logo">
             <div class="logo-icon">
                 <img src="logo-crm.png" alt="Azyvion CRM Logo" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display='none'">
@@ -2314,13 +2384,12 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
     <!-- Main -->
     <div class="main">
         <div class="topbar">
-            <!-- Logo visible solo en móvil -->
-            <div class="topbar-logo">
+            <!-- Botón hamburguesa: abre el menú completo (solo móvil) -->
+            <div class="hamburger-btn" onclick="_openSidebarDrawer()" title="Menú">
                 <svg viewBox="0 0 24 24">
-                    <rect x="3" y="3" width="7" height="7" rx="1"/>
-                    <rect x="14" y="3" width="7" height="7" rx="1"/>
-                    <rect x="14" y="14" width="7" height="7" rx="1"/>
-                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
                 </svg>
             </div>
             <div class="page-title" id="pageTitle">Inicio</div>
@@ -7493,7 +7562,40 @@ refreshCurrent = function() {
 };
 
 /* ════════════════════════════════════════════════════════════
-   MÓVIL — BOTTOM NAVIGATION  v1.0
+   MÓVIL — MENÚ HAMBURGUESA (drawer)  v1.0
+   ════════════════════════════════════════════════════════════ */
+function _openSidebarDrawer() {
+    var nav = document.getElementById('sidebarNav');
+    var ov  = document.getElementById('sidebarOverlay');
+    if (nav) nav.classList.add('open');
+    if (ov) ov.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function _closeSidebarDrawer() {
+    var nav = document.getElementById('sidebarNav');
+    var ov  = document.getElementById('sidebarOverlay');
+    if (nav) nav.classList.remove('open');
+    if (ov) ov.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+/* Cerrar el drawer automáticamente al elegir cualquier opción del menú */
+(function() {
+    var nav = document.getElementById('sidebarNav');
+    if (!nav) return;
+    nav.addEventListener('click', function(e) {
+        var item = e.target.closest('.nav-item, .user-pill');
+        if (item) {
+            /* Solo auto-cierra en móvil (el drawer no aplica en escritorio) */
+            if (window.innerWidth < 768) _closeSidebarDrawer();
+        }
+    });
+})();
+
+/* ════════════════════════════════════════════════════════════
+   MÓVIL — BOTTOM NAVIGATION  v1.0  (retirado del layout, ver
+   nota junto a .bottom-nav; se conserva el mapeo de badges)
    ════════════════════════════════════════════════════════════ */
 
 /* Mapeo página → item de bottom nav */
