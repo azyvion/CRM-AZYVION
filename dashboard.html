@@ -180,7 +180,12 @@
             transition: transform .3s cubic-bezier(0.32, 0.72, 0, 1);
             overflow-y: auto;
             overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
             box-shadow: 12px 0 40px rgba(0,0,0,.3);
+            will-change: transform;
+            isolation: isolate;
+            contain: layout style;
         }
         .sidebar.open { transform: translateX(0); }
 
@@ -1292,9 +1297,9 @@
         /* Toast — posición bottom en móvil */
         .toast {
             position: fixed;
-            bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+            bottom: 24px;
             left: 50%;
-            transform: translateX(-50%) translateY(120px);
+            transform: translateX(-50%) translateY(calc(100% + 40px));
             right: auto;
             top: auto;
             background: rgba(30, 30, 30, 0.92);
@@ -1309,12 +1314,13 @@
             align-items: center;
             gap: 8px;
             z-index: 600;
-            transform: translateY(-80px);
+            pointer-events: none;
             transition: transform .3s cubic-bezier(0.34, 1.42, 0.64, 1);
         }
 
         .toast.show {
             transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
         }
 
         .toast svg {
@@ -4214,33 +4220,11 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
             }).join('') + `<div class="cell-sub" style="margin-top:4px">Embudo abierto: ${abiertos.length} oportunidades</div>`;
         }
 
-        function renderProspectos(filtro) {
-            _filtroProActual = filtro;
-            let data = filtro === 'Todos' ? _prospectos.slice() : _prospectos.filter(p => p.etapa === filtro);
-
-            const ori = valOf('proFiltroOrigen');
-            if (ori) data = data.filter(p => p.origen === ori);
-
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            if (q && _currentPage === 'prospectos') {
-                data = data.filter(p => [p.nombre, p.empresa, p.correo, p.telefono, p.direccion, p.notas]
-                    .some(f => String(f || '').toLowerCase().includes(q)));
-            }
-
-            const orden = valOf('proOrden') || 'valor';
-            data.sort((a, b) => {
-                if (orden === 'prob') return Number(b.probabilidad || 0) - Number(a.probabilidad || 0);
-                if (orden === 'nombre') return String(a.nombre).localeCompare(String(b.nombre), 'es');
-                if (orden === 'reciente') return new Date(b.fechaReg || 0) - new Date(a.fechaReg || 0);
-                return Number(b.valorEstimado || 0) - Number(a.valorEstimado || 0);
-            });
-
-            const admin = esAdmin();
-            document.getElementById('prospectosTbody').innerHTML = data.length
-                ? data.map(p => {
-                    const prob = Math.max(0, Math.min(100, Number(p.probabilidad || 0)));
-                    const cls = prob >= 65 ? 'hot' : prob <= 30 ? 'cold' : '';
-                    return `<tr class="row-click" title="Ver ficha del prospecto" onclick="fichaRowClick(event,'Prospecto',${p.id})">
+        /* Genera el HTML de una fila de prospecto (extraído para reutilizar en el render por lotes) */
+        function _proRow(p, admin) {
+            const prob = Math.max(0, Math.min(100, Number(p.probabilidad || 0)));
+            const cls = prob >= 65 ? 'hot' : prob <= 30 ? 'cold' : '';
+            return `<tr class="row-click" title="Ver ficha del prospecto" onclick="fichaRowClick(event,'Prospecto',${p.id})">
         <td>
           <div class="client-name">
             <div class="mini-avatar" style="background:${p.color || '#8E8E93'}">${initials(p.nombre)}</div>
@@ -4272,8 +4256,30 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
           </div>
         </td>
       </tr>`;
-                }).join('')
-                : '<tr><td colspan="8" class="empty-cell">Sin prospectos con estos filtros</td></tr>';
+        }
+
+        var _proRenderToken = 0; /* cancela renders anteriores si el filtro cambia */
+
+        function renderProspectos(filtro) {
+            _filtroProActual = filtro;
+            let data = filtro === 'Todos' ? _prospectos.slice() : _prospectos.filter(p => p.etapa === filtro);
+
+            const ori = valOf('proFiltroOrigen');
+            if (ori) data = data.filter(p => p.origen === ori);
+
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            if (q && _currentPage === 'prospectos') {
+                data = data.filter(p => [p.nombre, p.empresa, p.correo, p.telefono, p.direccion, p.notas]
+                    .some(f => String(f || '').toLowerCase().includes(q)));
+            }
+
+            const orden = valOf('proOrden') || 'valor';
+            data.sort((a, b) => {
+                if (orden === 'prob') return Number(b.probabilidad || 0) - Number(a.probabilidad || 0);
+                if (orden === 'nombre') return String(a.nombre).localeCompare(String(b.nombre), 'es');
+                if (orden === 'reciente') return new Date(b.fechaReg || 0) - new Date(a.fechaReg || 0);
+                return Number(b.valorEstimado || 0) - Number(a.valorEstimado || 0);
+            });
 
             const suma = data.reduce((s, p) => s + Number(p.valorEstimado || 0), 0);
             const pond = data.reduce((s, p) => s + Number(p.valorEstimado || 0) * (Number(p.probabilidad || 0) / 100), 0);
@@ -4281,7 +4287,37 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
                 `<span><strong>${data.length}</strong> de ${_prospectos.length} prospectos</span>` +
                 `<span>Potencial: <strong>Q ${suma.toLocaleString()}</strong></span>` +
                 `<span>Ponderado: <strong>Q ${Math.round(pond).toLocaleString()}</strong></span>` +
-                (admin ? '' : '<span style="color:var(--text-muted)">Eliminar requiere rol Admin</span>');
+                (esAdmin() ? '' : '<span style="color:var(--text-muted)">Eliminar requiere rol Admin</span>');
+
+            const tbody = document.getElementById('prospectosTbody');
+            if (!data.length) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">Sin prospectos con estos filtros</td></tr>';
+                return;
+            }
+
+            /* ── Render por lotes para no bloquear el hilo principal en móvil ── */
+            const LOTE = 60;          /* filas por lote */
+            const token = ++_proRenderToken;
+            const admin = esAdmin();
+
+            /* Primera tanda: inmediata (el usuario ve contenido al instante) */
+            tbody.innerHTML = data.slice(0, LOTE).map(p => _proRow(p, admin)).join('');
+
+            if (data.length <= LOTE) return;
+
+            /* Tandas siguientes: diferidas con requestAnimationFrame */
+            var idx = LOTE;
+            function renderLote() {
+                if (token !== _proRenderToken) return; /* filtro cambió, cancelar */
+                var fragmento = document.createDocumentFragment();
+                var tmp = document.createElement('tbody');
+                tmp.innerHTML = data.slice(idx, idx + LOTE).map(p => _proRow(p, admin)).join('');
+                while (tmp.firstChild) fragmento.appendChild(tmp.firstChild);
+                tbody.appendChild(fragmento);
+                idx += LOTE;
+                if (idx < data.length) requestAnimationFrame(renderLote);
+            }
+            requestAnimationFrame(renderLote);
         }
 
         function filtrarProspectos(filtro, el) {
