@@ -1603,6 +1603,74 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
 .ficha-nota-full:last-child { border-bottom: 0; }
 .ficha-nota-pie { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 7px; }
 
+
+/* ══════════════════════════════════════════════════════════
+   TEMA OSCURO — redefine los tokens; casi todo el CRM usa
+   var(--bg)/var(--card)/var(--text-*)/var(--border), así que
+   la mayoría de la interfaz se reskinea automáticamente.
+══════════════════════════════════════════════════════════ */
+body.theme-dark {
+    --bg: #16171B;
+    --card: #1F2024;
+    --text-primary: #F2F2F7;
+    --text-secondary: #A5A5AA;
+    --text-muted: #7A7A80;
+    --border: rgba(255,255,255,0.09);
+    --accent-bg: rgba(10,132,255,0.16);
+    --success-bg: rgba(48,209,88,0.16);
+    --warning-bg: rgba(255,159,10,0.16);
+    --danger-bg: rgba(255,69,58,0.16);
+    --purple-bg: rgba(191,90,242,0.16);
+}
+/* Superficies que usan blanco fijo en vez de var(--card) */
+body.theme-dark .search-box,
+body.theme-dark .icon-btn,
+body.theme-dark .form-input,
+body.theme-dark .form-select,
+body.theme-dark .modal-box,
+body.theme-dark .cot-item-del,
+body.theme-dark .ficha-win-btn,
+body.theme-dark .switch .knob { background: var(--card); }
+body.theme-dark .form-input,
+body.theme-dark .form-select { color: var(--text-primary); border-color: var(--border); }
+body.theme-dark .switch:not(.on) { background: #3A3A3E; }
+body.theme-dark .topbar { background: rgba(22,23,27,0.85); }
+body.theme-dark thead th { background: rgba(255,255,255,0.02); }
+body.theme-dark tbody tr:hover,
+body.theme-dark .row-click:hover,
+body.theme-dark .btn-ghost:hover,
+body.theme-dark .filter-tab:hover:not(.active) { background: rgba(255,255,255,0.045); }
+body.theme-dark .switch-field,
+body.theme-dark .cot-tot-box,
+body.theme-dark .cot-builder-foot { background: rgba(255,255,255,0.03); }
+body.theme-dark .print-bar-btn { filter: brightness(0.92); }
+
+/* ══════════════════════════════════════════════════════════
+   DENSIDAD COMPACTA
+══════════════════════════════════════════════════════════ */
+body.densidad-compacta thead th { padding: 6px 16px; }
+body.densidad-compacta td { padding: 6px 16px; font-size: 12.5px; }
+body.densidad-compacta .cell-sub { margin-top: 1px; }
+
+/* ══════════════════════════════════════════════════════════
+   AJUSTES / PERFIL DE USUARIO
+══════════════════════════════════════════════════════════ */
+.user-pill { position: relative; }
+.perfil-head {
+    display: flex; align-items: center; gap: 18px; padding: 20px;
+    flex-wrap: wrap;
+}
+.perfil-avatar-wrap { position: relative; flex-shrink: 0; }
+.perfil-avatar {
+    width: 72px; height: 72px; border-radius: 50%; overflow: hidden;
+    background: linear-gradient(135deg, #0A84FF, #5e5ce6);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 24px; font-weight: 600; flex-shrink: 0;
+}
+.perfil-nombre { font-size: 19px; font-weight: 600; letter-spacing: -.2px; }
+.perfil-sub { font-size: 12.5px; color: var(--text-secondary); margin-top: 6px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.perfil-foto-acciones { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+
     </style>
 </head>
 
@@ -1710,7 +1778,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
             </svg>
             Usuarios
         </div>
-        <div class="nav-item" onclick="alert('Configuración — próximamente')">
+        <div class="nav-item" id="nav-perfil" onclick="showPage('perfil',this)">
             <svg viewBox="0 0 24 24">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
@@ -1719,13 +1787,13 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
         </div>
 
         <div class="sidebar-footer">
-            <div class="user-pill">
+            <div class="user-pill" onclick="showPage('perfil', document.getElementById('nav-perfil'))" title="Ver mi perfil">
                 <div class="avatar" id="userAvatar">—</div>
                 <div class="user-info">
                     <div class="user-name" id="userName">Cargando…</div>
                     <div class="user-role" id="userRole"></div>
                 </div>
-                <button class="logout-btn" onclick="doLogout()" title="Cerrar sesión">
+                <button class="logout-btn" onclick="event.stopPropagation(); doLogout()" title="Cerrar sesión">
                     <svg viewBox="0 0 24 24">
                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                         <polyline points="16 17 21 12 16 7" />
@@ -2392,6 +2460,14 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
             </div>
             <!-- /page-contabilidad -->
 
+
+            <!-- ── AJUSTES / PERFIL DE USUARIO ── -->
+            <div class="page" id="page-perfil">
+                <div id="perfilBody">
+                    <div class="empty-cell">Cargando tu perfil…</div>
+                </div>
+            </div>
+
             <!-- ── USUARIOS (solo Admin) ── -->
             <div class="page" id="page-usuarios">
                 <div class="card">
@@ -2663,7 +2739,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
            ⚠️  REEMPLAZA ESTA URL CON LA URL DE TU WEB APP ACTUAL
         ════════════════════════════════════════════════════════════ */
         (function () {
-            const API_URL = 'https://script.google.com/macros/s/AKfycbxOa1F3xbLVAZHGI-23hnwHjql4cb3d2SrUKewfu91XMZtKr33U8T5SnRmtwpJYCcAN/exec';
+            const API_URL = 'https://script.google.com/macros/s/AKfycbydb77kCfIbaPYLqo1n-vlHqJoG3dVTO3CEFFsGEC4Hq6m0k5mradzTxCGLmYs3lnqN/exec';
             const SESSION_KEY = 'azyvion_session';
 
             const MAP = {
@@ -2730,12 +2806,21 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
                 addNotaCRM:         (d) => Object.assign({action: 'addNotaCRM'}, d),
                 deleteNotaCRM:      (d) => Object.assign({action: 'deleteNotaCRM'}, d),
                 addActividadCRM:    (d) => Object.assign({action: 'addActividadCRM'}, d),
-                deleteActividadCRM: (d) => Object.assign({action: 'deleteActividadCRM'}, d)
+                deleteActividadCRM: (d) => Object.assign({action: 'deleteActividadCRM'}, d),
+
+                // ── Perfil de usuario ──
+                getPerfil:            ()  => ({action: 'getPerfil'}),
+                updatePerfil:         (d) => Object.assign({action: 'updatePerfil'}, d),
+                updatePreferencias:   (d) => Object.assign({action: 'updatePreferencias'}, d),
+                changePasswordPropio: (d) => Object.assign({action: 'changePasswordPropio'}, d),
+                uploadFotoPerfil:     (d) => Object.assign({action: 'uploadFotoPerfil'}, d),
+                deleteFotoPerfil:     (d) => Object.assign({action: 'deleteFotoPerfil'}, d)
             };
 
             // Acciones que viajan por POST (payload grande: ítems, mensajes largos)
             const POST_ACTIONS = ['addCotizacion', 'updateCotizacion', 'enviarCotizacion',
-                                  'addNotaCRM', 'addActividadCRM', 'addContacto', 'updateContacto'];
+                                  'addNotaCRM', 'addActividadCRM', 'addContacto', 'updateContacto',
+                                  'uploadFotoPerfil', 'updatePerfil', 'changePasswordPropio'];
 
             function readSession() {
                 try {return JSON.parse(localStorage.getItem(SESSION_KEY));} catch (e) {return null;}
@@ -2850,8 +2935,8 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
         let _rol = '';
         let _usuario = '';
 
-        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', ficha: 'Ficha', cotizaciones: 'Cotizaciones', inventario: 'Inventario', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad'};
-        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', cotizaciones: 'Nueva cotización', inventario: 'Nuevo ítem', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria'};
+        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', ficha: 'Ficha', cotizaciones: 'Cotizaciones', inventario: 'Inventario', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad', perfil: 'Ajustes'};
+        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', cotizaciones: 'Nueva cotización', inventario: 'Nuevo ítem', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria', perfil: ''};
 
         const ETAPAS = ['Nuevo', 'Contactado', 'Calificado', 'Propuesta', 'Negociación', 'Perdido'];
         const ORIGENES = ['Referido', 'Sitio web', 'Llamada fría', 'Evento', 'Redes sociales', 'Otro'];
@@ -2867,6 +2952,12 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
            INICIALIZACIÓN
         ═══════════════════════════════════════════════════════ */
         document.addEventListener('DOMContentLoaded', function () {
+            // ── 0. Aplicar tema/densidad cacheados de inmediato (evita parpadeo) ──
+            try {
+                var prefsCache = JSON.parse(localStorage.getItem('azyvion_perfil_cache') || 'null');
+                if (prefsCache && prefsCache.preferencias) aplicarPreferencias(prefsCache.preferencias);
+            } catch (e) {}
+
             // ── 1. Leer sesión de localStorage de forma inmediata ──
             var sessLocal = null;
             try { sessLocal = JSON.parse(localStorage.getItem('azyvion_session') || 'null'); } catch (e) {}
@@ -2897,9 +2988,19 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
             if (elRole)   elRole.textContent   = sessLocal.rol    || '';
             if (elAvatar) elAvatar.textContent = (sessLocal.nombre || '??').substring(0, 2).toUpperCase();
             if (elNav)    elNav.style.display  = esAdmin() ? 'flex' : 'none';
+            _aplicarAvatarSidebar();
 
             // ── 3. Cargar datos del dashboard de inmediato ──
             loadAll();
+
+            // Página de inicio preferida (una sola vez, si hay preferencia cacheada distinta a Inicio)
+            try {
+                var prefsCacheLanding = JSON.parse(localStorage.getItem('azyvion_perfil_cache') || 'null');
+                var landing = prefsCacheLanding && prefsCacheLanding.preferencias && prefsCacheLanding.preferencias.paginaInicio;
+                if (landing && landing !== 'overview' && document.getElementById('page-' + landing)) {
+                    showPage(landing, document.getElementById('nav-' + landing));
+                }
+            } catch (e) {}
 
             // ── 4. Verificar sesión con el backend en segundo plano ──
             //    Si el backend la rechaza → cerrar sesión y redirigir.
@@ -2921,6 +3022,12 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
                         if (elRole)   elRole.textContent   = sess.rol    || '';
                         if (elAvatar) elAvatar.textContent = (sess.nombre || '??').substring(0, 2).toUpperCase();
                         if (elNav)    elNav.style.display  = esAdmin() ? 'flex' : 'none';
+                        _perfil = _perfil || {};
+                        _perfil.fotoUrl = sess.fotoUrl || '';
+                        _perfil.preferencias = sess.preferencias || _perfil.preferencias;
+                        _cachePrefsLocal({ fotoUrl: sess.fotoUrl || '', preferencias: sess.preferencias });
+                        aplicarPreferencias(sess.preferencias);
+                        _aplicarAvatarSidebar();
                     })
                     .withFailureHandler(function (err) {
                         console.warn('[Azyvion] checkSession error de red (intento ' + intento + '):', err);
@@ -3881,8 +3988,9 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
 
             // La ficha es una vista interna: sin CTA y sin modo ampliado al salir
             const cta = document.getElementById('mainCta');
-            if (cta) cta.style.display = (id === 'ficha') ? 'none' : '';
+            if (cta) cta.style.display = (id === 'ficha' || id === 'perfil') ? 'none' : '';
             if (id !== 'ficha') document.body.classList.remove('ficha-max');
+            if (id === 'perfil') loadPerfil();
         }
 
         function ctaAction() {
@@ -5954,6 +6062,306 @@ body.ficha-max .ficha-shell { height: calc(100vh - 80px); }
             }
 
             return false;
+        }
+
+        /* ══════════════════════════════════════════════════════════
+           MÓDULO AJUSTES / PERFIL DE USUARIO — JavaScript
+        ══════════════════════════════════════════════════════════ */
+
+        let _perfil = null;
+        const PERFIL_CACHE_KEY = 'azyvion_perfil_cache';
+        const PAGINAS_NOMBRE = {
+            overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', inventario: 'Inventario',
+            cotizaciones: 'Cotizaciones', encuestas: 'Encuestas', contabilidad: 'Contabilidad', usuarios: 'Usuarios'
+        };
+
+        /* ── Avatar: genera iniciales o foto real ─────────────── */
+        function avatarHtml(nombre, fotoUrl, colorSemilla) {
+            if (fotoUrl) {
+                return `<img src="${escAttr(fotoUrl)}" alt="${escAttr(nombre)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"
+                        onerror="this.parentElement.textContent='${escAttr(initials(nombre))}';this.parentElement.style.background='${colorSemilla || '#0A84FF'}'">`;
+            }
+            return escHtml(initials(nombre));
+        }
+
+        function _aplicarAvatarSidebar() {
+            const el = document.getElementById('userAvatar');
+            if (!el) return;
+            const fotoUrl = _perfil && _perfil.fotoUrl;
+            el.innerHTML = avatarHtml(_usuario, fotoUrl);
+            el.style.background = fotoUrl ? 'transparent' : 'linear-gradient(135deg, #0A84FF, #5e5ce6)';
+            el.style.overflow = 'hidden';
+        }
+
+        /* ── Aplicar preferencias globalmente (tema, densidad) ── */
+        function aplicarPreferencias(prefs) {
+            if (!prefs) return;
+            document.body.classList.toggle('theme-dark', prefs.tema === 'oscuro');
+            document.body.classList.toggle('densidad-compacta', prefs.densidadTabla === 'compacta');
+        }
+
+        function _cachePrefsLocal(datos) {
+            try { localStorage.setItem(PERFIL_CACHE_KEY, JSON.stringify(datos)); } catch (e) {}
+        }
+        function _leerPrefsCache() {
+            try { return JSON.parse(localStorage.getItem(PERFIL_CACHE_KEY) || 'null'); } catch (e) { return null; }
+        }
+
+        /* ── Carga completa del perfil (para la página Ajustes) ── */
+        function loadPerfil() {
+            const body = document.getElementById('perfilBody');
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo cargar tu perfil', '#FF453A'); return; }
+                    _perfil = Object.assign({}, r.data, { fotoUrl: r.data.fotoUrl });
+                    _cachePrefsLocal({ fotoUrl: r.data.fotoUrl, preferencias: r.data.preferencias });
+                    aplicarPreferencias(r.data.preferencias);
+                    _aplicarAvatarSidebar();
+                    renderPerfil();
+                })
+                .withFailureHandler(function (e) { showToast('Error: ' + e.message, '#FF453A'); })
+                .getPerfil();
+        }
+
+        function renderPerfil() {
+            const body = document.getElementById('perfilBody');
+            if (!body || !_perfil) return;
+            const p = _perfil;
+
+            const paginasDisponibles = esAdmin()
+                ? Object.keys(PAGINAS_NOMBRE)
+                : (_rol === 'Gerente'
+                    ? Object.keys(PAGINAS_NOMBRE).filter(k => k !== 'usuarios')
+                    : ['overview', 'clientes', 'prospectos', 'inventario', 'cotizaciones', 'encuestas']);
+
+            body.innerHTML = `
+    <div class="perfil-head card">
+        <div class="perfil-avatar-wrap">
+            <div class="perfil-avatar" id="perfilAvatarBig">${avatarHtml(p.nombre, p.fotoUrl)}</div>
+            <input type="file" id="perfilFotoInput" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="onSeleccionFoto(event)"/>
+        </div>
+        <div style="flex:1;min-width:0">
+            <div class="perfil-nombre">${escHtml(p.nombre)}</div>
+            <div class="perfil-sub">
+                <span class="tag ${p.rol === 'Admin' ? 'tag-danger' : p.rol === 'Gerente' ? 'tag-accent' : 'tag-gray'}">${escHtml(p.rol)}</span>
+                ${p.cargo ? `<span class="ficha-sub-dato">${escHtml(p.cargo)}</span>` : ''}
+                <span class="ficha-sub-dato">Usuario: ${escHtml(p.usuario)}</span>
+            </div>
+            <div class="perfil-sub" style="margin-top:6px">
+                <span class="cell-sub">Miembro desde ${p.fechaReg ? fechaCorta(p.fechaReg) : 'siempre'}</span>
+                ${p.fechaPerfilActualizado ? `<span class="cell-sub">· Actualizado ${timeAgo(p.fechaPerfilActualizado)}</span>` : ''}
+            </div>
+        </div>
+        <div class="perfil-foto-acciones">
+            <button class="btn-ghost" onclick="document.getElementById('perfilFotoInput').click()">
+                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                ${p.fotoUrl ? 'Cambiar foto' : 'Subir foto'}
+            </button>
+            ${p.fotoUrl ? `<button class="btn-danger-sm" onclick="eliminarFotoPerfil()">Quitar foto</button>` : ''}
+        </div>
+    </div>
+
+    <div class="ficha-grid" style="margin-top:14px">
+        <div class="card ficha-card">
+            <div class="ficha-card-head"><span>Información personal</span></div>
+            <div class="ficha-card-body">
+                <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label>
+                    <input class="form-input" id="pfNombre" value="${escAttr(p.nombre)}"/></div>
+                <div class="form-field"><label class="form-label">CORREO</label>
+                    <input class="form-input" id="pfCorreo" type="email" value="${escAttr(p.correo)}" placeholder="tucorreo@empresa.com"/>
+                    <div style="font-size:11.5px;color:var(--text-secondary);margin-top:5px">Se usa para notificaciones y copias de cotizaciones.</div></div>
+                <div class="form-field"><label class="form-label">TELÉFONO</label>
+                    <input class="form-input" id="pfTelefono" value="${escAttr(p.telefono)}"/></div>
+                <div class="form-field"><label class="form-label">CARGO / PUESTO</label>
+                    <input class="form-input" id="pfCargo" value="${escAttr(p.cargo)}" placeholder="Ej. Ejecutivo de ventas"/></div>
+                <div class="form-field"><label class="form-label">USUARIO DE ACCESO</label>
+                    <input class="form-input" value="${escAttr(p.usuario)}" disabled style="opacity:.6;cursor:not-allowed"/>
+                    <div style="font-size:11.5px;color:var(--text-secondary);margin-top:5px">El usuario de acceso no se puede cambiar. Contacta a un administrador si lo necesitas.</div></div>
+                <div style="display:flex;justify-content:flex-end;margin-top:6px">
+                    <button class="btn-save" id="pfGuardarBtn" onclick="guardarPerfilInfo()">Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card ficha-card">
+            <div class="ficha-card-head"><span>Preferencias del sistema</span></div>
+            <div class="ficha-card-body">
+                <div class="switch-field">
+                    <div><div class="sf-txt">Tema oscuro</div><div class="sf-sub">Cambia la apariencia de todo el CRM.</div></div>
+                    <label class="switch${p.preferencias.tema === 'oscuro' ? ' on' : ''}" id="prefTemaSwitch">
+                        <input type="checkbox" id="prefTema" ${p.preferencias.tema === 'oscuro' ? 'checked' : ''} onchange="onTogglePref(this,'prefTemaSwitch')"/>
+                        <span class="knob"></span>
+                    </label>
+                </div>
+                <div class="switch-field">
+                    <div><div class="sf-txt">Tablas compactas</div><div class="sf-sub">Reduce el espaciado de las filas para ver más información.</div></div>
+                    <label class="switch${p.preferencias.densidadTabla === 'compacta' ? ' on' : ''}" id="prefDensidadSwitch">
+                        <input type="checkbox" id="prefDensidad" ${p.preferencias.densidadTabla === 'compacta' ? 'checked' : ''} onchange="onTogglePref(this,'prefDensidadSwitch')"/>
+                        <span class="knob"></span>
+                    </label>
+                </div>
+                <div class="form-field" style="margin-top:4px">
+                    <label class="form-label">PÁGINA DE INICIO</label>
+                    <select class="form-select" id="prefPaginaInicio">
+                        ${paginasDisponibles.map(k => `<option value="${k}"${k === p.preferencias.paginaInicio ? ' selected' : ''}>${PAGINAS_NOMBRE[k]}</option>`).join('')}
+                    </select>
+                    <div style="font-size:11.5px;color:var(--text-secondary);margin-top:5px">La página que verás justo después de iniciar sesión.</div>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:6px">
+                    <button class="btn-save" onclick="guardarPreferenciasGenerales()">Guardar preferencias</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card ficha-card">
+            <div class="ficha-card-head"><span>Notificaciones</span></div>
+            <div class="ficha-card-body">
+                <div class="switch-field">
+                    <div><div class="sf-txt">Copiarme mis cotizaciones enviadas</div><div class="sf-sub">Recibe una copia oculta cuando envíes una cotización por correo.</div></div>
+                    <label class="switch${p.preferencias.copiarmeCotizaciones ? ' on' : ''}" id="prefCopiaSwitch">
+                        <input type="checkbox" id="prefCopia" ${p.preferencias.copiarmeCotizaciones ? 'checked' : ''} onchange="onTogglePref(this,'prefCopiaSwitch')"/>
+                        <span class="knob"></span>
+                    </label>
+                </div>
+                <div class="switch-field" style="margin-bottom:0">
+                    <div><div class="sf-txt">Alertas de stock crítico</div><div class="sf-sub">Recíbe un correo cuando un producto que registres o edites entre en stock crítico.</div></div>
+                    <label class="switch${p.preferencias.alertaStockCritico ? ' on' : ''}" id="prefStockSwitch">
+                        <input type="checkbox" id="prefStock" ${p.preferencias.alertaStockCritico ? 'checked' : ''} onchange="onTogglePref(this,'prefStockSwitch')"/>
+                        <span class="knob"></span>
+                    </label>
+                </div>
+                ${!p.correo ? '<div style="font-size:11.5px;color:var(--warning);margin-top:10px">Agrega un correo en "Información personal" para poder recibir estas notificaciones.</div>' : ''}
+                <div style="display:flex;justify-content:flex-end;margin-top:12px">
+                    <button class="btn-save" onclick="guardarPreferenciasGenerales()">Guardar preferencias</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card ficha-card">
+            <div class="ficha-card-head"><span>Seguridad</span></div>
+            <div class="ficha-card-body">
+                <div class="form-field"><label class="form-label">CONTRASEÑA ACTUAL *</label>
+                    <input class="form-input" id="pwActual" type="password" autocomplete="current-password"/></div>
+                <div class="form-field"><label class="form-label">NUEVA CONTRASEÑA *</label>
+                    <input class="form-input" id="pwNueva" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres"/></div>
+                <div class="form-field"><label class="form-label">CONFIRMAR NUEVA CONTRASEÑA *</label>
+                    <input class="form-input" id="pwConfirmar" type="password" autocomplete="new-password"/></div>
+                <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:6px">
+                    Al cambiar tu contraseña, cerraremos tus demás sesiones activas por seguridad.
+                </div>
+                <div style="display:flex;justify-content:flex-end">
+                    <button class="btn-save" id="pwGuardarBtn" onclick="guardarNuevaContrasena()">Actualizar contraseña</button>
+                </div>
+            </div>
+        </div>
+    </div>`;
+        }
+
+        /* ── Guardar información personal ─────────────────────── */
+        function guardarPerfilInfo() {
+            const btn = document.getElementById('pfGuardarBtn');
+            const nombre = (v('pfNombre') || '').trim();
+            if (!nombre) { showToast('El nombre es requerido', '#FF9F0A'); return; }
+            btn.disabled = true; btn.textContent = 'Guardando…';
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    btn.disabled = false; btn.textContent = 'Guardar cambios';
+                    if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo guardar', '#FF453A'); return; }
+                    showToast('Perfil actualizado', '#30D158');
+                    _usuario = nombre;
+                    loadPerfil();
+                })
+                .withFailureHandler(function (e) { btn.disabled = false; btn.textContent = 'Guardar cambios'; showToast('Error: ' + e.message, '#FF453A'); })
+                .updatePerfil({ nombre: nombre, correo: v('pfCorreo'), telefono: v('pfTelefono'), cargo: v('pfCargo') });
+        }
+
+        /* ── Preferencias (switches + selects) ────────────────── */
+        function onTogglePref(input, switchId) {
+            const sw = document.getElementById(switchId);
+            if (sw) sw.classList.toggle('on', input.checked);
+        }
+
+        function guardarPreferenciasGenerales() {
+            const datos = {
+                tema: document.getElementById('prefTema').checked ? 'oscuro' : 'claro',
+                densidadTabla: document.getElementById('prefDensidad').checked ? 'compacta' : 'comoda',
+                paginaInicio: v('prefPaginaInicio'),
+                copiarmeCotizaciones: document.getElementById('prefCopia').checked ? 'true' : 'false',
+                alertaStockCritico: document.getElementById('prefStock').checked ? 'true' : 'false'
+            };
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo guardar', '#FF453A'); return; }
+                    showToast('Preferencias guardadas', '#30D158');
+                    _perfil.preferencias = r.preferencias;
+                    _cachePrefsLocal({ fotoUrl: _perfil.fotoUrl, preferencias: r.preferencias });
+                    aplicarPreferencias(r.preferencias);
+                })
+                .withFailureHandler(function (e) { showToast('Error: ' + e.message, '#FF453A'); })
+                .updatePreferencias(datos);
+        }
+
+        /* ── Foto de perfil ────────────────────────────────────── */
+        function onSeleccionFoto(ev) {
+            const file = ev.target.files && ev.target.files[0];
+            if (!file) return;
+            const tiposOk = ['image/png', 'image/jpeg', 'image/webp'];
+            if (tiposOk.indexOf(file.type) === -1) { showToast('Formato no admitido. Usa PNG, JPG o WEBP.', '#FF9F0A'); ev.target.value = ''; return; }
+            if (file.size > 2 * 1024 * 1024) { showToast('La imagen no debe superar 2 MB', '#FF9F0A'); ev.target.value = ''; return; }
+
+            const avatarBig = document.getElementById('perfilAvatarBig');
+            if (avatarBig) avatarBig.innerHTML = '<div style="font-size:11px;color:var(--text-secondary)">Subiendo…</div>';
+
+            const reader = new FileReader();
+            reader.onload = function () {
+                google.script.run
+                    .withSuccessHandler(function (r) {
+                        ev.target.value = '';
+                        if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo subir la foto', '#FF453A'); renderPerfil(); return; }
+                        showToast('Foto de perfil actualizada', '#30D158');
+                        _perfil.fotoUrl = r.fotoUrl;
+                        _cachePrefsLocal({ fotoUrl: r.fotoUrl, preferencias: _perfil.preferencias });
+                        _aplicarAvatarSidebar();
+                        renderPerfil();
+                    })
+                    .withFailureHandler(function (e) { ev.target.value = ''; showToast('Error: ' + e.message, '#FF453A'); renderPerfil(); })
+                    .uploadFotoPerfil({ imagenBase64: reader.result, mimeType: file.type });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function eliminarFotoPerfil() {
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo eliminar la foto', '#FF453A'); return; }
+                    showToast('Foto de perfil eliminada', '#30D158');
+                    _perfil.fotoUrl = '';
+                    _cachePrefsLocal({ fotoUrl: '', preferencias: _perfil.preferencias });
+                    _aplicarAvatarSidebar();
+                    renderPerfil();
+                })
+                .withFailureHandler(function (e) { showToast('Error: ' + e.message, '#FF453A'); })
+                .deleteFotoPerfil({});
+        }
+
+        /* ── Cambio de contraseña ──────────────────────────────── */
+        function guardarNuevaContrasena() {
+            const actual = v('pwActual'), nueva = v('pwNueva'), confirmar = v('pwConfirmar');
+            if (!actual || !nueva) { showToast('Completa la contraseña actual y la nueva', '#FF9F0A'); return; }
+            if (nueva.length < 6) { showToast('La nueva contraseña debe tener al menos 6 caracteres', '#FF9F0A'); return; }
+            if (nueva !== confirmar) { showToast('Las contraseñas nuevas no coinciden', '#FF9F0A'); return; }
+
+            const btn = document.getElementById('pwGuardarBtn');
+            btn.disabled = true; btn.textContent = 'Actualizando…';
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    btn.disabled = false; btn.textContent = 'Actualizar contraseña';
+                    if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo actualizar', '#FF453A'); return; }
+                    showToast('Contraseña actualizada. Tus otras sesiones se cerraron.', '#30D158');
+                    ['pwActual', 'pwNueva', 'pwConfirmar'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                })
+                .withFailureHandler(function (e) { btn.disabled = false; btn.textContent = 'Actualizar contraseña'; showToast('Error: ' + e.message, '#FF453A'); })
+                .changePasswordPropio({ actual: actual, nueva: nueva });
         }
 
     </script>
