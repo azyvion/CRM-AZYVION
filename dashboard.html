@@ -1680,7 +1680,7 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
     <nav class="sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon">
-                <img src="logo-crm.png" alt="Azyvion CRM Logo" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\'0 0 24 24\' style=\'width:18px;height:18px;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none\'><path d=\'M12 2L2 7l10 5 10-5-10-5z\'/><path d=\'M2 17l10 5 10-5\'/><path d=\'M2 12l10 5 10-5\'/></svg>'">
+                <img src="logo-crm.png" alt="Azyvion CRM Logo" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display='none'">
             </div>
             <div>
                 <div class="logo-name">Azyvion</div>
@@ -2810,7 +2810,10 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
                 updatePreferencias:   (d) => Object.assign({action: 'updatePreferencias'}, d),
                 changePasswordPropio: (d) => Object.assign({action: 'changePasswordPropio'}, d),
                 uploadFotoPerfil:     (d) => Object.assign({action: 'uploadFotoPerfil'}, d),
-                deleteFotoPerfil:     (d) => Object.assign({action: 'deleteFotoPerfil'}, d)
+                deleteFotoPerfil:     (d) => Object.assign({action: 'deleteFotoPerfil'}, d),
+
+                // ── Carga unificada del dashboard (1 sola petición) ──
+                getDashboardInit:     (d) => Object.assign({action: 'getDashboardInit'}, d || {})
             };
 
             // Acciones que viajan por POST (payload grande: ítems, mensajes largos)
@@ -4339,9 +4342,7 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
                 <div class="bank-card" onclick="openBankDrawer(${c.id})">
                     <div class="bank-card-top">
                         <div class="bank-logo-wrap bank-logo-${escHtml(c.logo)}" title="${escHtml(c.banco)}" style="position:relative;overflow:hidden;">
-                            <img src="logo-banco-${escHtml(c.logo).toLowerCase()}.png" alt="${escHtml(c.banco)}"
-                                 style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;"
-                                 onerror="this.style.display='none'">
+                            <img src="logo-banco-${escHtml(c.logo).toLowerCase()}.png" alt="${escHtml(c.banco)}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display='none'">
                             <span class="bank-logo-text" style="position:relative;z-index:1;">${LOGO_INITIALS[c.logo] || c.logo.substring(0,2)}</span>
                         </div>
                         <span class="bank-card-badge${activa?'':' inactiva'}">${activa?'Activa':'Inactiva'}</span>
@@ -4614,9 +4615,7 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
                             ${(c&&c.logo===logo)||(!c&&logo==='Industrial')?'checked':''}>
                         <div class="bank-logo-wrap bank-logo-${logo} logo-radio-wrap" style="width:50px;height:50px;border-radius:12px;border:2px solid transparent;font-size:13px"
                              onclick="selectLogo('${logo}')">
-                            <img src="logo-banco-${logo.toLowerCase()}.png" alt="${logo}"
-                                 style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;"
-                                 onerror="this.style.display='none'">
+                            <img src="logo-banco-${logo.toLowerCase()}.png" alt="${logo}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display='none'">
                             <span class="bank-logo-text" style="position:relative;z-index:1;">${LOGO_INITIALS[logo]||logo.substring(0,2)}</span>
                         </div>
                         <span style="font-size:10px;color:var(--text-secondary)">${logo}</span>
