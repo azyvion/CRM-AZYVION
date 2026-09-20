@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="viewport" content="width=1280, initial-scale=1.0" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="mobile-web-app-capable" content="yes" />
@@ -6608,7 +6608,223 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
         function verCotizacion(id) {
             const win = window.open('', '_blank');
             if (win) {
-                win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Generando…</title></head>' +
+                win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Generando…</title>    <style id="az-desktop-patch">
+/* ══════════════════════════════════════════════════════════════
+   AZYVION CRM · PARCHE ESCRITORIO v1.0
+   Elimina el comportamiento móvil (bottom sheets, drawer, vistas
+   "mob-") y fija un layout de PC en cualquier ancho de ventana.
+   Este bloque va al final del <head>: gana a todo lo anterior.
+══════════════════════════════════════════════════════════════ */
+
+/* ── 1. Lienzo de escritorio ─────────────────────────────── */
+html { overflow-x: auto; }
+body {
+    min-width: 1080px;
+    padding-top: 0;
+    font-size: 13.5px;
+}
+
+/* Scrollbars estilo escritorio */
+*::-webkit-scrollbar { width: 11px; height: 11px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+    background: rgba(60,60,67,.22);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(60,60,67,.38); background-clip: content-box; }
+body.theme-dark *::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); background-clip: content-box; }
+
+/* ── 2. Sidebar siempre fija (nunca drawer) ──────────────── */
+.sidebar {
+    width: 232px !important;
+    padding: 26px 0 18px !important;
+    position: fixed; top: 0; left: 0; bottom: 0;
+    transform: none !important;
+    box-shadow: none !important;
+    z-index: 100;
+}
+.sidebar-close-btn,
+.hamburger-btn,
+.sidebar-drawer-overlay,
+.bottom-nav, .bn-more-sheet, .bn-more-overlay { display: none !important; }
+
+.main { margin-left: 232px !important; }
+.nav-item { padding: 9px 20px; font-size: 13px; }
+
+/* ── 3. Topbar de escritorio ─────────────────────────────── */
+.topbar { height: 58px; padding: 0 28px; }
+.topbar-logo { display: none !important; }
+.search-box { display: flex !important; }
+.page-title { font-size: 18px; }
+.topbar-btn { height: 34px; font-size: 13px; border-radius: 9px; }
+.topbar-btn span { display: inline !important; }
+.topbar-btn:hover { filter: brightness(1.08); }
+.icon-btn { width: 34px; height: 34px; }
+.icon-btn:hover { background: var(--bg); }
+
+/* ── 4. Contenido: ancho máximo cómodo y centrado ────────── */
+.content { padding: 24px 28px 40px !important; }
+.page.active {
+    display: block;
+    max-width: 1560px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Grids de escritorio en cualquier ancho */
+.kpi-grid    { grid-template-columns: repeat(4, 1fr) !important; gap: 14px; }
+.two-col     { grid-template-columns: 1fr 300px !important; }
+.survey-grid { grid-template-columns: 1fr 1fr !important; }
+.form-row    { grid-template-columns: 1fr 1fr !important; gap: 14px; }
+.cot-grid    { grid-template-columns: repeat(3, 1fr) !important; }
+.cot-grid-2  { grid-template-columns: repeat(2, 1fr) !important; }
+.bank-grid   { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)) !important; }
+
+/* ── 5. Tablas: sin scroll horizontal forzado, hover real ── */
+.table-card { overflow-x: visible !important; }
+.table-card table { min-width: unset !important; display: table !important; }
+td { white-space: normal !important; }
+tbody tr { transition: background .12s; }
+tbody tr:hover { background: #FAFAFC; }
+body.theme-dark tbody tr:hover { background: rgba(255,255,255,.035); }
+thead th { position: sticky; top: 0; z-index: 2; background: var(--card); }
+body.theme-dark thead th { background: var(--card); }
+
+/* ── 6. Se ocultan TODAS las vistas móviles ──────────────── */
+.mob-only, .mob-seg, .mob-kpi-bar, .mob-list, .mob-funnel-toggle,
+#mobContactosWrap { display: none !important; }
+#nav-prospectos { display: flex !important; }
+#navCliLabel { font-size: 13px !important; }
+#navCliLabel::after { content: '' !important; font-size: 0 !important; }
+#page-clientes .kpi-grid,
+#page-prospectos .kpi-grid { display: grid !important; }
+#page-clientes .table-card,
+#page-prospectos .table-card,
+#page-prospectos .funnel-card { display: block !important; }
+
+/* ══════════════════════════════════════════════════════════
+   7. MODALES — diálogo centrado de PC (ya no bottom sheet)
+══════════════════════════════════════════════════════════ */
+.modal-overlay {
+    align-items: center;
+    padding: 40px 24px;
+    background: rgba(0,0,0,.42);
+}
+.modal-box {
+    width: 100%;
+    max-width: 640px;           /* lo ajusta el JS según el formulario */
+    border-radius: 14px;
+    max-height: min(84vh, 780px);
+    padding-bottom: 0;
+    box-shadow: 0 24px 70px rgba(0,0,0,.28);
+    transform: translateY(10px) scale(.985);
+    opacity: 0;
+    transition: transform .16s ease-out, opacity .16s ease-out;
+}
+.modal-overlay.open .modal-box { transform: none; opacity: 1; }
+.modal-box::before { display: none !important; }   /* fuera el "handle" de sheet */
+
+.modal-header { padding: 15px 22px 13px; }
+.modal-title  { font-size: 15.5px; letter-spacing: -.1px; }
+.modal-close  { width: 28px; height: 28px; border-radius: 7px; transition: background .15s, color .15s; }
+.modal-close:hover { background: var(--danger-bg); color: var(--danger); }
+.modal-close svg { width: 14px; height: 14px; }
+
+.modal-body { padding: 18px 22px; gap: 14px; }
+.modal-footer {
+    padding: 13px 22px;
+    justify-content: flex-end;
+    background: #FAFAFC;
+    border-radius: 0 0 14px 14px;
+}
+body.theme-dark .modal-footer { background: rgba(255,255,255,.03); }
+
+/* Campos compactos de escritorio */
+.form-label {
+    font-size: 10.5px;
+    letter-spacing: .7px;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+.form-input, .form-select {
+    height: 36px;
+    padding: 0 11px;
+    font-size: 13.5px;
+    border-width: 1px;
+    border-radius: 9px;
+}
+.form-input:hover:not(:focus), .form-select:hover:not(:focus) { border-color: rgba(60,60,67,.28); }
+.form-input:focus, .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(10,132,255,.14);
+}
+textarea.form-input { height: auto; min-height: 74px; padding: 9px 11px; line-height: 1.45; }
+.form-field { gap: 5px; }
+.form-select {
+    background: var(--card) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238E8E93' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 10px center;
+    background-size: 13px;
+    padding-right: 30px;
+}
+
+/* Botones del pie: ya no ocupan todo el ancho */
+.btn-cancel {
+    flex: 0 0 auto; min-width: 104px; height: 36px;
+    font-size: 13px; border-radius: 9px; border-width: 1px;
+    transition: background .15s;
+}
+.btn-cancel:hover { background: var(--border); }
+.btn-save {
+    flex: 0 0 auto; min-width: 156px; height: 36px;
+    font-size: 13px; border-radius: 9px;
+    transition: filter .15s, box-shadow .15s;
+}
+.btn-save:hover:not(:disabled) { filter: brightness(1.08); box-shadow: 0 3px 12px rgba(10,132,255,.32); }
+
+/* ── 8. Constructor de cotizaciones: siempre diálogo centrado ── */
+.cot-builder {
+    top: 50%; left: 50%; right: auto; bottom: auto;
+    width: min(1100px, calc(100vw - 56px));
+    max-height: calc(100vh - 56px);
+    border-radius: 16px;
+    transform: translate(-50%, -48%) scale(.99);
+    box-shadow: 0 28px 80px rgba(0,0,0,.3);
+}
+.cot-builder.open { transform: translate(-50%, -50%) scale(1); }
+.cot-items-head { display: grid !important; }
+.cot-item-row {
+    grid-template-columns: minmax(200px, 1fr) 82px 130px 82px 128px 34px !important;
+}
+.cot-item-row > *:nth-child(3),
+.cot-item-row > *:nth-child(4) { display: block !important; }
+.cot-tot-box { width: 340px; margin-left: auto; }
+
+/* ── 9. Panel lateral de cuentas bancarias ───────────────── */
+.bank-drawer { width: 480px !important; right: -520px; padding-top: 0 !important; }
+.bank-drawer.open { right: 0; box-shadow: -8px 0 40px rgba(0,0,0,.18); }
+
+/* ── 10. Toast arriba a la derecha (estilo escritorio) ───── */
+.toast {
+    bottom: auto; left: auto;
+    top: 74px; right: 28px;
+    transform: translateX(calc(100% + 48px));
+    max-width: 380px;
+}
+.toast.show { transform: translateX(0); }
+
+/* ── 11. Paginación / controles con tamaño de PC ─────────── */
+.pg-btn { min-width: 34px; height: 34px; font-size: 13px; }
+.pg-btn.pg-next { min-width: 46px; }
+.btn-sm, .btn-danger-sm, .btn-success-sm, .filter-tab, .cont-tab { min-height: 30px; }
+
+/* ── 12. Ficha a altura de ventana de escritorio ─────────── */
+.ficha-shell { height: calc(100vh - 116px); }
+body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
+.ficha-tabs { overflow-x: visible; }
+
+    </style>
+</head>' +
                     '<body style="font-family:-apple-system,Segoe UI,Arial,sans-serif;padding:40px;color:#555">' +
                     'Generando la cotización…</body></html>');
             }
@@ -8610,6 +8826,91 @@ window.addEventListener('resize', function() {
             </div>
         </div>
     </div>
+
+    <script id="az-desktop-patch-js">
+/* ══════════════════════════════════════════════════════════════
+   AZYVION CRM · PARCHE ESCRITORIO (JS) v1.0
+   - Desactiva por completo la lógica de vistas móviles.
+   - Modales: ancho adaptado al formulario, foco automático,
+     Esc para cerrar y Enter para guardar.
+══════════════════════════════════════════════════════════════ */
+(function () {
+    'use strict';
+
+    /* 1 · Nunca más "modo móvil" ------------------------------ */
+    window._isMobile = function () { return false; };
+    try { _isMobile = window._isMobile; } catch (e) {}
+
+    var mobWrap = document.getElementById('mobContactosWrap');
+    if (mobWrap) mobWrap.style.display = 'none';
+
+    /* El drawer de sidebar ya no aplica: la barra es fija */
+    window._openSidebarDrawer = function () {};
+    window._closeSidebarDrawer = function () {};
+
+    /* 2 · Modales: ancho según la densidad del formulario ----- */
+    var modal = document.getElementById('modal');
+    var box = modal ? modal.querySelector('.modal-box') : null;
+
+    function ajustarModal() {
+        if (!box) return;
+        var body = document.getElementById('modalBody');
+        var rows = body ? body.querySelectorAll('.form-row').length : 0;
+        var campos = body ? body.querySelectorAll('.form-field').length : 0;
+        var ancho = '480px';
+        if (rows >= 3 || campos >= 8) ancho = '760px';
+        else if (rows >= 1) ancho = '640px';
+        box.style.maxWidth = ancho;
+    }
+
+    function enfocarPrimero() {
+        var body = document.getElementById('modalBody');
+        if (!body) return;
+        var el = body.querySelector('input:not([type=hidden]):not([disabled]), select, textarea');
+        if (el) { try { el.focus(); el.select && el.select(); } catch (e) {} }
+    }
+
+    if (typeof window.openModal === 'function') {
+        var _open = window.openModal;
+        window.openModal = function (titulo, html) {
+            _open(titulo, html);
+            ajustarModal();
+            setTimeout(enfocarPrimero, 60);
+        };
+        try { openModal = window.openModal; } catch (e) {}
+    }
+
+    /* 3 · Atajos de teclado ----------------------------------- */
+    document.addEventListener('keydown', function (e) {
+        var abierto = modal && modal.classList.contains('open');
+
+        if (e.key === 'Escape') {
+            if (abierto && typeof window.closeModal === 'function') { window.closeModal(); return; }
+            var cot = document.getElementById('cotBuilder');
+            if (cot && cot.classList.contains('open') && typeof window.closeCotBuilder === 'function') {
+                window.closeCotBuilder(); return;
+            }
+            var dr = document.getElementById('bankDrawer');
+            if (dr && dr.classList.contains('open') && typeof window.closeBankDrawer === 'function') {
+                window.closeBankDrawer(); return;
+            }
+        }
+
+        /* Enter guarda (salvo en textarea, donde sirve para saltar línea) */
+        if (e.key === 'Enter' && abierto && !e.shiftKey) {
+            var t = e.target || {};
+            if (t.tagName === 'TEXTAREA' || t.tagName === 'BUTTON') return;
+            var btn = document.getElementById('modalSaveBtn');
+            if (btn && !btn.disabled) { e.preventDefault(); btn.click(); }
+        }
+    });
+
+    /* 4 · La vista móvil ya no se re-renderiza al redimensionar */
+    ['mobInit', 'mobRenderCli', 'mobRenderPro', 'mobRenderFunnel', 'mobUpdateKpi', 'mobSwitchSeg']
+        .forEach(function (fn) { if (typeof window[fn] === 'function') window[fn] = function () {}; });
+})();
+
+    </script>
 
 </body>
 
