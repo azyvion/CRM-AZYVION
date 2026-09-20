@@ -1672,6 +1672,125 @@ body.densidad-compacta .cell-sub { margin-top: 1px; }
 .perfil-foto-acciones { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
 
 /* ══════════════════════════════════════════════════════════
+   SPLASH / PANTALLA DE CARGA
+══════════════════════════════════════════════════════════ */
+#az-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #1C1C1E;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity .5s cubic-bezier(.4,0,.2,1), visibility .5s;
+}
+#az-splash.az-splash-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+.az-splash-logo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 52px;
+    animation: az-splash-in .5s cubic-bezier(.34,1.4,.64,1) both;
+}
+@keyframes az-splash-in {
+    from { opacity: 0; transform: translateY(12px) scale(.95); }
+    to   { opacity: 1; transform: none; }
+}
+.az-splash-icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #0A84FF 0%, #005cc5 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 36px rgba(10,132,255,.45), 0 0 0 1px rgba(255,255,255,.08) inset;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+.az-splash-icon img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    border-radius: inherit;
+}
+.az-splash-icon-fallback {
+    width: 28px; height: 28px;
+    stroke: #fff; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+    fill: none;
+}
+.az-splash-brand { display: flex; flex-direction: column; }
+.az-splash-name {
+    font-size: 30px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -.6px;
+    line-height: 1;
+}
+.az-splash-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,.38);
+    letter-spacing: .3px;
+    margin-top: 5px;
+}
+
+/* Barra de progreso indeterminada */
+.az-splash-track {
+    width: 220px;
+    height: 2px;
+    background: rgba(255,255,255,.1);
+    border-radius: 2px;
+    overflow: hidden;
+    animation: az-splash-in .5s .15s cubic-bezier(.34,1.4,.64,1) both;
+}
+.az-splash-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: linear-gradient(90deg, #0A84FF, #30D158, #0A84FF);
+    background-size: 200% 100%;
+    animation: az-bar-move 1.6s ease-in-out infinite,
+               az-bar-bg   2.4s linear infinite;
+}
+@keyframes az-bar-move {
+    0%   { width: 0%;   transform: translateX(0%); }
+    40%  { width: 55%;  }
+    60%  { width: 55%;  }
+    100% { width: 0%;   transform: translateX(460%); }
+}
+@keyframes az-bar-bg {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Texto de estado */
+.az-splash-status {
+    margin-top: 18px;
+    font-size: 12px;
+    color: rgba(255,255,255,.3);
+    letter-spacing: .2px;
+    height: 18px;
+    transition: opacity .25s;
+    animation: az-splash-in .5s .25s both;
+}
+.az-splash-status.az-fade {
+    opacity: 0;
+}
+
+/* Versión discreta en esquina inferior */
+.az-splash-version {
+    position: absolute;
+    bottom: 28px;
+    font-size: 11px;
+    color: rgba(255,255,255,.16);
+    letter-spacing: .2px;
+}
+
+/* ══════════════════════════════════════════════════════════
    MODAL DE RECORTE DE FOTO DE PERFIL
 ══════════════════════════════════════════════════════════ */
 .crop-overlay {
@@ -1776,7 +1895,31 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
 
 <body>
 
-    <!-- Sidebar -->
+    <!-- ══ PANTALLA DE CARGA ══════════════════════════════════ -->
+    <div id="az-splash">
+        <div class="az-splash-logo">
+            <div class="az-splash-icon">
+                <img src="logo-crm.png" alt=""
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+                <svg class="az-splash-icon-fallback" style="display:none" viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                </svg>
+            </div>
+            <div class="az-splash-brand">
+                <div class="az-splash-name">Azyvion</div>
+                <div class="az-splash-sub">CRM · Sistema de gestión</div>
+            </div>
+        </div>
+        <div class="az-splash-track">
+            <div class="az-splash-bar"></div>
+        </div>
+        <div class="az-splash-status" id="az-splash-status">Iniciando sesión…</div>
+        <div class="az-splash-version">v5.2</div>
+    </div>
+    <!-- /splash -->
     <nav class="sidebar">
         <div class="sidebar-logo">
             <div class="logo-icon">
@@ -3096,6 +3239,7 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
             _aplicarAvatarSidebar();
 
             // ── 3. Cargar datos del dashboard de inmediato ──
+            _setSplashStatus('Verificando acceso…');
             loadAll();
 
             // Página de inicio preferida (una sola vez, si hay preferencia cacheada distinta a Inicio)
@@ -6910,14 +7054,49 @@ function _handleActividad(r) {
     }).join('');
 }
 
+/* ══════════════════════════════════════════════════════════
+   SPLASH SCREEN — control
+══════════════════════════════════════════════════════════ */
+var _splashShownAt  = Date.now();
+var _splashHidden   = false;
+var _SPLASH_MIN_MS  = 1200;   // mínimo en pantalla (ms) para que no parpadee
+
+function _setSplashStatus(txt) {
+    var el = document.getElementById('az-splash-status');
+    if (!el || _splashHidden) return;
+    el.classList.add('az-fade');
+    setTimeout(function () {
+        el.textContent = txt;
+        el.classList.remove('az-fade');
+    }, 240);
+}
+
+function _hideSplash() {
+    if (_splashHidden) return;
+    var splash  = document.getElementById('az-splash');
+    var elapsed = Date.now() - _splashShownAt;
+    var delay   = Math.max(0, _SPLASH_MIN_MS - elapsed);
+
+    _setSplashStatus('¡Listo!');
+    setTimeout(function () {
+        _splashHidden = true;
+        if (splash) {
+            splash.classList.add('az-splash-out');
+            setTimeout(function () { splash.style.display = 'none'; }, 520);
+        }
+    }, delay);
+}
+
 /* ── NUEVA loadAll: una sola petición en lugar de 9 ─────── */
 loadAll = function() {
     _mostrarSkeletons();
+    _setSplashStatus('Cargando datos…');
 
     // Intentar desde caché local primero (respuesta instantánea)
     const cached = _loadDashCache();
     if (cached) {
         _aplicarDashboardInit(cached);
+        _hideSplash();
         // Luego actualiza en segundo plano sin bloquear la UI
         setTimeout(function() {
             google.script.run
@@ -6936,7 +7115,6 @@ loadAll = function() {
     google.script.run
         .withSuccessHandler(function(r) {
             if (!r || !r.ok) {
-                // Mostrar el error real para diagnóstico
                 showToast('Init: ' + (r && r.error ? r.error : 'sin respuesta'), '#FF9F0A');
                 console.warn('[Azyvion] getDashboardInit respondió error:', r);
                 _loadAllFallback();
@@ -6944,11 +7122,13 @@ loadAll = function() {
             }
             _saveDashCache(r);
             _aplicarDashboardInit(r);
+            _hideSplash();
         })
         .withFailureHandler(function(e) {
             showToast('Red: ' + (e && e.message ? e.message : String(e)), '#FF453A');
             console.error('[Azyvion] getDashboardInit fallo de red:', e);
             _loadAllFallback();
+            _hideSplash();
         })
         .getDashboardInit({});
 };
@@ -6964,6 +7144,7 @@ function _loadAllFallback() {
     loadCotizaciones();
     if (esAdmin()) loadUsuarios();
     _initContabilidad();
+    _hideSplash();
 }
 
 /* ── Invalida caché tras cada mutación del usuario ──────── */
