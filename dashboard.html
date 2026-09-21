@@ -4514,8 +4514,10 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             }
         });
         window._supabase = _sb;
+        window._sb = _sb;
         window.AZ_API_URL = '';
         const SESSION_KEY = 'azyvion_session';
+        window.SESSION_KEY = SESSION_KEY;
 
         function readSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e){ return null; } }
 
@@ -5047,12 +5049,12 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             _setSplashStatus('Verificando acceso…');
             (function restaurarSesionSupabase() {
                 var s = (function(){ try { return JSON.parse(localStorage.getItem('azyvion_session')); } catch(e){ return null; } })();
-                if (!s || !s.token) { localStorage.removeItem(SESSION_KEY); window.location.href = 'index.html'; return; }
-                _sb.auth.setSession({ access_token: s.token, refresh_token: s.refresh_token || '' })
+                if (!s || !s.token) { localStorage.removeItem('azyvion_session'); window.location.href = 'index.html'; return; }
+                window._sb.auth.setSession({ access_token: s.token, refresh_token: s.refresh_token || '' })
                     .then(function(res) {
                         if (res.error || !res.data || !res.data.session) {
                             // No se pudo restaurar: limpiar y redirigir. NO ejecutar loadAll().
-                            localStorage.removeItem(SESSION_KEY);
+                            localStorage.removeItem('azyvion_session');
                             window.location.href = 'index.html?expired=1';
                             return;
                         }
@@ -5062,7 +5064,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                             s.token         = newSess.access_token;
                             s.refresh_token = newSess.refresh_token;
                             s.expira        = new Date(newSess.expires_at * 1000).toISOString();
-                            try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch(e) {}
+                            try { localStorage.setItem('azyvion_session', JSON.stringify(s)); } catch(e) {}
                         }
 
                         // ── 4. Cargar datos del dashboard SOLO después de sesión Auth válida ──
@@ -5085,7 +5087,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                         // atrapado en carga infinita. Redirigimos al login para que vuelva
                         // a intentarlo cuando haya conectividad.
                         _hideSplash();
-                        localStorage.removeItem(SESSION_KEY);
+                        localStorage.removeItem('azyvion_session');
                         window.location.href = 'index.html?expired=1';
                     });
             })();
