@@ -90,21 +90,10 @@
         }
 
         @keyframes drift {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-
-            33% {
-                transform: translate(40px, 30px) scale(1.06);
-            }
-
-            66% {
-                transform: translate(-20px, 50px) scale(0.95);
-            }
-
-            100% {
-                transform: translate(0, 0) scale(1);
-            }
+            0%   { transform: translate(0, 0) scale(1); }
+            33%  { transform: translate(40px, 30px) scale(1.06); }
+            66%  { transform: translate(-20px, 50px) scale(0.95); }
+            100% { transform: translate(0, 0) scale(1); }
         }
 
         .card {
@@ -122,21 +111,13 @@
             box-shadow: 0 2px 0 rgba(255, 255, 255, 0.6) inset, 0 32px 80px rgba(0, 0, 0, 0.38), 0 8px 24px rgba(0, 0, 0, 0.22);
             animation: cardIn 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both;
         }
-        /* Mobile: pantallas muy pequeñas */
         @media (max-width: 380px) {
             .card { padding: 28px 20px 24px; border-radius: 24px; }
         }
 
         @keyframes cardIn {
-            from {
-                opacity: 0;
-                transform: translateY(28px) scale(0.96);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
+            from { opacity: 0; transform: translateY(28px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .brand {
@@ -263,55 +244,55 @@
         }
 
         .error-msg {
-            font-size: 13px;
             color: var(--danger);
+            font-size: 13px;
+            font-weight: 500;
+            min-height: 20px;
             margin-bottom: 12px;
-            display: none;
-            background: rgba(255, 69, 58, 0.08);
-            border-radius: 10px;
-            padding: 9px 13px;
+            opacity: 0;
+            transform: translateY(-4px);
+            transition: opacity .22s, transform .22s;
         }
 
         .error-msg.visible {
-            display: block;
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .row-aux {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         .checkbox-label {
             display: flex;
             align-items: center;
-            gap: 7px;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-primary);
             cursor: pointer;
-            font-size: 13.5px;
-            color: var(--text-secondary);
             user-select: none;
         }
 
-        .checkbox-label input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
+        .checkbox-label input[type="checkbox"] {
+            display: none;
         }
 
         .custom-check {
             width: 18px;
             height: 18px;
             border-radius: 5px;
-            border: 1.5px solid rgba(60, 60, 67, 0.3);
+            border: 1.5px solid var(--text-secondary);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background .15s, border-color .15s;
             flex-shrink: 0;
+            transition: background .15s, border-color .15s;
         }
 
-        .checkbox-label input:checked~.custom-check {
+        .checkbox-label input:checked ~ .custom-check {
             background: var(--accent);
             border-color: var(--accent);
         }
@@ -328,7 +309,7 @@
             transition: opacity .15s;
         }
 
-        .checkbox-label input:checked~.custom-check svg {
+        .checkbox-label input:checked ~ .custom-check svg {
             opacity: 1;
         }
 
@@ -362,7 +343,6 @@
             overflow: hidden;
             transition: background .2s;
             margin-bottom: 20px;
-            /* Active state for mobile */
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
@@ -403,9 +383,7 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg)
-            }
+            to { transform: rotate(360deg) }
         }
 
         .btn-primary.loading .btn-text {
@@ -459,26 +437,16 @@
         }
 
         @media(prefers-reduced-motion:reduce) {
-
-            .bg-orb,
-            .card {
-                animation: none;
-            }
+            .bg-orb, .card { animation: none; }
         }
 
-        /* ── Mobile tap highlight ── */
         * { -webkit-tap-highlight-color: transparent; }
         button, a, label { touch-action: manipulation; }
-
-        /* ── Checkbox label más grande para touch ── */
         .checkbox-label { min-height: 44px; }
         .link { min-height: 44px; display: flex; align-items: center; }
         .row-aux { align-items: center; }
-
-        /* ── Campo de acción (ojo contraseña) más grande ── */
         .field-action { min-width: 44px; min-height: 44px; justify-content: center; }
 
-        /* ── Dark mode del sistema ── */
         @media (prefers-color-scheme: dark) {
             :root:not([data-theme="light"]) {
                 --card: rgba(40, 40, 50, 0.92);
@@ -563,147 +531,51 @@
     </div>
 
     <!-- ════════════════════════════════════════════════════════════
-         AZYVION CRM — SUPABASE LOGIN
+         AZYVION CRM — LOGIN via Edge Function login-crm
     ═════════════════════════════════════════════════════════════ -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
     (function () {
-        const SUPABASE_URL      = 'https://dwtykzporgjjvdustjfq.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable__sKrMJxAHySP1qqHZ5v6mQ_6BTligkc';
-        const { createClient } = supabase;
-        const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const SESSION_KEY = 'azyvion_session';
+        var SESSION_KEY  = 'azyvion_session';
+        var REMEMBER_KEY = 'azyvion_remember_user';
+        var LOGIN_URL    = 'https://dwtykzporgjjvdustjfq.supabase.co/functions/v1/login-crm';
 
-        async function _sha256(v) {
-            const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
-            return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2,'0')).join('');
-        }
-        async function _hashPwd(pwd, salt) {
-            let h = await _sha256(salt + pwd);
-            for (let i = 0; i < 9999; i++) h = await _sha256(h + salt + pwd);
-            return h;
-        }
-        function _uuid() {
-            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
-        }
-        function _prefsUsuario(u) {
-            u = u || {};
-            return {
-                tema: u.tema === 'oscuro' ? 'oscuro' : 'claro',
-                paginaInicio: ['overview','clientes','prospectos','inventario','cotizaciones','encuestas','contabilidad','usuarios'].includes(u.paginaInicio) ? u.paginaInicio : 'overview',
-                densidadTabla: u.densidadTabla === 'compacta' ? 'compacta' : 'comoda',
-                copiarmeCotizaciones: u.copiarmeCotizaciones === true || String(u.copiarmeCotizaciones).toLowerCase() === 'true',
-                alertaStockCritico: u.alertaStockCritico === true || String(u.alertaStockCritico).toLowerCase() === 'true'
-            };
-        }
-
-        async function _login(usuario, contrasena, remember) {
-            if (!usuario || !contrasena) return { ok: false, error: 'Usuario y contraseña son requeridos.' };
-            const { data: usr, error: e } = await _sb.from('Usuarios').select('*').eq('usuario', usuario.trim()).single();
-            if (e || !usr) return { ok: false, error: 'Usuario o contraseña incorrectos.' };
-            if (!usr.activo) return { ok: false, error: 'Esta cuenta está desactivada. Contacta al administrador.' };
-
-            let ok = false;
-            if (usr.passwordMigrated && usr.passwordHash && usr.passwordSalt) {
-                ok = (await _hashPwd(contrasena, usr.passwordSalt)) === usr.passwordHash;
-            } else if (usr.contrasena) {
-                ok = String(usr.contrasena) === String(contrasena);
-                if (ok) {
-                    const s = _uuid() + Date.now().toString(36);
-                    const h = await _hashPwd(contrasena, s);
-                    await _sb.from('Usuarios').update({ passwordHash: h, passwordSalt: s, passwordMigrated: true, contrasena: '' }).eq('id', usr.id);
+        /* ── Verificación rápida de sesión existente ─────────────────────────────
+           El dashboard requiere azyvion_session con { token, expira }.
+           Si ya existe una sesión válida (token presente y no expirada),
+           redirigir directamente sin llamar al backend.                          */
+        (function checkExisting() {
+            try {
+                var raw = localStorage.getItem(SESSION_KEY);
+                if (!raw) return;
+                var sess = JSON.parse(raw);
+                if (!sess || !sess.token) return;
+                if (sess.expira && new Date(sess.expira) <= new Date()) {
+                    localStorage.removeItem(SESSION_KEY);
+                    return;
                 }
-            }
-            if (!ok) return { ok: false, error: 'Usuario o contraseña incorrectos.' };
+                // Sesión todavía válida: ir directo al dashboard
+                window.location.href = 'dashboard.html';
+            } catch (e) {}
+        })();
 
-            const token = _uuid().replace(/-/g,'') + _uuid().replace(/-/g,'');
-            const tokenHash = await _sha256(token);
-            const dur = (remember === 'true' || remember === true) ? 30*24*60*60*1000 : 8*60*60*1000;
-            const expira = new Date(Date.now() + dur).toISOString();
-            await _sb.from('Sesiones').insert({ id: _uuid(), tokenHash, usuario: usr.usuario, rol: usr.rol, expira, activo: true, creado: new Date().toISOString() });
-            localStorage.setItem(SESSION_KEY, JSON.stringify({ token, nombre: usr.nombre, usuario: usr.usuario, rol: usr.rol, expira }));
-            await _sb.from('Actividad').insert({ id: _uuid(), tipo: 'login', usuario: usr.usuario, descripcion: 'Sesión iniciada. Rol: ' + usr.rol, fecha: new Date().toISOString() });
-            return { ok: true, token, nombre: usr.nombre, rol: usr.rol, expira, fotoUrl: usr.fotoUrl || '', preferencias: _prefsUsuario(usr) };
-        }
+        /* ── Pre-rellenar usuario si Recordarme estaba activo ───────────────── */
+        (function prefillUser() {
+            try {
+                var saved = localStorage.getItem(REMEMBER_KEY);
+                if (saved) {
+                    document.getElementById('usuario').value = saved;
+                    document.getElementById('remember').checked = true;
+                }
+            } catch (e) {}
+        })();
 
-        async function _checkSession() {
-            const sess = (() => { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; } })();
-            if (!sess || !sess.token) return { ok: false };
-            if (sess.expira && new Date(sess.expira) <= new Date()) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
-            const th = await _sha256(sess.token);
-            const { data: s, error: sErr } = await _sb.from('Sesiones').select('*').eq('tokenHash', th).eq('activo', true).single();
-            if (sErr || !s) {
-                // Si la tabla Sesiones falla, verificar al menos que el usuario exista y esté activo
-                const usuario = sess.usuario || sess.nombre;
-                if (!usuario) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
-                const { data: usr2 } = await _sb.from('Usuarios').select('*').eq('usuario', usuario).single();
-                if (!usr2 || !usr2.activo) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
-                return { ok: true, nombre: usr2.nombre, rol: usr2.rol, usuario: usr2.usuario, expira: sess.expira, fotoUrl: usr2.fotoUrl || '', preferencias: _prefsUsuario(usr2) };
-            }
-            if (new Date(s.expira) <= new Date()) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
-            const { data: usr } = await _sb.from('Usuarios').select('*').eq('usuario', s.usuario).single();
-            if (!usr || !usr.activo) { localStorage.removeItem(SESSION_KEY); return { ok: false }; }
-            return { ok: true, nombre: usr.nombre, rol: usr.rol, usuario: usr.usuario, expira: s.expira, fotoUrl: usr.fotoUrl || '', preferencias: _prefsUsuario(usr) };
-        }
-
-        async function _logout() {
-            const sess = (() => { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e) { return null; } })();
-            if (sess && sess.token) { const th = await _sha256(sess.token); await _sb.from('Sesiones').update({ activo: false }).eq('tokenHash', th); }
-            localStorage.removeItem(SESSION_KEY);
-            return { ok: true };
-        }
-
-        async function _dispatch(name, args) {
-            switch (name) {
-                case 'login':        return await _login(args[0], args[1], args[2]);
-                case 'checkSession': return await _checkSession();
-                case 'logout':       return await _logout();
-                default:             return { ok: false, error: 'Acción no disponible en login: ' + name };
-            }
-        }
-
-        function makeRunner(onSuccess, onFailure) {
-            const runner = {
-                withSuccessHandler: fn => makeRunner(fn, onFailure),
-                withFailureHandler: fn => makeRunner(onSuccess, fn)
-            };
-            ['login','logout','checkSession'].forEach(name => {
-                runner[name] = function () {
-                    _dispatch(name, Array.from(arguments))
-                        .then(data => { if (onSuccess) onSuccess(data); })
-                        .catch(err => { console.error('[Supabase]', name, err); if (onFailure) onFailure(err); });
-                };
-            });
-            return runner;
-        }
-
-        window.google = window.google || {};
-        window.google.script = window.google.script || {};
-        window.google.script.run = makeRunner(null, null);
-    })();
-    </script>
-
-    <script>
-        /* ---------- Toggle contraseña ---------- */
-        let pwdVisible = false;
-        function togglePwd() {
-            pwdVisible = !pwdVisible;
-            document.getElementById('password').type = pwdVisible ? 'text' : 'password';
-            document.getElementById('eyeIcon').innerHTML = pwdVisible
-                ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
-           <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
-           <line x1="1" y1="1" x2="23" y2="23"/>`
-                : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
-        }
-
-        /* ---------- Login con GAS ---------- */
-        function handleLogin() {
-            const usuario   = document.getElementById('usuario').value.trim();
-            const pwd       = document.getElementById('password').value;
-            const remember  = document.getElementById('remember').checked;
-            const btn       = document.getElementById('loginBtn');
-            const err       = document.getElementById('errMsg');
+        /* ── handleLogin ─────────────────────────────────────────────────────── */
+        window.handleLogin = function () {
+            var usuario  = document.getElementById('usuario').value.trim();
+            var pwd      = document.getElementById('password').value;
+            var remember = document.getElementById('remember').checked;
+            var btn      = document.getElementById('loginBtn');
+            var err      = document.getElementById('errMsg');
 
             err.classList.remove('visible');
 
@@ -716,69 +588,101 @@
             btn.classList.add('loading');
             btn.disabled = true;
 
-            google.script.run
-                .withSuccessHandler(function (res) {
-                    btn.classList.remove('loading');
-                    btn.disabled = false;
-                    if (res.ok) {
-                        // "Recordarme": guarda el nombre de usuario para autocompletar
-                        // (NUNCA la contraseña — el token seguro sí se guarda)
-                        if (remember) {
-                            try { localStorage.setItem('azyvion_remember_user', usuario); } catch(e) {}
-                        } else {
-                            try { localStorage.removeItem('azyvion_remember_user'); } catch(e) {}
-                        }
-                        showToast('Sesión iniciada — bienvenido, ' + res.nombre, '#30d158');
-                        setTimeout(function () {
-                            window.location.href = 'dashboard.html';
-                        }, 1300);
-                    } else {
-                        err.textContent = res.error || 'Error al iniciar sesión.';
-                        err.classList.add('visible');
-                    }
-                })
-                .withFailureHandler(function (e) {
-                    btn.classList.remove('loading');
-                    btn.disabled = false;
-                    err.textContent = 'Error de conexión: ' + (e.message || 'intenta de nuevo.');
+            fetch(LOGIN_URL, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ usuario: usuario, contrasena: pwd })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+
+                if (!res.ok) {
+                    err.textContent = res.error || 'Error al iniciar sesión.';
                     err.classList.add('visible');
-                })
-                .login(usuario, pwd, remember);
-        }
-
-        /* ---------- Pre-rellenar usuario si Recordarme estaba activo ---------- */
-        (function() {
-            try {
-                const savedUser = localStorage.getItem('azyvion_remember_user');
-                if (savedUser) {
-                    document.getElementById('usuario').value = savedUser;
-                    document.getElementById('remember').checked = true;
+                    return;
                 }
-                // Si ya hay sesión válida, comprobar con el backend
-                const sess = JSON.parse(localStorage.getItem('azyvion_session') || 'null');
-                if (sess && sess.token) {
-                    google.script.run
-                        .withSuccessHandler(function(r) {
-                            if (r.ok) window.location.href = 'dashboard.html';
-                        })
-                        .checkSession();
-                }
-            } catch(e) {}
-        })();
 
-        function handleForgot() {
+                /* ── Recordarme: solo el nombre de usuario, nunca la contraseña */
+                try {
+                    if (remember) {
+                        localStorage.setItem(REMEMBER_KEY, usuario);
+                    } else {
+                        localStorage.removeItem(REMEMBER_KEY);
+                    }
+                } catch (e) {}
+
+                /* ── Construir objeto de sesión compatible con dashboard.html ───
+                   El dashboard verifica:
+                     sess.token   → debe existir (usamos access_token de Supabase Auth)
+                     sess.expira  → ISO string; si <= now() la sesión es inválida
+                     sess.rol     → string 'Admin' | 'Gerente' | 'Agente'
+                     sess.nombre  → string con el nombre visible
+                     sess.usuario → string con el username
+                   Campos adicionales que el dashboard consume si están presentes:
+                     sess.fotoUrl, sess.preferencias                              */
+                var expiresAt = res.session.expires_at;
+                // expires_at de Supabase Auth es unix timestamp (segundos)
+                var expira = new Date(expiresAt * 1000).toISOString();
+
+                var sesion = {
+                    token:        res.session.access_token,
+                    refresh_token: res.session.refresh_token,
+                    nombre:       res.nombre,
+                    usuario:      res.usuario,
+                    rol:          res.rol,
+                    expira:       expira,
+                    fotoUrl:      res.fotoUrl  || '',
+                    preferencias: res.preferencias || {}
+                };
+
+                try {
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
+                } catch (e) {
+                    err.textContent = 'No se pudo guardar la sesión. Revisa los permisos del navegador.';
+                    err.classList.add('visible');
+                    return;
+                }
+
+                showToast('Sesión iniciada — bienvenido, ' + res.nombre, '#30d158');
+                setTimeout(function () {
+                    window.location.href = 'dashboard.html';
+                }, 1300);
+            })
+            .catch(function (e) {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                err.textContent = 'Error de conexión: ' + (e.message || 'intenta de nuevo.');
+                err.classList.add('visible');
+            });
+        };
+
+        /* ── Helpers UI ──────────────────────────────────────────────────────── */
+        window.handleForgot = function () {
             showToast('Contacta al administrador para restablecer tu contraseña', '#0A84FF');
-        }
+        };
 
         function showToast(msg, color) {
             color = color || '#30d158';
-            const t = document.getElementById('toast');
-            t.innerHTML = `<svg viewBox="0 0 24 24" style="stroke:${color};width:18px;height:18px;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none"><polyline points="20 6 9 17 4 12"/></svg> ${msg}`;
+            var t = document.getElementById('toast');
+            t.innerHTML = '<svg viewBox="0 0 24 24" style="stroke:' + color + ';width:18px;height:18px;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none"><polyline points="20 6 9 17 4 12"/></svg> ' + msg;
             t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
+            setTimeout(function () { t.classList.remove('show'); }, 3000);
         }
 
-        document.addEventListener('keydown', e => {if (e.key === 'Enter') handleLogin();});
+        var pwdVisible = false;
+        window.togglePwd = function () {
+            pwdVisible = !pwdVisible;
+            document.getElementById('password').type = pwdVisible ? 'text' : 'password';
+        };
+
+        /* ── Enter en cualquier campo dispara el login ───────────────────────── */
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') window.handleLogin();
+        });
+
+    })();
     </script>
 </body>
 
