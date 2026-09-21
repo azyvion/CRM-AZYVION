@@ -4506,7 +4506,13 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         const SUPABASE_URL      = 'https://dwtykzporgjjvdustjfq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable__sKrMJxAHySP1qqHZ5v6mQ_6BTligkc';
         const { createClient } = supabase;
-        const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            auth: {
+                autoRefreshToken:  true,
+                persistSession:    false,   // Azyvion gestiona la sesión en azyvion_session
+                detectSessionInUrl: false
+            }
+        });
         window._supabase = _sb;
         window.AZ_API_URL = '';
         const SESSION_KEY = 'azyvion_session';
@@ -5006,14 +5012,14 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
             // Sin token → login de inmediato
             if (!sessLocal || !sessLocal.token) {
-                window.location.href = 'index.html';
+                window.location.href = 'index.html?expired=1';
                 return;
             }
 
             // Token expirado localmente → login de inmediato
             if (sessLocal.expira && new Date(sessLocal.expira) <= new Date()) {
                 localStorage.removeItem('azyvion_session');
-                window.location.href = 'index.html';
+                window.location.href = 'index.html?expired=1';
                 return;
             }
 
@@ -5047,7 +5053,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                         if (res.error || !res.data || !res.data.session) {
                             // No se pudo restaurar: limpiar y redirigir. NO ejecutar loadAll().
                             localStorage.removeItem(SESSION_KEY);
-                            window.location.href = 'index.html';
+                            window.location.href = 'index.html?expired=1';
                             return;
                         }
                         var newSess = res.data.session;
@@ -5072,9 +5078,15 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                         } catch (e) {}
                     })
                     .catch(function(err) {
-                        console.warn('[Azyvion] setSession error:', err);
-                        // Error de red: NO eliminar la sesión local ni redirigir por un error temporal.
-                        // Tampoco ejecutar loadAll() para evitar consultas protegidas sin Auth válida.
+                        console.warn('[Azyvion] setSession error de red:', err);
+                        // Error de red o fallo al contactar Supabase Auth.
+                        // No eliminamos la sesión local (puede ser un error temporal de red).
+                        // Pero SÍ debemos ocultar el splash para que el usuario no quede
+                        // atrapado en carga infinita. Redirigimos al login para que vuelva
+                        // a intentarlo cuando haya conectividad.
+                        _hideSplash();
+                        localStorage.removeItem(SESSION_KEY);
+                        window.location.href = 'index.html?expired=1';
                     });
             })();
         });
