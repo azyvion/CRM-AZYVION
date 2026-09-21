@@ -10611,11 +10611,13 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         if (id === 'suscripciones') {
             var cta = document.getElementById('mainCta');
             if (cta) cta.style.display = 'none';
-            // Inicializar si es la primera vez
-            if (!_tablesExist && _tabActual === 'dashboard') {
+            // Si ya tenemos datos, renderizar directo
+            if (_tablesExist) {
+                window._subTab(_tabActual);
+            } else {
+                // Primera vez: cargar y luego renderizar
                 _subInit();
             }
-            _subTab(_tabActual);
         }
     };
 
