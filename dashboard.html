@@ -3977,12 +3977,11 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                                     <th>Nombre</th>
                                     <th>Rol</th>
                                     <th>Estado</th>
-                                    <th>Contraseña</th>
                                     <th style="text-align:right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="usuariosTbody">
-                                <tr><td colspan="6" class="empty-cell">Cargando usuarios…</td></tr>
+                                <tr><td colspan="5" class="empty-cell">Cargando usuarios…</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -4643,17 +4642,6 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
             return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
         }
 
-        // ── _hashPwd / sha256: solo para administración de contraseñas de usuarios ──
-        async function _sha256(v) {
-            const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
-            return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
-        }
-
-        async function _hashPwd(pwd, salt) {
-            let h = await _sha256(salt+pwd);
-            for(let i=0;i<9999;i++) h = await _sha256(h+salt+pwd);
-            return h;
-        }
 
         function _estadoItem(tipo, unidades, stockMax) {
             if (tipo === 'Servicio') return 'Servicio';
@@ -4722,9 +4710,9 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
         async function _updateEncuesta(id,p,u){const up={};['nombre','estado','fechaEnvio','tipo'].forEach(k=>{if(p[k]!==undefined)up[k]=p[k];});if(p.totalEnviadas!==undefined)up.totalEnviadas=Number(p.totalEnviadas)||0;if(p.respuestas!==undefined)up.respuestas=Number(p.respuestas)||0;if(p.pregConf!==undefined)up.pregConf=Number(p.pregConf)||0;if(p.pregTotal!==undefined)up.pregTotal=Number(p.pregTotal)||12;const{error}=await _sb.from('Encuestas').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteEncuesta(id,u){const{error}=await _sb.from('Encuestas').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
-        async function _getUsuarios(){const{data,error}=await _sb.from('Usuarios').select('id,usuario,nombre,rol,activo,passwordMigrated').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:(data||[]).map(u=>({...u,migrated:u.passwordMigrated===true||u.passwordMigrated==='true'}))};}
-        async function _addUsuario(p,authU){if(!p.usuario||!p.nombre||!p.contrasena||!p.rol)return{ok:false,error:'Campos requeridos.'};if(!['Admin','Gerente','Agente'].includes(p.rol))return{ok:false,error:'Rol inválido.'};const{data:e}=await _sb.from('Usuarios').select('id').eq('usuario',p.usuario.trim()).single();if(e)return{ok:false,error:'Ya existe un usuario con ese nombre.'};const s=_uuid()+Date.now().toString(36);const h=await _hashPwd(p.contrasena,s);const r={id:_uuid(),usuario:p.usuario.trim(),contrasena:'',nombre:p.nombre.trim(),rol:p.rol,activo:true,passwordHash:h,passwordSalt:s,passwordMigrated:true,correo:p.correo||'',telefono:p.telefono||'',cargo:p.cargo||'',fotoUrl:'',fotoFileId:'',tema:'claro',paginaInicio:'overview',densidadTabla:'comoda',copiarmeCotizaciones:false,alertaStockCritico:false,fechaReg:new Date().toISOString()};const{error}=await _sb.from('Usuarios').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
-        async function _updateUsuario(id,p,authU){const up={};if(p.nombre!==undefined)up.nombre=p.nombre.trim();if(p.rol!==undefined&&['Admin','Gerente','Agente'].includes(p.rol))up.rol=p.rol;if(p.activo!==undefined)up.activo=p.activo==='true'||p.activo===true;if(p.nuevaContrasena&&p.nuevaContrasena.trim()){const s=_uuid()+Date.now().toString(36);const h=await _hashPwd(p.nuevaContrasena,s);up.passwordHash=h;up.passwordSalt=s;up.passwordMigrated=true;up.contrasena='';}const{error}=await _sb.from('Usuarios').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
+        async function _getUsuarios(){const{data,error}=await _sb.from('Usuarios').select('id,usuario,nombre,rol,activo,auth_uid,correo,organization_id').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:(data||[])};}
+        async function _addUsuario(p,authU){if(!p.usuario||!p.nombre||!p.contrasena||!p.rol)return{ok:false,error:'Campos requeridos.'};if(!p.correo||!p.correo.trim())return{ok:false,error:'El correo es obligatorio para crear el usuario en Supabase Auth.'};if(!['Admin','Gerente','Agente'].includes(p.rol))return{ok:false,error:'Rol inválido.'};const{data,error}=await _sb.functions.invoke('admin-user-manager',{body:{action:'createUser',usuario:p.usuario.trim(),nombre:p.nombre.trim(),email:p.correo.trim(),password:p.contrasena,rol:p.rol,organization_id:_currentOrgId}});if(error)return{ok:false,error:error.message};if(data&&data.error)return{ok:false,error:data.error};return{ok:true};}
+        async function _updateUsuario(id,p,authU){const up={};if(p.nombre!==undefined)up.nombre=p.nombre.trim();if(p.rol!==undefined&&['Admin','Gerente','Agente'].includes(p.rol))up.rol=p.rol;if(p.activo!==undefined)up.activo=p.activo==='true'||p.activo===true;if(p.nuevaContrasena&&p.nuevaContrasena.trim()){const uObj=(_usuarios||[]).find(u=>String(u.id)===String(id));const authUid=uObj&&uObj.auth_uid;if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede restablecer la contraseña.'};const{data:pwData,error:pwError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'resetUserPassword',user_id:authUid,password:p.nuevaContrasena.trim()}});if(pwError)return{ok:false,error:pwError.message};if(pwData&&pwData.error)return{ok:false,error:pwData.error};}if(Object.keys(up).length===0)return{ok:true};const{error}=await _sb.from('Usuarios').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteUsuario(id,authU){const{error}=await _sb.from('Usuarios').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
         async function _getCuentasBancarias(){const{data,error}=await _sb.from('CuentasBancarias').select('*').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
@@ -4803,7 +4791,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
         async function _getPerfil(sess){const {data:usr}=await _sb.from('Usuarios').select('*').eq('usuario',sess.usuario||sess.nombre).single();if(!usr)return{ok:false,error:'Usuario no encontrado.'};return{ok:true,data:{id:usr.id,usuario:usr.usuario,nombre:usr.nombre,rol:usr.rol,correo:usr.correo||'',telefono:usr.telefono||'',cargo:usr.cargo||'',fotoUrl:usr.fotoUrl||'',fechaReg:usr.fechaReg||'',fechaPerfilActualizado:usr.fechaPerfilActualizado||'',preferencias:_prefsUsuario(usr)}};}
         async function _updatePerfil(p,sess){if(!p.nombre||!String(p.nombre).trim())return{ok:false,error:'El nombre es requerido.'};const up={nombre:String(p.nombre).trim(),fechaPerfilActualizado:new Date().toISOString()};if(p.correo!==undefined)up.correo=p.correo.trim();if(p.telefono!==undefined)up.telefono=p.telefono;if(p.cargo!==undefined)up.cargo=p.cargo;const{error}=await _sb.from('Usuarios').update(up).eq('usuario',sess.usuario||sess.nombre);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _updatePreferencias(p,sess){const validos={tema:['claro','oscuro'],paginaInicio:['overview','clientes','prospectos','inventario','cotizaciones','encuestas','contabilidad','usuarios'],densidadTabla:['comoda','compacta']};const up={};if(p.tema!==undefined&&validos.tema.includes(p.tema))up.tema=p.tema;if(p.paginaInicio!==undefined&&validos.paginaInicio.includes(p.paginaInicio))up.paginaInicio=p.paginaInicio;if(p.densidadTabla!==undefined&&validos.densidadTabla.includes(p.densidadTabla))up.densidadTabla=p.densidadTabla;if(p.copiarmeCotizaciones!==undefined)up.copiarmeCotizaciones=p.copiarmeCotizaciones===true||String(p.copiarmeCotizaciones)==='true';if(p.alertaStockCritico!==undefined)up.alertaStockCritico=p.alertaStockCritico===true||String(p.alertaStockCritico)==='true';const{error}=await _sb.from('Usuarios').update(up).eq('usuario',sess.usuario||sess.nombre);if(error)return{ok:false,error:error.message};return{ok:true,preferencias:up};}
-        async function _changePasswordPropio(p,sess){if(!p.actual||!p.nueva)return{ok:false,error:'Contraseña actual y nueva son requeridas.'};if(String(p.nueva).length<6)return{ok:false,error:'La nueva contraseña debe tener al menos 6 caracteres.'};if(p.actual===p.nueva)return{ok:false,error:'La nueva contraseña debe ser diferente.'};const{data:usr}=await _sb.from('Usuarios').select('*').eq('usuario',sess.usuario||sess.nombre).single();if(!usr)return{ok:false,error:'Usuario no encontrado.'};let valida=false;if(usr.passwordMigrated&&usr.passwordHash&&usr.passwordSalt){valida=(await _hashPwd(p.actual,usr.passwordSalt))===usr.passwordHash;}else{valida=String(usr.contrasena)===String(p.actual);}if(!valida)return{ok:false,error:'La contraseña actual no es correcta.'};const s=_uuid()+Date.now().toString(36);const h=await _hashPwd(p.nueva,s);const{error}=await _sb.from('Usuarios').update({passwordHash:h,passwordSalt:s,passwordMigrated:true,contrasena:''}).eq('usuario',sess.usuario||sess.nombre);if(error)return{ok:false,error:error.message};return{ok:true};}
+        async function _changePasswordPropio(p,sess){if(!p.actual||!p.nueva)return{ok:false,error:'Contraseña actual y nueva son requeridas.'};if(String(p.nueva).length<6)return{ok:false,error:'La nueva contraseña debe tener al menos 6 caracteres.'};if(p.actual===p.nueva)return{ok:false,error:'La nueva contraseña debe ser diferente.'};const{error}=await _sb.auth.updateUser({current_password:p.actual,password:p.nueva});if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _uploadFotoPerfil(p,sess){if(!p.imagenBase64)return{ok:false,error:'No se recibió ninguna imagen.'};let datos=String(p.imagenBase64);const idx=datos.indexOf('base64,');if(idx!==-1)datos=datos.substring(idx+7);let bytes;try{bytes=Uint8Array.from(atob(datos),c=>c.charCodeAt(0));}catch(e){return{ok:false,error:'Imagen inválida.'};}if(!bytes.length)return{ok:false,error:'La imagen está vacía.'};if(bytes.length>2*1024*1024)return{ok:false,error:'La imagen no debe superar 2 MB.'};const mime=p.mimeType||'image/jpeg';const ext={'image/png':'.png','image/jpeg':'.jpg','image/webp':'.webp'}[mime]||'.jpg';const filename='perfil_'+(sess.usuario||sess.nombre)+'_'+Date.now()+ext;const blob=new Blob([bytes],{type:mime});const{data:up,error:upE}=await _sb.storage.from('fotos-perfil').upload(filename,blob,{upsert:true,contentType:mime});if(upE)return{ok:false,error:'No se pudo subir la foto: '+upE.message+'. Crea el bucket "fotos-perfil" como público en Supabase Storage.'};const{data:uD}=_sb.storage.from('fotos-perfil').getPublicUrl(filename);const fotoUrl=uD.publicUrl;await _sb.from('Usuarios').update({fotoUrl,fotoFileId:filename,fechaPerfilActualizado:new Date().toISOString()}).eq('usuario',sess.usuario||sess.nombre);return{ok:true,fotoUrl};}
         async function _deleteFotoPerfil(p,sess){const{data:usr}=await _sb.from('Usuarios').select('fotoFileId,fotoUrl').eq('usuario',sess.usuario||sess.nombre).single();if(usr&&usr.fotoFileId)await _sb.storage.from('fotos-perfil').remove([usr.fotoFileId]);await _sb.from('Usuarios').update({fotoUrl:'',fotoFileId:'',fechaPerfilActualizado:new Date().toISOString()}).eq('usuario',sess.usuario||sess.nombre);return{ok:true};}
 
@@ -6051,10 +6039,10 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                 if (m.action === 'delete') {
                     window.api.withSuccessHandler(done('Usuario eliminado', '#FF453A')).deleteUsuario(m.id);
                 } else if (m.action === 'add') {
-                    const usu = v('uUsuario').trim(), nom = v('uNombre').trim(), pwd = v('uPassword'), rol = v('uRol');
-                    if (!usu || !nom || !pwd) {saveBtn.disabled=false; saveBtn.textContent='Guardar'; showToast('Usuario, nombre y contraseña son requeridos', '#FF9F0A'); return;}
+                    const usu = v('uUsuario').trim(), nom = v('uNombre').trim(), pwd = v('uPassword'), rol = v('uRol'), correo = v('uCorreo').trim();
+                    if (!usu || !nom || !pwd || !correo) {saveBtn.disabled=false; saveBtn.textContent='Guardar'; showToast('Usuario, nombre, correo y contraseña son requeridos', '#FF9F0A'); return;}
                     if (pwd.length < 6) {saveBtn.disabled=false; saveBtn.textContent='Guardar'; showToast('La contraseña debe tener al menos 6 caracteres', '#FF9F0A'); return;}
-                    window.api.withSuccessHandler(done('Usuario creado', '#30D158')).addUsuario({usuario: usu, nombre: nom, contrasena: pwd, rol: rol, activo: v('uActivo')});
+                    window.api.withSuccessHandler(done('Usuario creado', '#30D158')).addUsuario({usuario: usu, nombre: nom, correo: correo, contrasena: pwd, rol: rol, activo: v('uActivo')});
                 } else {
                     const data = {nombre: v('uNombre'), rol: v('uRol'), activo: v('uActivo')};
                     const pwd = v('uPassword');
@@ -6161,7 +6149,6 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
             tbody.innerHTML = _usuarios.length
                 ? _usuarios.map(u => {
                     const activo = String(u.activo).toLowerCase() === 'true';
-                    const migrated = u.migrated;
                     return `<tr>
                       <td><div class="cell-main">${escHtml(u.usuario)}</div></td>
                       <td>${escHtml(u.nombre)}</td>
@@ -6169,8 +6156,6 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                       <td>${activo
                           ? '<span class="tag tag-success">Activo</span>'
                           : '<span class="tag tag-gray">Inactivo</span>'}</td>
-                      <td><span style="font-size:11px;color:${migrated?'var(--success)':'var(--warning)'}">
-                          ${migrated ? '🔒 Segura' : '⚠️ Migración pendiente'}</span></td>
                       <td>
                         <div class="row-actions">
                           <button class="section-action" onclick="editUsuario('${u.id}')">Editar</button>
@@ -6179,7 +6164,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                       </td>
                     </tr>`;
                 }).join('')
-                : '<tr><td colspan="6" class="empty-cell">Sin usuarios</td></tr>';
+                : '<tr><td colspan="5" class="empty-cell">Sin usuarios</td></tr>';
 
             const foot = document.getElementById('usrFoot');
             if (foot) {
@@ -6196,6 +6181,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                 <div class="form-field"><label class="form-label">USUARIO *</label><input class="form-input" id="uUsuario" placeholder="nombre.apellido"/></div>
                 <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label><input class="form-input" id="uNombre" placeholder="Ana Pérez"/></div>
               </div>
+              <div class="form-field"><label class="form-label">CORREO ELECTRÓNICO *</label><input class="form-input" id="uCorreo" type="email" placeholder="usuario@ejemplo.com"/></div>
               <div class="form-field"><label class="form-label">CONTRASEÑA *</label><input class="form-input" id="uPassword" type="password" placeholder="Mínimo 8 caracteres"/></div>
               <div class="form-row">
                 <div class="form-field"><label class="form-label">ROL</label>
@@ -6206,7 +6192,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                 </div>
               </div>
               <div style="background:var(--accent-bg);border-radius:9px;padding:10px 12px;font-size:12px;color:#0060df;margin-top:4px;">
-                🔒 La contraseña se guardará de forma segura (hash+salt). Nunca se almacena en texto plano.
+                🔐 La contraseña se gestiona mediante Supabase Auth. Nunca se almacena en la tabla Usuarios.
               </div>
             `);
         }
