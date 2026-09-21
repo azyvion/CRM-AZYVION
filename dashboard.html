@@ -4923,6 +4923,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
         let _cotEditId = null;
         let _cotEmpresa = null;
         let _rol = '';
+        let _currentUserRole = null; // Fase 4B: rol nuevo derivado de _rol legacy
         let _usuario = '';
 
         const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', ficha: 'Ficha', cotizaciones: 'Cotizaciones', inventario: 'Inventario', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad', perfil: 'Ajustes', suscripciones: 'Suscripciones', 'sub-empresas': 'Empresas', 'sub-planes': 'Planes', 'sub-pagos': 'Pagos'};
@@ -4968,6 +4969,12 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
             // ── 2. Inicializar UI con datos locales SIN esperar al backend ──
             _rol     = sessLocal.rol    || '';
             _usuario = sessLocal.nombre || '';
+            // Fase 4B: derivar _currentUserRole desde el rol legacy
+            _currentUserRole = {
+                'Admin':   'ADMIN',
+                'Gerente': 'GERENTE',
+                'Agente':  'AGENTE'
+            }[_rol] || 'AGENTE';
 
             var elName   = document.getElementById('userName');
             var elRole   = document.getElementById('userRole');
@@ -10614,4 +10621,3 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
 </body>
 
 </html>
-                
