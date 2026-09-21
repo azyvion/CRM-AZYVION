@@ -5517,7 +5517,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
         <td class="cell-num">Q ${Number(p.valorEstimado || 0).toLocaleString()}</td>
         <td>
           <div class="row-actions">
-            ${p.etapa !== 'Perdido' ? `<button class="btn-success-sm" onclick="confirmConvertir('${p.id}')">Convertir</button>` : ''}
+            <button class="btn-success-sm" onclick="confirmConvertir('${p.id}')">Convertir</button>
             <button class="section-action" onclick="editProspecto('${p.id}')">Editar</button>
             ${admin ? `<button class="btn-danger-sm" onclick="confirmDeleteProspecto('${p.id}','${escAttr(p.nombre)}')">Eliminar</button>` : ''}
           </div>
@@ -9892,7 +9892,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
     /* ── Init ── */
     async function _subInit() {
         await _loadAll();
-        if (_tabActual === 'dashboard') _renderDashboard();
+        if (_tablesExist) window._subTab(_tabActual);
     }
 
     window._subInit = _subInit;
@@ -9938,8 +9938,9 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
 
     window._subReintentarSetup = async function() {
         showToast('Verificando tablas…', '#3B6EF5');
-        await _subInit();
+        await _checkTables();
         if (_tablesExist) {
+            await _loadAll();
             showToast('¡Tablas encontradas! Módulo activo.', '#22C55E');
             _subTab(_tabActual);
         } else {
