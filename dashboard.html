@@ -3975,13 +3975,14 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                                 <tr>
                                     <th>Usuario</th>
                                     <th>Nombre</th>
+                                    <th>Correo</th>
                                     <th>Rol</th>
                                     <th>Estado</th>
                                     <th style="text-align:right">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="usuariosTbody">
-                                <tr><td colspan="5" class="empty-cell">Cargando usuarios…</td></tr>
+                                <tr><td colspan="6" class="empty-cell">Cargando usuarios…</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -4712,7 +4713,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
 
         async function _getUsuarios(){const{data,error}=await _sb.from('Usuarios').select('id,usuario,nombre,rol,activo,auth_uid,correo,organization_id').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:(data||[])};}
         async function _addUsuario(p,authU){if(!p.usuario||!p.nombre||!p.contrasena||!p.rol)return{ok:false,error:'Campos requeridos.'};if(!p.correo||!p.correo.trim())return{ok:false,error:'El correo es obligatorio para crear el usuario en Supabase Auth.'};if(!['Admin','Gerente','Agente'].includes(p.rol))return{ok:false,error:'Rol inválido.'};const{data,error}=await _sb.functions.invoke('admin-user-manager',{body:{action:'createUser',usuario:p.usuario.trim(),nombre:p.nombre.trim(),email:p.correo.trim(),password:p.contrasena,rol:p.rol,organization_id:_currentOrgId}});if(error)return{ok:false,error:error.message};if(data&&data.error)return{ok:false,error:data.error};return{ok:true};}
-        async function _updateUsuario(id,p,authU){const up={};if(p.nombre!==undefined)up.nombre=p.nombre.trim();if(p.rol!==undefined&&['Admin','Gerente','Agente'].includes(p.rol))up.rol=p.rol;if(p.activo!==undefined)up.activo=p.activo==='true'||p.activo===true;if(p.nuevaContrasena&&p.nuevaContrasena.trim()){const uObj=(_usuarios||[]).find(u=>String(u.id)===String(id));const authUid=uObj&&uObj.auth_uid;if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede restablecer la contraseña.'};const{data:pwData,error:pwError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'resetUserPassword',user_id:authUid,password:p.nuevaContrasena.trim()}});if(pwError)return{ok:false,error:pwError.message};if(pwData&&pwData.error)return{ok:false,error:pwData.error};}if(Object.keys(up).length===0)return{ok:true};const{error}=await _sb.from('Usuarios').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
+        async function _updateUsuario(id,p,authU){const up={};if(p.nombre!==undefined)up.nombre=p.nombre.trim();if(p.rol!==undefined&&['Admin','Gerente','Agente'].includes(p.rol))up.rol=p.rol;if(p.activo!==undefined)up.activo=p.activo==='true'||p.activo===true;const uObj=(_usuarios||[]).find(u=>String(u.id)===String(id));const authUid=uObj&&uObj.auth_uid;if(p.nuevaContrasena&&p.nuevaContrasena.trim()){if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede restablecer la contraseña.'};const{data:pwData,error:pwError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'resetUserPassword',user_id:authUid,password:p.nuevaContrasena.trim()}});if(pwError)return{ok:false,error:pwError.message};if(pwData&&pwData.error)return{ok:false,error:pwData.error};}if(p.correo&&p.correo.trim()){const nuevoCorreo=p.correo.trim();if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede cambiar el correo.'};const{data:emData,error:emError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'updateUserEmail',user_id:authUid,email:nuevoCorreo}});if(emError)return{ok:false,error:emError.message};if(emData&&emData.error)return{ok:false,error:emData.error};up.correo=nuevoCorreo;}if(Object.keys(up).length===0)return{ok:true};const{error}=await _sb.from('Usuarios').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteUsuario(id,authU){const{error}=await _sb.from('Usuarios').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
         async function _getCuentasBancarias(){const{data,error}=await _sb.from('CuentasBancarias').select('*').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
@@ -6045,6 +6046,8 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                     window.api.withSuccessHandler(done('Usuario creado', '#30D158')).addUsuario({usuario: usu, nombre: nom, correo: correo, contrasena: pwd, rol: rol, activo: v('uActivo')});
                 } else {
                     const data = {nombre: v('uNombre'), rol: v('uRol'), activo: v('uActivo')};
+                    const nuevoCorreo = (v('uCorreo') || '').trim();
+                    if (nuevoCorreo) data.correo = nuevoCorreo;
                     const pwd = v('uPassword');
                     if (pwd && pwd.length >= 6) data.nuevaContrasena = pwd;
                     window.api.withSuccessHandler(done('Usuario actualizado', '#30D158')).updateUsuario(m.id, data);
@@ -6152,6 +6155,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                     return `<tr>
                       <td><div class="cell-main">${escHtml(u.usuario)}</div></td>
                       <td>${escHtml(u.nombre)}</td>
+                      <td style="font-size:12px;color:var(--text-secondary)">${escHtml(u.correo || '—')}</td>
                       <td><span class="tag ${u.rol==='Admin'?'tag-danger':u.rol==='Gerente'?'tag-accent':'tag-gray'}">${u.rol}</span></td>
                       <td>${activo
                           ? '<span class="tag tag-success">Activo</span>'
@@ -6164,7 +6168,7 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                       </td>
                     </tr>`;
                 }).join('')
-                : '<tr><td colspan="5" class="empty-cell">Sin usuarios</td></tr>';
+                : '<tr><td colspan="6" class="empty-cell">Sin usuarios</td></tr>';
 
             const foot = document.getElementById('usrFoot');
             if (foot) {
@@ -6207,6 +6211,10 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
               <div class="form-row">
                 <div class="form-field"><label class="form-label">USUARIO</label><input class="form-input" id="uUsuario" value="${escHtml(u.usuario)}" disabled style="opacity:.6"/></div>
                 <div class="form-field"><label class="form-label">NOMBRE COMPLETO</label><input class="form-input" id="uNombre" value="${escHtml(u.nombre)}"/></div>
+              </div>
+              <div class="form-field">
+                <label class="form-label">CORREO ELECTRÓNICO</label>
+                <input class="form-input" id="uCorreo" type="email" value="${escHtml(u.correo || '')}"/>
               </div>
               <div class="form-field">
                 <label class="form-label">NUEVA CONTRASEÑA <span style="color:var(--text-secondary);font-weight:400">(dejar vacío para no cambiar)</span></label>
