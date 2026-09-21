@@ -283,16 +283,7 @@
 
         /* Badge de nav item (usado por JS) */
         .nav-item .badge {
-            margin-left: auto;
-            flex-shrink: 0;
-            background: var(--accent);
-            color: #fff;
-            font-size: 10px;
-            font-weight: 600;
-            padding: 1px 5px;
-            border-radius: 20px;
-            min-width: 16px;
-            text-align: center;
+            display: none;
         }
 
         /* Avatar (referenciado por JS para actualizar foto) */
@@ -4611,7 +4602,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         }
 
         async function _getResumen() {
-            const [cR,pR,iR,eR]=await Promise.all([_sb.from('Clientes').select('*'),_sb.from('Prospectos').select('*'),_sb.from('Inventario').select('*'),_sb.from('Encuestas').select('*')]);
+            const [cR,iR,eR]=await Promise.all([_sb.from('Clientes').select('*'),_sb.from('Inventario').select('*'),_sb.from('Encuestas').select('*')]);
+            const pR=await _getProspectos();
             const cli=cR.data||[],pro=pR.data||[],inv=iR.data||[],enc=eR.data||[];
             inv.forEach(i=>{i.tipo=String(i.tipo||'')==='Servicio'?'Servicio':'Producto';i.estado=_estadoItem(i.tipo,i.unidades,i.stockMax);});
             const invP=inv.filter(i=>i.tipo==='Producto'),invS=inv.filter(i=>i.tipo==='Servicio');
