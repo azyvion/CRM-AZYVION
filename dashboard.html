@@ -4513,16 +4513,12 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
         function readSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e){ return null; } }
 
-        function _estadoItem(tipo, unidades, stockMax) {
-            if (tipo === 'Servicio') return 'Servicio';
-            const u = Number(unidades)||0, m = Number(stockMax)||1;
-            return u <= m*0.1 ? 'Crítico' : u <= m*0.3 ? 'Bajo' : 'Normal';
-        }
-
+        // ── _uuid: solo para IDs de negocio (Clientes, Cotizaciones, etc.) ──────
         function _uuid() {
             return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>(c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
         }
 
+        // ── _hashPwd / sha256: solo para administración de contraseñas de usuarios ──
         async function _sha256(v) {
             const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v));
             return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
@@ -4532,6 +4528,12 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             let h = await _sha256(salt+pwd);
             for(let i=0;i<9999;i++) h = await _sha256(h+salt+pwd);
             return h;
+        }
+
+        function _estadoItem(tipo, unidades, stockMax) {
+            if (tipo === 'Servicio') return 'Servicio';
+            const u = Number(unidades)||0, m = Number(stockMax)||1;
+            return u <= m*0.1 ? 'Crítico' : u <= m*0.3 ? 'Bajo' : 'Normal';
         }
 
         function _prefsUsuario(u) {
@@ -4545,20 +4547,11 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             };
         }
 
-        // _login eliminado: el login se realiza en login.html via Edge Function + Supabase Auth.
-
-        async function _checkSession() {
-            // Validación local: lee azyvion_session y comprueba expiración.
-            // No consulta la tabla Sesiones (migración a Supabase Auth).
-            const sess=readSession();
-            if(!sess||!sess.token||!sess.nombre||!sess.usuario||!sess.rol||!sess.expira) return {ok:false};
-            if(new Date(sess.expira)<=new Date()){localStorage.removeItem(SESSION_KEY);return {ok:false};}
-            return {ok:true,nombre:sess.nombre,rol:sess.rol,usuario:sess.usuario,expira:sess.expira,fotoUrl:sess.fotoUrl||'',preferencias:sess.preferencias||{}};
-        }
-
+        // ── _logout: cierra sesión en Supabase Auth y limpia localStorage ────────
         async function _logout() {
-            // Elimina la sesión local. No modifica la tabla Sesiones (migración a Supabase Auth).
+            try { await _sb.auth.signOut(); } catch(e) {}
             localStorage.removeItem(SESSION_KEY);
+            localStorage.removeItem('azyvion_perfil_cache');
             return {ok:true};
         }
 
@@ -4837,8 +4830,6 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         async function _dispatch(name,args){
             const sess=readSession();
             const usuario=sess?(sess.usuario||sess.nombre||''):'';
-            // login eliminado: manejado por login.html via Edge Function
-            if(name==='checkSession')return await _checkSession();
             if(name==='logout')return await _logout();
             if(!sess||!sess.token)return{ok:false,error:'Sesión inválida o expirada. Por favor inicia sesión de nuevo.'};
             switch(name){
@@ -4931,26 +4922,27 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             }
         }
 
-        function makeRunner(onSuccess,onFailure){
+        // ── api(): mecanismo de llamadas al backend via _dispatch ─────────
+        function api(onSuccess,onFailure){
             const runner={
-                withSuccessHandler:fn=>makeRunner(fn,onFailure),
-                withFailureHandler:fn=>makeRunner(onSuccess,fn)
+                withSuccessHandler:fn=>api(fn,onFailure),
+                withFailureHandler:fn=>api(onSuccess,fn)
             };
-            const METHODS=['logout','checkSession','getResumen','getActividad','getClientes','addCliente','updateCliente','deleteCliente','getProspectos','addProspecto','updateProspecto','deleteProspecto','convertirProspecto','getInventario','addInventario','updateInventario','deleteInventario','getEncuestas','addEncuesta','updateEncuesta','deleteEncuesta','getUsuarios','addUsuario','updateUsuario','deleteUsuario','getCuentasBancarias','addCuentaBancaria','updateCuentaBancaria','deleteCuentaBancaria','getPlanCuentas','addCuentaContable','updateCuentaContable','deleteCuentaContable','getTransacciones','addTransaccion','deleteTransaccion','getResumenContable','getCotizaciones','getCotizacion','getCotizacionHtml','addCotizacion','updateCotizacion','updateEstadoCotizacion','deleteCotizacion','enviarCotizacion','getResumenCotizaciones','getFicha','addContacto','updateContacto','deleteContacto','addNotaCRM','deleteNotaCRM','addActividadCRM','deleteActividadCRM','getPerfil','updatePerfil','updatePreferencias','changePasswordPropio','uploadFotoPerfil','deleteFotoPerfil','getDashboardInit'];
+            const METHODS=['logout','getResumen','getActividad','getClientes','addCliente','updateCliente','deleteCliente','getProspectos','addProspecto','updateProspecto','deleteProspecto','convertirProspecto','getInventario','addInventario','updateInventario','deleteInventario','getEncuestas','addEncuesta','updateEncuesta','deleteEncuesta','getUsuarios','addUsuario','updateUsuario','deleteUsuario','getCuentasBancarias','addCuentaBancaria','updateCuentaBancaria','deleteCuentaBancaria','getPlanCuentas','addCuentaContable','updateCuentaContable','deleteCuentaContable','getTransacciones','addTransaccion','deleteTransaccion','getResumenContable','getCotizaciones','getCotizacion','getCotizacionHtml','addCotizacion','updateCotizacion','updateEstadoCotizacion','deleteCotizacion','enviarCotizacion','getResumenCotizaciones','getFicha','addContacto','updateContacto','deleteContacto','addNotaCRM','deleteNotaCRM','addActividadCRM','deleteActividadCRM','getPerfil','updatePerfil','updatePreferencias','changePasswordPropio','uploadFotoPerfil','deleteFotoPerfil','getDashboardInit'];
             METHODS.forEach(name=>{
                 runner[name]=function(){
                     const args=Array.from(arguments);
                     _dispatch(name,args).then(data=>{
                         if(data&&data.ok===false&&data.error&&data.error.includes('Sesión inválida')){localStorage.removeItem('azyvion_session');window.location.href='index.html';return;}
                         if(onSuccess)onSuccess(data);
-                    }).catch(err=>{console.error('[Supabase]',name,err);if(onFailure)onFailure(err);});
+                    }).catch(err=>{console.error('[Azyvion]',name,err);if(onFailure)onFailure(err);});
                 };
             });
             return runner;
         }
 
         window._dispatch = _dispatch;
-        window.google={script:{run:makeRunner(null,null)}};
+        window.api = api(null, null);
 
         window.addEventListener('load',function(){
             if(window.COM&&window.COM.api){
@@ -5040,40 +5032,51 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             if (elNav)    elNav.style.display  = esAdmin() ? 'flex' : 'none';
             _aplicarAvatarSidebar();
 
-            // ── 3. Cargar datos del dashboard de inmediato ──
+            // ── 3. Restaurar sesión en Supabase Auth ANTES de cargar datos ──
+            //    Si el access_token sigue vigente → setSession lo activa en el cliente.
+            //    Si expiró pero existe refresh_token → Supabase Auth lo renueva
+            //    automáticamente y devuelve nuevos tokens que actualizamos en localStorage.
+            //    Si la sesión no puede restaurarse → redirigir al login.
+            //    loadAll() SOLO se ejecuta después de que setSession() haya terminado con éxito.
             _setSplashStatus('Verificando acceso…');
-            loadAll();
+            (function restaurarSesionSupabase() {
+                var s = readSession();
+                if (!s || !s.token) { localStorage.removeItem(SESSION_KEY); window.location.href = 'index.html'; return; }
+                _sb.auth.setSession({ access_token: s.token, refresh_token: s.refresh_token || '' })
+                    .then(function(res) {
+                        if (res.error || !res.data || !res.data.session) {
+                            // No se pudo restaurar: limpiar y redirigir. NO ejecutar loadAll().
+                            localStorage.removeItem(SESSION_KEY);
+                            window.location.href = 'index.html';
+                            return;
+                        }
+                        var newSess = res.data.session;
+                        // Si Supabase renovó los tokens, actualizar azyvion_session
+                        if (newSess.access_token !== s.token) {
+                            s.token         = newSess.access_token;
+                            s.refresh_token = newSess.refresh_token;
+                            s.expira        = new Date(newSess.expires_at * 1000).toISOString();
+                            try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch(e) {}
+                        }
 
-            // Página de inicio preferida (una sola vez, si hay preferencia cacheada distinta a Inicio)
-            try {
-                var prefsCacheLanding = JSON.parse(localStorage.getItem('azyvion_perfil_cache') || 'null');
-                var landing = prefsCacheLanding && prefsCacheLanding.preferencias && prefsCacheLanding.preferencias.paginaInicio;
-                if (landing && landing !== 'overview' && document.getElementById('page-' + landing)) {
-                    showPage(landing, document.getElementById('nav-' + landing));
-                }
-            } catch (e) {}
+                        // ── 4. Cargar datos del dashboard SOLO después de sesión Auth válida ──
+                        loadAll();
 
-            // ── 4. Verificar sesión localmente (migrado de backend legacy a localStorage) ──
-            _checkSession().then(function(sess) {
-                if (!sess || !sess.ok) {
-                    localStorage.removeItem('azyvion_session');
-                    window.location.href = 'index.html';
-                    return;
-                }
-                // Actualizar UI con datos frescos de la sesión local
-                _rol     = sess.rol || _rol;
-                _usuario = sess.nombre || sess.usuario || _usuario;
-                if (elName)   elName.textContent   = sess.nombre || '';
-                if (elRole)   elRole.textContent   = sess.rol    || '';
-                if (elAvatar) elAvatar.textContent = (sess.nombre || '??').substring(0, 2).toUpperCase();
-                if (elNav)    elNav.style.display  = esAdmin() ? 'flex' : 'none';
-                _perfil = _perfil || {};
-                _perfil.fotoUrl = sess.fotoUrl || '';
-                _perfil.preferencias = sess.preferencias || _perfil.preferencias;
-                _cachePrefsLocal({ fotoUrl: sess.fotoUrl || '', preferencias: sess.preferencias });
-                aplicarPreferencias(sess.preferencias);
-                _aplicarAvatarSidebar();
-            });
+                        // Página de inicio preferida (una sola vez, si hay preferencia cacheada distinta a Inicio)
+                        try {
+                            var prefsCacheLanding = JSON.parse(localStorage.getItem('azyvion_perfil_cache') || 'null');
+                            var landing = prefsCacheLanding && prefsCacheLanding.preferencias && prefsCacheLanding.preferencias.paginaInicio;
+                            if (landing && landing !== 'overview' && document.getElementById('page-' + landing)) {
+                                showPage(landing, document.getElementById('nav-' + landing));
+                            }
+                        } catch (e) {}
+                    })
+                    .catch(function(err) {
+                        console.warn('[Azyvion] setSession error:', err);
+                        // Error de red: NO eliminar la sesión local ni redirigir por un error temporal.
+                        // Tampoco ejecutar loadAll() para evitar consultas protegidas sin Auth válida.
+                    });
+            })();
         });
 
         function loadAll() {
@@ -5105,7 +5108,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
            CARGA DE DATOS
         ═══════════════════════════════════════════════════════ */
         function loadResumen() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r.ok) { showToast('Error al cargar resumen: ' + (r.error || ''), '#FF453A'); return; }
                     const c   = r.clientes   || {};
@@ -5183,7 +5186,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         }
 
         function loadActividad() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r.ok) return;
                     const feed = document.getElementById('activityFeed');
@@ -5210,7 +5213,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         }
 
         function loadClientes() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r.ok) { showToast('Error clientes: ' + (r.error || 'sin datos'), '#FF453A'); return; }
                     _clientes = r.data || [];
@@ -5223,7 +5226,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         }
 
         function loadProspectos() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r.ok) { showToast('Error prospectos: ' + (r.error || 'sin datos'), '#FF453A'); return; }
                     _prospectos = r.data || [];
@@ -5235,7 +5238,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         }
 
         function loadInventario() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r.ok) { showToast('Error inventario: ' + (r.error || 'sin datos'), '#FF453A'); return; }
                     _inventario = r.data || [];
@@ -5248,7 +5251,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         }
 
         function loadEncuestas() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r.ok) { showToast('Error encuestas: ' + (r.error || 'sin datos'), '#FF453A'); return; }
                     _encuestas = r.data || [];
@@ -5989,7 +5992,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
             if (m.type === 'cliente') {
                 if (m.action === 'delete') {
-                    google.script.run.withSuccessHandler(res => {
+                    window.api.withSuccessHandler(res => {
                         closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
                         if (res.ok) {showToast('Cliente eliminado', '#FF453A'); loadClientes(); loadResumen();}
                         else showToast('Error: ' + res.error, '#FF453A');
@@ -6001,8 +6004,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                                   telefono: v('mTelefono'), direccion: v('mDireccion'),
                                   estado: v('mEstado'), valorTotal: v('mValor')};
                     const fn = m.action === 'add'
-                        ? (cb => google.script.run.withSuccessHandler(cb).addCliente(data))
-                        : (cb => google.script.run.withSuccessHandler(cb).updateCliente(m.id, data));
+                        ? (cb => window.api.withSuccessHandler(cb).addCliente(data))
+                        : (cb => window.api.withSuccessHandler(cb).updateCliente(m.id, data));
                     fn(res => {
                         closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
                         if (res.ok) {showToast(m.action === 'add' ? 'Cliente creado' : 'Cliente actualizado', '#30D158'); loadClientes(); loadResumen(); loadActividad(); if (_currentPage === 'ficha') recargarFicha();}
@@ -6018,10 +6021,10 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 };
 
                 if (m.action === 'delete') {
-                    google.script.run.withSuccessHandler(done('Prospecto eliminado', '#FF453A')).deleteProspecto(m.id);
+                    window.api.withSuccessHandler(done('Prospecto eliminado', '#FF453A')).deleteProspecto(m.id);
                 }
                 else if (m.action === 'convert') {
-                    google.script.run.withSuccessHandler(done('Prospecto convertido en cliente', '#30D158'))
+                    window.api.withSuccessHandler(done('Prospecto convertido en cliente', '#30D158'))
                         .convertirProspecto(m.id, {segmento: v('cvSegmento'), estado: v('cvEstado'), valorTotal: v('cvValor')});
                 }
                 else {
@@ -6033,13 +6036,13 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                         etapa: v('pEtapa'), valorEstimado: v('pValor'), probabilidad: v('pProb'), notas: v('pNotas')
                     };
                     const cb = done(m.action === 'add' ? 'Prospecto creado' : 'Prospecto actualizado', '#30D158');
-                    if (m.action === 'add') google.script.run.withSuccessHandler(cb).addProspecto(data);
-                    else google.script.run.withSuccessHandler(cb).updateProspecto(m.id, data);
+                    if (m.action === 'add') window.api.withSuccessHandler(cb).addProspecto(data);
+                    else window.api.withSuccessHandler(cb).updateProspecto(m.id, data);
                 }
             }
             else if (m.type === 'inventario') {
                 if (m.action === 'delete') {
-                    google.script.run.withSuccessHandler(res => {
+                    window.api.withSuccessHandler(res => {
                         closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
                         if (res.ok) {showToast('Producto eliminado', '#FF453A'); loadInventario(); loadResumen();}
                         else showToast('Error: ' + res.error, '#FF453A');
@@ -6063,8 +6066,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                         precioUnit: v('mPrecio') || 0
                     };
                     const fn = m.action === 'add'
-                        ? (cb => google.script.run.withSuccessHandler(cb).addInventario(data))
-                        : (cb => google.script.run.withSuccessHandler(cb).updateInventario(m.id, data));
+                        ? (cb => window.api.withSuccessHandler(cb).addInventario(data))
+                        : (cb => window.api.withSuccessHandler(cb).updateInventario(m.id, data));
                     fn(res => {
                         closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
                         if (res.ok) {showToast(m.action === 'add' ? 'Ítem agregado' : 'Ítem actualizado', '#30D158'); loadInventario(); loadResumen(); loadActividad();}
@@ -6079,22 +6082,22 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     else showToast('Error: ' + res.error, '#FF453A');
                 };
                 if (m.action === 'delete') {
-                    google.script.run.withSuccessHandler(done('Usuario eliminado', '#FF453A')).deleteUsuario(m.id);
+                    window.api.withSuccessHandler(done('Usuario eliminado', '#FF453A')).deleteUsuario(m.id);
                 } else if (m.action === 'add') {
                     const usu = v('uUsuario').trim(), nom = v('uNombre').trim(), pwd = v('uPassword'), rol = v('uRol');
                     if (!usu || !nom || !pwd) {saveBtn.disabled=false; saveBtn.textContent='Guardar'; showToast('Usuario, nombre y contraseña son requeridos', '#FF9F0A'); return;}
                     if (pwd.length < 6) {saveBtn.disabled=false; saveBtn.textContent='Guardar'; showToast('La contraseña debe tener al menos 6 caracteres', '#FF9F0A'); return;}
-                    google.script.run.withSuccessHandler(done('Usuario creado', '#30D158')).addUsuario({usuario: usu, nombre: nom, contrasena: pwd, rol: rol, activo: v('uActivo')});
+                    window.api.withSuccessHandler(done('Usuario creado', '#30D158')).addUsuario({usuario: usu, nombre: nom, contrasena: pwd, rol: rol, activo: v('uActivo')});
                 } else {
                     const data = {nombre: v('uNombre'), rol: v('uRol'), activo: v('uActivo')};
                     const pwd = v('uPassword');
                     if (pwd && pwd.length >= 6) data.nuevaContrasena = pwd;
-                    google.script.run.withSuccessHandler(done('Usuario actualizado', '#30D158')).updateUsuario(m.id, data);
+                    window.api.withSuccessHandler(done('Usuario actualizado', '#30D158')).updateUsuario(m.id, data);
                 }
             }
             else if (m.type === 'encuesta') {
                 if (m.action === 'delete') {
-                    google.script.run.withSuccessHandler(res => {
+                    window.api.withSuccessHandler(res => {
                         closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
                         if (res.ok) {showToast('Encuesta eliminada', '#FF453A'); loadEncuestas(); loadResumen();}
                         else showToast('Error: ' + res.error, '#FF453A');
@@ -6105,8 +6108,8 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     let data = {nombre, tipo: v('mEncTipo'), pregTotal: v('mEncPregTotal')};
                     if (m.action === 'edit') Object.assign(data, {estado: v('mEncEstado'), totalEnviadas: v('mEncEnv'), respuestas: v('mEncResp'), pregConf: v('mEncConf')});
                     const fn = m.action === 'add'
-                        ? (cb => google.script.run.withSuccessHandler(cb).addEncuesta(data))
-                        : (cb => google.script.run.withSuccessHandler(cb).updateEncuesta(m.id, data));
+                        ? (cb => window.api.withSuccessHandler(cb).addEncuesta(data))
+                        : (cb => window.api.withSuccessHandler(cb).updateEncuesta(m.id, data));
                     fn(res => {
                         closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
                         if (res.ok) {showToast(m.action === 'add' ? 'Encuesta creada' : 'Encuesta actualizada', '#30D158'); loadEncuestas(); loadResumen(); loadActividad();}
@@ -6174,7 +6177,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         ═══════════════════════════════════════════════════════ */
         function loadUsuarios() {
             if (!esAdmin()) return;
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r.ok) return;
                     _usuarios = r.data;
@@ -6299,7 +6302,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             const btn = document.getElementById('logoutConfirmBtn');
             btn.disabled = true;
             btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>Cerrando…';
-            google.script.run
+            window.api
                 .withSuccessHandler(function () {
                     window.location.href = 'index.html';
                 })
@@ -6443,7 +6446,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
            CARGA DE DATOS
         ═══════════════════════════════════════════════════════════ */
         function loadResumenContable() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function(r) {
                     if (!r.ok) return;
                     const fQ = n => 'Q ' + Number(n || 0).toLocaleString('es-GT', {minimumFractionDigits:2, maximumFractionDigits:2});
@@ -6466,7 +6469,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         }
         
         function loadCuentasBancarias() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function(r) {
                     if (!r.ok) { showToast('Error cuentas bancarias: ' + (r.error||''), '#FF453A'); return; }
                     _cuentasBancarias = r.data || [];
@@ -6478,7 +6481,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         }
         
         function loadPlanCuentas() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function(r) {
                     if (!r.ok) return;
                     _planCuentas = r.data || [];
@@ -6490,7 +6493,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         }
         
         function loadTransacciones() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function(r) {
                     if (!r.ok) return;
                     _transacciones = r.data || [];
@@ -7023,7 +7026,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             // ── Cuenta bancaria ──
             if (m.type === 'cuentaBancaria') {
                 if (m.action === 'delete') {
-                    google.script.run
+                    window.api
                         .withSuccessHandler(function(r) {
                             _btnDel();
                             if (!r.ok) { showToast(r.error||'Error al eliminar', '#FF453A'); return; }
@@ -7051,7 +7054,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 }
                 if (m.action === 'add') {
                     d.saldoInicial = (document.getElementById('cbSaldoInicial')||{}).value||'0';
-                    google.script.run
+                    window.api
                         .withSuccessHandler(function(r) {
                             _btnOk();
                             if (!r.ok) { showToast(r.error||'Error', '#FF453A'); return; }
@@ -7064,7 +7067,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 } else {
                     d.id = m.id;
                     d.activa = (document.getElementById('cbActiva')||{}).value||'true';
-                    google.script.run
+                    window.api
                         .withSuccessHandler(function(r) {
                             _btnOk();
                             if (!r.ok) { showToast(r.error||'Error', '#FF453A'); return; }
@@ -7082,7 +7085,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             // ── Cuenta contable ──
             if (m.type === 'cuentaContable') {
                 if (m.action === 'delete') {
-                    google.script.run
+                    window.api
                         .withSuccessHandler(function(r) {
                             _btnDel();
                             if (!r.ok) { showToast(r.error||'Error al eliminar', '#FF453A'); return; }
@@ -7103,7 +7106,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 };
                 if (!d.codigo||!d.nombre) { _btnOk(); showToast('Código y nombre son requeridos','#FF9F0A'); return true; }
                 if (m.action === 'add') {
-                    google.script.run
+                    window.api
                         .withSuccessHandler(function(r) {
                             _btnOk();
                             if (!r.ok) { showToast(r.error||'Error','#FF453A'); return; }
@@ -7116,7 +7119,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 } else {
                     d.id = m.id;
                     d.activa = (document.getElementById('ccActiva')||{}).value||'true';
-                    google.script.run
+                    window.api
                         .withSuccessHandler(function(r) {
                             _btnOk();
                             if (!r.ok) { showToast(r.error||'Error','#FF453A'); return; }
@@ -7133,7 +7136,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             // ── Transacción ──
             if (m.type === 'transaccion') {
                 if (m.action === 'delete') {
-                    google.script.run
+                    window.api
                         .withSuccessHandler(function(r) {
                             _btnDel();
                             if (!r.ok) { showToast(r.error||'Error al eliminar', '#FF453A'); return; }
@@ -7162,7 +7165,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 if (isNaN(Number(d.monto)) || Number(d.monto) <= 0) {
                     _btnOk(); showToast('El monto debe ser un número mayor a 0','#FF9F0A'); return true;
                 }
-                google.script.run
+                window.api
                     .withSuccessHandler(function(r) {
                         _btnOk();
                         if (!r.ok) { showToast(r.error||'Error', '#FF453A'); return; }
@@ -7207,7 +7210,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
         /* ── Carga ─────────────────────────────────────────────── */
         function loadCotizaciones() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r || !r.ok) {
                         const tb = document.getElementById('cotTbody');
@@ -7388,7 +7391,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
         function editarCotizacion(id) {
             const btn = document.getElementById('cotSaveBtn');
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo abrir la cotización', '#FF453A'); return; }
                     const c = r.data;
@@ -7584,15 +7587,15 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
             if (_cotEditId) {
                 data.id = _cotEditId;
-                google.script.run.withSuccessHandler(done).withFailureHandler(fail).updateCotizacion(data);
+                window.api.withSuccessHandler(done).withFailureHandler(fail).updateCotizacion(data);
             } else {
-                google.script.run.withSuccessHandler(done).withFailureHandler(fail).addCotizacion(data);
+                window.api.withSuccessHandler(done).withFailureHandler(fail).addCotizacion(data);
             }
         }
 
         /* ── Estado / eliminar ─────────────────────────────────── */
         function cambiarEstadoCot(id, estado) {
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo cambiar el estado', '#FF453A'); loadCotizaciones(); return; }
                     showToast('Estado actualizado a ' + estado, '#30D158');
@@ -7622,7 +7625,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     '<body style="font-family:-apple-system,Segoe UI,Arial,sans-serif;padding:40px;color:#555">' +
                     'Generando la cotización…</body></html>');
             }
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r || !r.ok) {
                         if (win) win.close();
@@ -7688,7 +7691,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             }
 
             if (m.type === 'cotizacion' && m.action === 'delete') {
-                google.script.run
+                window.api
                     .withSuccessHandler(function (r) {
                         restore('Eliminar', 'var(--danger)');
                         if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo eliminar', '#FF453A'); return; }
@@ -7705,7 +7708,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 const para = (v('cePara') || '').trim();
                 if (!para) { restore('Enviar'); showToast('Escribe el correo del destinatario', '#FF9F0A'); return true; }
                 if (saveBtn) saveBtn.textContent = 'Enviando…';
-                google.script.run
+                window.api
                     .withSuccessHandler(function (r) {
                         restore('Enviar');
                         if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo enviar', '#FF453A'); return; }
@@ -7759,7 +7762,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 document.getElementById('fichaBody').innerHTML =
                     '<div class="empty-cell">Cargando ficha…</div>';
             }
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r || !r.ok) {
                         showToast((r && r.error) || 'No se pudo abrir la ficha', '#FF453A');
@@ -8148,7 +8151,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         function guardarNotaRapida() {
             const txt = (v('fichaNotaRapida') || '').trim();
             if (!txt) { showToast('Escribe la nota antes de guardar', '#FF9F0A'); return; }
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo guardar', '#FF453A'); return; }
                     showToast('Nota agregada', '#30D158');
@@ -8196,7 +8199,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
             if (m.type === 'fichaContacto') {
                 if (esDelete) {
-                    google.script.run.withSuccessHandler(done('Contacto eliminado', '#FF453A'))
+                    window.api.withSuccessHandler(done('Contacto eliminado', '#FF453A'))
                         .withFailureHandler(fail).deleteContacto({id: m.id});
                     return true;
                 }
@@ -8207,23 +8210,23 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                     telefono: v('fcTelefono'), correo: v('fcCorreo'), notas: v('fcNotas')
                 };
                 if (m.action === 'add') {
-                    google.script.run.withSuccessHandler(done('Contacto agregado', '#30D158')).withFailureHandler(fail).addContacto(d);
+                    window.api.withSuccessHandler(done('Contacto agregado', '#30D158')).withFailureHandler(fail).addContacto(d);
                 } else {
                     d.id = m.id;
-                    google.script.run.withSuccessHandler(done('Contacto actualizado', '#30D158')).withFailureHandler(fail).updateContacto(d);
+                    window.api.withSuccessHandler(done('Contacto actualizado', '#30D158')).withFailureHandler(fail).updateContacto(d);
                 }
                 return true;
             }
 
             if (m.type === 'fichaActividad') {
                 if (esDelete) {
-                    google.script.run.withSuccessHandler(done('Actividad eliminada', '#FF453A'))
+                    window.api.withSuccessHandler(done('Actividad eliminada', '#FF453A'))
                         .withFailureHandler(fail).deleteActividadCRM({id: m.id});
                     return true;
                 }
                 const titulo = (v('faTitulo') || '').trim();
                 if (!titulo) { restore('Guardar'); showToast('El título es requerido', '#FF9F0A'); return true; }
-                google.script.run.withSuccessHandler(done('Actividad registrada', '#30D158')).withFailureHandler(fail)
+                window.api.withSuccessHandler(done('Actividad registrada', '#30D158')).withFailureHandler(fail)
                     .addActividadCRM({
                         tipo: ref.tipo, refId: ref.id, categoria: v('faCategoria'), titulo: titulo,
                         descripcion: v('faDescripcion'), fecha: v('faFecha'), fechaSeguimiento: v('faSeguimiento')
@@ -8233,13 +8236,13 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
             if (m.type === 'fichaNota') {
                 if (esDelete) {
-                    google.script.run.withSuccessHandler(done('Nota eliminada', '#FF453A'))
+                    window.api.withSuccessHandler(done('Nota eliminada', '#FF453A'))
                         .withFailureHandler(fail).deleteNotaCRM({id: m.id});
                     return true;
                 }
                 const txt = (v('fnContenido') || '').trim();
                 if (!txt) { restore('Guardar'); showToast('Escribe el contenido de la nota', '#FF9F0A'); return true; }
-                google.script.run.withSuccessHandler(done('Nota agregada', '#30D158')).withFailureHandler(fail)
+                window.api.withSuccessHandler(done('Nota agregada', '#30D158')).withFailureHandler(fail)
                     .addNotaCRM({tipo: ref.tipo, refId: ref.id, contenido: txt});
                 return true;
             }
@@ -8302,7 +8305,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
         /* ── Carga completa del perfil (para la página Ajustes) ── */
         function loadPerfil() {
             const body = document.getElementById('perfilBody');
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo cargar tu perfil', '#FF453A'); return; }
                     _perfil = Object.assign({}, r.data, { fotoUrl: r.data.fotoUrl });
@@ -8455,7 +8458,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             const nombre = (v('pfNombre') || '').trim();
             if (!nombre) { showToast('El nombre es requerido', '#FF9F0A'); return; }
             btn.disabled = true; btn.textContent = 'Guardando…';
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     btn.disabled = false; btn.textContent = 'Guardar cambios';
                     if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo guardar', '#FF453A'); return; }
@@ -8481,7 +8484,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
                 copiarmeCotizaciones: document.getElementById('prefCopia').checked ? 'true' : 'false',
                 alertaStockCritico: document.getElementById('prefStock').checked ? 'true' : 'false'
             };
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo guardar', '#FF453A'); return; }
                     showToast('Preferencias guardadas', '#30D158');
@@ -8655,7 +8658,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
             canvas.toBlob(function (blob) {
                 const reader = new FileReader();
                 reader.onload = function () {
-                    google.script.run
+                    window.api
                         .withSuccessHandler(function (r) {
                             if (btn) { btn.disabled = false; btn.textContent = 'Subir foto'; }
                             _cancelCrop();
@@ -8679,7 +8682,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
         /* ── Eliminar foto ────────────────────────────────── */
         function eliminarFotoPerfil() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo eliminar la foto', '#FF453A'); return; }
                     showToast('Foto de perfil eliminada', '#30D158');
@@ -8701,7 +8704,7 @@ body.theme-dark .com-notif.no-leida { background: rgba(10,132,255,.09); }
 
             const btn = document.getElementById('pwGuardarBtn');
             btn.disabled = true; btn.textContent = 'Actualizando…';
-            google.script.run
+            window.api
                 .withSuccessHandler(function (r) {
                     btn.disabled = false; btn.textContent = 'Actualizar contraseña';
                     if (!r || !r.ok) { showToast((r && r.error) || 'No se pudo actualizar', '#FF453A'); return; }
@@ -9027,7 +9030,7 @@ loadAll = function() {
         _hideSplash();
         // Luego actualiza en segundo plano sin bloquear la UI
         setTimeout(function() {
-            google.script.run
+            window.api
                 .withSuccessHandler(function(r) {
                     if (!r || !r.ok) return;
                     _saveDashCache(r);
@@ -9040,7 +9043,7 @@ loadAll = function() {
     }
 
     // Sin caché: carga con la petición principal
-    google.script.run
+    window.api
         .withSuccessHandler(function(r) {
             if (!r || !r.ok) {
                 showToast('Init: ' + (r && r.error ? r.error : 'sin respuesta'), '#FF9F0A');
