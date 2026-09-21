@@ -542,9 +542,17 @@
         /* ── Verificación rápida de sesión existente ─────────────────────────────
            El dashboard requiere azyvion_session con { token, expira }.
            Si ya existe una sesión válida (token presente y no expirada),
-           redirigir directamente sin llamar al backend.                          */
+           redirigir directamente sin llamar al backend.
+           Si llegamos aquí con ?logout=1 o ?expired=1 en la URL, no redirigir
+           (el dashboard nos mandó de vuelta porque la sesión falló).             */
         (function checkExisting() {
             try {
+                // Si el dashboard nos redirigió de vuelta, no volver a redirigir
+                if (window.location.search.indexOf('logout') !== -1 ||
+                    window.location.search.indexOf('expired') !== -1) {
+                    localStorage.removeItem(SESSION_KEY);
+                    return;
+                }
                 var raw = localStorage.getItem(SESSION_KEY);
                 if (!raw) return;
                 var sess = JSON.parse(raw);
