@@ -3307,9 +3307,11 @@
               </div>
               <div class="form-row">
                 <div class="form-field"><label class="form-label">ROL</label>
-                  <select class="form-select" id="uRol">
+                  ${(window._superIds && u.auth_uid && window._superIds.indexOf(u.auth_uid) !== -1)
+                    ? `<select class="form-select" id="uRol" disabled style="opacity:.75"><option value="Admin" selected>Super Admin</option></select>`
+                    : `<select class="form-select" id="uRol">
                     ${['Agente','Gerente','Admin'].map(r => `<option${r===u.rol?' selected':''}>${r}</option>`).join('')}
-                  </select>
+                  </select>`}
                 </div>
                 <div class="form-field"><label class="form-label">ESTADO</label>
                   <select class="form-select" id="uActivo">
@@ -5386,7 +5388,7 @@
         <div style="flex:1;min-width:0">
             <div class="perfil-nombre">${escHtml(p.nombre)}</div>
             <div class="perfil-sub">
-                <span class="tag ${p.rol === 'Admin' ? 'tag-danger' : p.rol === 'Gerente' ? 'tag-accent' : 'tag-gray'}">${escHtml(p.rol)}</span>
+                <span class="tag ${(window._esSuperAdmin || p.rol === 'Admin') ? 'tag-danger' : p.rol === 'Gerente' ? 'tag-accent' : 'tag-gray'}">${escHtml(window._esSuperAdmin ? 'Super Admin' : p.rol)}</span>
                 ${p.cargo ? `<span class="ficha-sub-dato">${escHtml(p.cargo)}</span>` : ''}
                 <span class="ficha-sub-dato">Usuario: ${escHtml(p.usuario)}</span>
             </div>
@@ -7001,6 +7003,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
             var r = await _sb().rpc('sub_es_admin');
             _esSuper = !r.error && r.data === true;
         } catch (e) { _esSuper = false; }
+        window._esSuperAdmin = _esSuper;
         _mostrarNavSub(_esSuper);
         if (_esSuper) {
             try {
