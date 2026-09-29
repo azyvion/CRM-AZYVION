@@ -1886,51 +1886,55 @@
                     pro.valorPotencial = pro.valorPotencial || 0;
                     pro.valorPonderado = pro.valorPonderado || 0;
 
+                    // Helpers seguros — evitan "Cannot set properties of null"
+                    function _st(id, val) { var e = document.getElementById(id); if (e) e.textContent = val; }
+                    function _sh(id, val) { var e = document.getElementById(id); if (e) e.innerHTML  = val; }
+                    var _arr = '<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ';
+
                     // Overview KPIs — compatibilidad (ov-cli kept for renderOvKpis)
-                    if (document.getElementById('ov-cli')) document.getElementById('ov-cli').textContent = c.activos;
-                    document.getElementById('ov-cli-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${c.total} total`;
-                    document.getElementById('ov-prod').textContent = inv.totalUnidades;
-                    document.getElementById('ov-prod-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${inv.totalProductos} productos`;
-                    document.getElementById('ov-enc').textContent = enc.respuestas;
-                    document.getElementById('ov-enc-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} activas`;
-                    document.getElementById('ov-tasa').textContent = enc.tasaRespuesta + '%';
-                    document.getElementById('ov-tasa-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} encuestas activas`;
+                    _st('ov-cli',   c.activos);
+                    _sh('ov-cli-d', _arr + c.total + ' total');
+                    _st('ov-prod',   inv.totalUnidades);
+                    _sh('ov-prod-d', _arr + inv.totalProductos + ' productos');
+                    _st('ov-enc',   enc.respuestas);
+                    _sh('ov-enc-d', _arr + enc.activas + ' activas');
+                    _st('ov-tasa',   enc.tasaRespuesta + '%');
+                    _sh('ov-tasa-d', _arr + enc.activas + ' encuestas activas');
 
                     // Clientes KPIs
-                    document.getElementById('cli-total').textContent = c.total;
-                    document.getElementById('cli-total-d').textContent = `${Math.round(c.activos / Math.max(c.total, 1) * 100)}% activos`;
-                    document.getElementById('cli-activos').textContent = c.activos;
-                    document.getElementById('cli-activos-d').textContent = `${Math.round(c.activos / Math.max(c.total, 1) * 100)}% del total`;
-                    document.getElementById('cli-pend').textContent = c.pendientes;
-                    document.getElementById('cli-pend-d').textContent = 'En revisión';
-                    document.getElementById('cli-valor').textContent = 'Q ' + Number(c.valorPromedio).toLocaleString();
+                    _st('cli-total',    c.total);
+                    _st('cli-total-d',  Math.round(c.activos / Math.max(c.total, 1) * 100) + '% activos');
+                    _st('cli-activos',  c.activos);
+                    _st('cli-activos-d',Math.round(c.activos / Math.max(c.total, 1) * 100) + '% del total');
+                    _st('cli-pend',     c.pendientes);
+                    _st('cli-pend-d',   'En revisión');
+                    _st('cli-valor',    'Q ' + Number(c.valorPromedio).toLocaleString());
 
                     // Inventario KPIs
-                    document.getElementById('inv-total').textContent = inv.totalProductos;
-                    const invServEl = document.getElementById('inv-serv-d');
-                    if (invServEl) invServEl.textContent = (inv.totalServicios || 0) + ' servicios registrados';
-                    document.getElementById('inv-unid').textContent = inv.totalUnidades;
-                    document.getElementById('inv-crit').textContent = inv.stockCritico;
+                    _st('inv-total',  inv.totalProductos);
+                    _st('inv-serv-d', (inv.totalServicios || 0) + ' servicios registrados');
+                    _st('inv-unid',   inv.totalUnidades);
+                    _st('inv-crit',   inv.stockCritico);
                     const kQ = inv.valorInventario >= 1000 ? (inv.valorInventario / 1000).toFixed(1) + 'k' : inv.valorInventario;
-                    document.getElementById('inv-valor').textContent = 'Q ' + kQ;
+                    _st('inv-valor',  'Q ' + kQ);
 
                     // Encuestas KPIs
-                    document.getElementById('enc-activas').textContent = enc.activas;
-                    document.getElementById('enc-resp').textContent = enc.respuestas;
-                    document.getElementById('enc-tasa').textContent = enc.tasaRespuesta + '%';
+                    _st('enc-activas', enc.activas);
+                    _st('enc-resp',    enc.respuestas);
+                    _st('enc-tasa',    enc.tasaRespuesta + '%');
 
                     // Prospectos KPIs
-                    document.getElementById('pro-activos').textContent = pro.activos;
-                    document.getElementById('pro-activos-d').textContent = `${pro.total} en total`;
-                    document.getElementById('pro-calif').textContent = pro.calificados;
-                    document.getElementById('pro-calif-d').textContent = `${Math.round(pro.calificados / Math.max(pro.activos, 1) * 100)}% del embudo abierto`;
-                    document.getElementById('pro-valor').textContent = 'Q ' + Number(pro.valorPotencial).toLocaleString();
-                    document.getElementById('pro-pond').textContent = 'Q ' + Number(pro.valorPonderado).toLocaleString();
+                    _st('pro-activos',  pro.activos);
+                    _st('pro-activos-d',pro.total + ' en total');
+                    _st('pro-calif',    pro.calificados);
+                    _st('pro-calif-d',  Math.round(pro.calificados / Math.max(pro.activos, 1) * 100) + '% del embudo abierto');
+                    _st('pro-valor',    'Q ' + Number(pro.valorPotencial).toLocaleString());
+                    _st('pro-pond',     'Q ' + Number(pro.valorPonderado).toLocaleString());
 
                     // Badges sidebar
-                    document.getElementById('badgeProspectos').textContent = pro.activos;
-                    document.getElementById('badgeClientes').textContent = c.total;
-                    document.getElementById('badgeEncuestas').textContent = enc.activas;
+                    _st('badgeProspectos', pro.activos);
+                    _st('badgeClientes',   c.total);
+                    _st('badgeEncuestas',  enc.activas);
                 })
                 .withFailureHandler(function (err) { _onApiError('resumen', err); })
                 .getResumen();
