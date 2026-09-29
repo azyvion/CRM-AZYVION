@@ -3276,3 +3276,50 @@ body.theme-dark .sub-estado-INTERNAL { background: rgba(94,53,177,.25); color: #
 @media (max-width: 900px) {
     .nav-subitem { padding: 9px 14px 9px 38px; font-size: 13px; }
 }
+
+/* ── Catálogos de inventario (Marca · Línea · Familia · Unidad de negocio · Tipo) ── */
+.cat-count { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.cat-filtro-sel { height: 32px; font-size: 12px; padding: 0 30px 0 10px; min-width: 170px; }
+.cat-row-name { display: flex; align-items: center; gap: 10px; }
+.cat-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+    background: linear-gradient(145deg, rgba(59,110,245,.16), rgba(108,71,255,.16));
+    color: #3B6EF5; font-size: 13px; font-weight: 700;
+}
+.cat-empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 38px 16px; }
+.cat-empty-ico {
+    width: 46px; height: 46px; border-radius: 14px; margin-bottom: 4px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(59,110,245,.10); color: #3B6EF5;
+}
+.cat-empty-ico svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.cat-empty-t { font-size: 14px; font-weight: 600; color: var(--text); }
+.cat-empty-s { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px; max-width: 340px; }
+.cat-readonly {
+    padding: 9px 12px; border-radius: 10px; font-size: 13px; font-weight: 500;
+    background: rgba(142,142,147,.12); color: var(--text-secondary);
+}
+
+/* Formulario de ítem: clasificación */
+.cat-section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase;
+    color: var(--text-muted); padding-top: 6px; margin-top: 2px;
+    border-top: 1px solid var(--border, rgba(142,142,147,.2));
+}
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 520px) { .form-grid-2 { grid-template-columns: 1fr; } .form-grid-2 > * { grid-column: auto !important; } }
+.cat-hint { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; margin-top: -4px; }
+.cat-hint a { color: var(--accent); cursor: pointer; font-weight: 600; text-decoration: none; }
+.cat-hint a:hover { text-decoration: underline; }
+
+/* Chips de clasificación en la tabla de inventario */
+.cat-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.cat-chip {
+    display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10.5px; font-weight: 600;
+    background: rgba(59,110,245,.12); color: #2f5be0;
+}
+.cat-chip-alt { background: rgba(108,71,255,.12); color: #5b3de0; }
+body.theme-dark .cat-chip { color: #8fb0ff; }
+body.theme-dark .cat-chip-alt { color: #b9a4ff; }
+body.theme-dark .cat-badge { color: #8fb0ff; }
