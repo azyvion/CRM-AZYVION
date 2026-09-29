@@ -135,43 +135,9 @@
                 <svg viewBox="0 0 24 24" style="width:14px;height:14px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                 Ver inventario
             </div>
-            <!-- Crear producto: expandible con sub-ítems -->
-            <div class="nav-subitem" id="nav-crear-producto-toggle" onclick="toggleNavSubGroup('crearProductoGroup',this)" style="justify-content:space-between">
-                <span style="display:flex;align-items:center;gap:7px">
-                    <svg viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                    Crear producto
-                </span>
-                <svg class="nav-chevron" id="chevron-crearProductoGroup" viewBox="0 0 24 24" style="width:12px;height:12px;transition:transform .2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
-            </div>
-            <div class="nav-subgroup" id="crearProductoGroup" style="display:none;padding-left:10px">
-                <div class="nav-subitem" id="nav-categorias" onclick="showPage('categorias',document.getElementById('nav-inventario'))">
-                    <svg viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                    Categorías
-                </div>
-                <div class="nav-subitem" id="nav-catalogo-marcas" onclick="showPage('catalogo-marcas',document.getElementById('nav-inventario'))">
-                    <svg viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                    Marcas
-                </div>
-                <div class="nav-subitem" id="nav-catalogo-lineas" onclick="showPage('catalogo-lineas',document.getElementById('nav-inventario'))">
-                    <svg viewBox="0 0 24 24" style="width:13px;height:13px"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/></svg>
-                    Líneas
-                </div>
-                <div class="nav-subitem" id="nav-catalogo-familias" onclick="showPage('catalogo-familias',document.getElementById('nav-inventario'))">
-                    <svg viewBox="0 0 24 24" style="width:13px;height:13px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                    Familias
-                </div>
-                <div class="nav-subitem" id="nav-catalogo-unidades" onclick="showPage('catalogo-unidades',document.getElementById('nav-inventario'))">
-                    <svg viewBox="0 0 24 24" style="width:13px;height:13px"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                    Unidades de negocio
-                </div>
-                <div class="nav-subitem" id="nav-catalogo-tipos" onclick="showPage('catalogo-tipos',document.getElementById('nav-inventario'))">
-                    <svg viewBox="0 0 24 24" style="width:13px;height:13px"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/></svg>
-                    Tipos de producto
-                </div>
-                <div class="nav-subitem" id="nav-crear-producto-form" onclick="showPage('crear-producto',document.getElementById('nav-inventario'))">
-                    <svg viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M12 5v14M5 12h14"/></svg>
-                    Crear producto
-                </div>
+            <div class="nav-subitem" id="nav-crear-producto" onclick="showPage('crear-producto',document.getElementById('nav-inventario'))">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                Crear producto
             </div>
         </div>
         <div class="nav-item" id="nav-encuestas" onclick="showPage('encuestas',this)">
@@ -844,194 +810,116 @@
 
 
             <!-- ══════════════════════ CATEGORÍAS INVENTARIO ══════════════════════ -->
-            <div class="page" id="page-categorias">
-                <div class="table-card">
-                    <div class="table-toolbar">
-                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Categorías de inventario</span>
-                        </div>
-                        <button class="topbar-btn" onclick="newCategoria()" style="height:32px;font-size:12px">
-                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Nueva categoría
+            <!-- ══════════════════════ CREAR PRODUCTO (tabs unificados) ══════════════════════ -->
+            <div class="page" id="page-crear-producto">
+                <div class="table-card" style="padding:0">
+                    <!-- Tabs -->
+                    <div id="cp-tabs" style="display:flex;gap:0;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none">
+                        <button class="cp-tab active" onclick="cpTab('nuevo-producto')" id="cptab-nuevo-producto" style="padding:12px 18px;font-size:13px;font-weight:500;border:none;background:none;color:var(--text-primary);border-bottom:2px solid var(--accent);cursor:pointer;white-space:nowrap;flex-shrink:0">Nuevo producto</button>
+                        <button class="cp-tab" onclick="cpTab('categorias')" id="cptab-categorias" style="padding:12px 18px;font-size:13px;font-weight:500;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0">Categorías</button>
+                        <button class="cp-tab" onclick="cpTab('marcas')" id="cptab-marcas" style="padding:12px 18px;font-size:13px;font-weight:500;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0">Marcas</button>
+                        <button class="cp-tab" onclick="cpTab('lineas')" id="cptab-lineas" style="padding:12px 18px;font-size:13px;font-weight:500;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0">Líneas</button>
+                        <button class="cp-tab" onclick="cpTab('familias')" id="cptab-familias" style="padding:12px 18px;font-size:13px;font-weight:500;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0">Familias</button>
+                        <button class="cp-tab" onclick="cpTab('unidades')" id="cptab-unidades" style="padding:12px 18px;font-size:13px;font-weight:500;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0">Unidades de negocio</button>
+                        <button class="cp-tab" onclick="cpTab('tipos')" id="cptab-tipos" style="padding:12px 18px;font-size:13px;font-weight:500;border:none;background:none;color:var(--text-muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;flex-shrink:0">Tipos de producto</button>
+                    </div>
+
+                    <!-- Tab: Nuevo producto — dispara el modal existente -->
+                    <div id="cppanel-nuevo-producto" style="padding:32px 24px;text-align:center">
+                        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Completa los campos del nuevo producto. Asegúrate de tener configurados los catálogos en las pestañas de la izquierda.</p>
+                        <button class="topbar-btn" onclick="nuevaEntradaInv()" style="height:36px;font-size:13px;padding:0 20px">
+                            <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Nuevo producto
                         </button>
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th>Productos</th>
-                                <th>Estado</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="categoriasTbody">
-                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>
-                        </tbody>
-                    </table>
+
+                    <!-- Tab: Categorías -->
+                    <div id="cppanel-categorias" style="display:none">
+                        <div class="table-toolbar" style="padding:14px 16px">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Categorías</span>
+                            <button class="topbar-btn" onclick="newCategoria()" style="height:32px;font-size:12px">
+                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Nueva categoría
+                            </button>
+                        </div>
+                        <table><thead><tr><th>Nombre</th><th>Descripción</th><th>Productos</th><th>Estado</th><th></th></tr></thead>
+                        <tbody id="categoriasTbody"><tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr></tbody></table>
+                    </div>
+
+                    <!-- Tab: Marcas -->
+                    <div id="cppanel-marcas" style="display:none">
+                        <div class="table-toolbar" style="padding:14px 16px">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Marcas <span class="cat-count" id="cat-count-marcas"></span></span>
+                            <button class="topbar-btn" onclick="nuevoCatalogo('marcas')" style="height:32px;font-size:12px">
+                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Nueva marca
+                            </button>
+                        </div>
+                        <table><thead><tr><th>Nombre</th><th>Descripción</th><th style="text-align:center">Ítems</th><th id="cat-th-emp-marcas" style="display:none">Empresa</th><th>Estado</th><th></th></tr></thead>
+                        <tbody id="cat-tbody-marcas"><tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr></tbody></table>
+                    </div>
+
+                    <!-- Tab: Líneas -->
+                    <div id="cppanel-lineas" style="display:none">
+                        <div class="table-toolbar" style="padding:14px 16px">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Líneas <span class="cat-count" id="cat-count-lineas"></span></span>
+                            <button class="topbar-btn" onclick="nuevoCatalogo('lineas')" style="height:32px;font-size:12px">
+                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Nueva línea
+                            </button>
+                        </div>
+                        <table><thead><tr><th>Nombre</th><th>Descripción</th><th style="text-align:center">Ítems</th><th id="cat-th-emp-lineas" style="display:none">Empresa</th><th>Estado</th><th></th></tr></thead>
+                        <tbody id="cat-tbody-lineas"><tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr></tbody></table>
+                    </div>
+
+                    <!-- Tab: Familias -->
+                    <div id="cppanel-familias" style="display:none">
+                        <div class="table-toolbar" style="padding:14px 16px">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Familias <span class="cat-count" id="cat-count-familias"></span></span>
+                            <button class="topbar-btn" onclick="nuevoCatalogo('familias')" style="height:32px;font-size:12px">
+                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Nueva familia
+                            </button>
+                        </div>
+                        <table><thead><tr><th>Nombre</th><th>Descripción</th><th style="text-align:center">Ítems</th><th id="cat-th-emp-familias" style="display:none">Empresa</th><th>Estado</th><th></th></tr></thead>
+                        <tbody id="cat-tbody-familias"><tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr></tbody></table>
+                    </div>
+
+                    <!-- Tab: Unidades de negocio -->
+                    <div id="cppanel-unidades" style="display:none">
+                        <div class="table-toolbar" style="padding:14px 16px">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Unidades de negocio <span class="cat-count" id="cat-count-unidades"></span></span>
+                            <button class="topbar-btn" onclick="nuevoCatalogo('unidades')" style="height:32px;font-size:12px">
+                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Nueva unidad de negocio
+                            </button>
+                        </div>
+                        <table><thead><tr><th>Nombre</th><th>Descripción</th><th style="text-align:center">Ítems</th><th id="cat-th-emp-unidades" style="display:none">Empresa</th><th>Estado</th><th></th></tr></thead>
+                        <tbody id="cat-tbody-unidades"><tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr></tbody></table>
+                    </div>
+
+                    <!-- Tab: Tipos de producto -->
+                    <div id="cppanel-tipos" style="display:none">
+                        <div class="table-toolbar" style="padding:14px 16px">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Tipos de producto <span class="cat-count" id="cat-count-tipos"></span></span>
+                            <button class="topbar-btn" onclick="nuevoCatalogo('tipos')" style="height:32px;font-size:12px">
+                                <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Nuevo tipo
+                            </button>
+                        </div>
+                        <table><thead><tr><th>Nombre</th><th>Descripción</th><th style="text-align:center">Ítems</th><th id="cat-th-emp-tipos" style="display:none">Empresa</th><th>Estado</th><th></th></tr></thead>
+                        <tbody id="cat-tbody-tipos"><tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr></tbody></table>
+                    </div>
                 </div>
             </div>
 
-
-            <!-- ══════════════════════ CATÁLOGO: MARCAS ══════════════════════ -->
-            <div class="page" id="page-catalogo-marcas">
-                <div class="table-card">
-                    <div class="table-toolbar">
-                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Marcas</span>
-                            <span class="cat-count" id="cat-count-marcas"></span>
-                            <span id="cat-filtro-marcas" style="display:none"></span>
-                        </div>
-                        <button class="topbar-btn" onclick="nuevoCatalogo('marcas')" style="height:32px;font-size:12px">
-                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Nueva marca
-                        </button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th style="text-align:center">Ítems</th>
-                                <th id="cat-th-emp-marcas" style="display:none">Empresa</th>
-                                <th>Estado</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="cat-tbody-marcas">
-                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ══════════════════════ CATÁLOGO: LÍNEAS ══════════════════════ -->
-            <div class="page" id="page-catalogo-lineas">
-                <div class="table-card">
-                    <div class="table-toolbar">
-                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Líneas</span>
-                            <span class="cat-count" id="cat-count-lineas"></span>
-                            <span id="cat-filtro-lineas" style="display:none"></span>
-                        </div>
-                        <button class="topbar-btn" onclick="nuevoCatalogo('lineas')" style="height:32px;font-size:12px">
-                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Nueva línea
-                        </button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th style="text-align:center">Ítems</th>
-                                <th id="cat-th-emp-lineas" style="display:none">Empresa</th>
-                                <th>Estado</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="cat-tbody-lineas">
-                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ══════════════════════ CATÁLOGO: FAMILIAS ══════════════════════ -->
-            <div class="page" id="page-catalogo-familias">
-                <div class="table-card">
-                    <div class="table-toolbar">
-                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Familias</span>
-                            <span class="cat-count" id="cat-count-familias"></span>
-                            <span id="cat-filtro-familias" style="display:none"></span>
-                        </div>
-                        <button class="topbar-btn" onclick="nuevoCatalogo('familias')" style="height:32px;font-size:12px">
-                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Nueva familia
-                        </button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th style="text-align:center">Ítems</th>
-                                <th id="cat-th-emp-familias" style="display:none">Empresa</th>
-                                <th>Estado</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="cat-tbody-familias">
-                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ══════════════════════ CATÁLOGO: UNIDADES DE NEGOCIO ══════════════════════ -->
-            <div class="page" id="page-catalogo-unidades">
-                <div class="table-card">
-                    <div class="table-toolbar">
-                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Unidades de negocio</span>
-                            <span class="cat-count" id="cat-count-unidades"></span>
-                            <span id="cat-filtro-unidades" style="display:none"></span>
-                        </div>
-                        <button class="topbar-btn" onclick="nuevoCatalogo('unidades')" style="height:32px;font-size:12px">
-                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Nueva unidad de negocio
-                        </button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th style="text-align:center">Ítems</th>
-                                <th id="cat-th-emp-unidades" style="display:none">Empresa</th>
-                                <th>Estado</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="cat-tbody-unidades">
-                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ══════════════════════ CATÁLOGO: TIPOS DE PRODUCTO ══════════════════════ -->
-            <div class="page" id="page-catalogo-tipos">
-                <div class="table-card">
-                    <div class="table-toolbar">
-                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Tipos de producto</span>
-                            <span class="cat-count" id="cat-count-tipos"></span>
-                            <span id="cat-filtro-tipos" style="display:none"></span>
-                        </div>
-                        <button class="topbar-btn" onclick="nuevoCatalogo('tipos')" style="height:32px;font-size:12px">
-                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                            Nuevo tipo de producto
-                        </button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Descripción</th>
-                                <th style="text-align:center">Ítems</th>
-                                <th id="cat-th-emp-tipos" style="display:none">Empresa</th>
-                                <th>Estado</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="cat-tbody-tipos">
-                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <!-- páginas de catálogo individuales mantenidas como alias para compatibilidad con enlaces internos -->
+            <div class="page" id="page-categorias" style="display:none!important"></div>
+            <div class="page" id="page-catalogo-marcas" style="display:none!important"></div>
+            <div class="page" id="page-catalogo-lineas" style="display:none!important"></div>
+            <div class="page" id="page-catalogo-familias" style="display:none!important"></div>
+            <div class="page" id="page-catalogo-unidades" style="display:none!important"></div>
+            <div class="page" id="page-catalogo-tipos" style="display:none!important"></div>
 
             <!-- ── FICHA DE CLIENTE / PROSPECTO ── -->
             <div class="page" id="page-ficha">
@@ -2240,8 +2128,8 @@
         let _currentOrgId = null;    // organization_id del usuario autenticado
         let _usuario = '';
 
-        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', ficha: 'Ficha', cotizaciones: 'Cotizaciones', inventario: 'Inventario', categorias: 'Categorías', 'catalogo-marcas': 'Marcas', 'catalogo-lineas': 'Líneas', 'catalogo-familias': 'Familias', 'catalogo-unidades': 'Unidades de negocio', 'catalogo-tipos': 'Tipos de producto', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad', perfil: 'Ajustes', suscripciones: 'Suscripciones', 'sub-empresas': 'Empresas', 'sub-planes': 'Planes', 'sub-pagos': 'Pagos'};
-        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', cotizaciones: 'Nueva cotización', inventario: 'Nuevo ítem', categorias: 'Nueva categoría', 'catalogo-marcas': 'Nueva marca', 'catalogo-lineas': 'Nueva línea', 'catalogo-familias': 'Nueva familia', 'catalogo-unidades': 'Nueva unidad de negocio', 'catalogo-tipos': 'Nuevo tipo de producto', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria', perfil: '', suscripciones: '', 'sub-empresas': 'Nueva empresa', 'sub-planes': 'Nuevo plan', 'sub-pagos': ''};
+        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', ficha: 'Ficha', cotizaciones: 'Cotizaciones', inventario: 'Inventario', 'crear-producto': 'Crear producto', categorias: 'Categorías', 'catalogo-marcas': 'Marcas', 'catalogo-lineas': 'Líneas', 'catalogo-familias': 'Familias', 'catalogo-unidades': 'Unidades de negocio', 'catalogo-tipos': 'Tipos de producto', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad', perfil: 'Ajustes', suscripciones: 'Suscripciones', 'sub-empresas': 'Empresas', 'sub-planes': 'Planes', 'sub-pagos': 'Pagos'};
+        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', cotizaciones: 'Nueva cotización', inventario: 'Nuevo ítem', 'crear-producto': 'Nuevo producto', categorias: 'Nueva categoría', 'catalogo-marcas': 'Nueva marca', 'catalogo-lineas': 'Nueva línea', 'catalogo-familias': 'Nueva familia', 'catalogo-unidades': 'Nueva unidad de negocio', 'catalogo-tipos': 'Nuevo tipo de producto', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria', perfil: '', suscripciones: '', 'sub-empresas': 'Nueva empresa', 'sub-planes': 'Nuevo plan', 'sub-pagos': ''};
 
         const ETAPAS = ['Nuevo', 'Contactado', 'Calificado', 'Propuesta', 'Negociación', 'Perdido'];
         const ORIGENES = ['Referido', 'Sitio web', 'Llamada fría', 'Evento', 'Redes sociales', 'Otro'];
@@ -3609,6 +3497,30 @@
            NAVEGACIÓN Y CTA
         ═══════════════════════════════════════════════════════ */
         function showPage(id, navEl) {
+            // Redirigir páginas de catálogo al módulo unificado
+            const _catTabMap = {categorias:'categorias','catalogo-marcas':'marcas','catalogo-lineas':'lineas','catalogo-familias':'familias','catalogo-unidades':'unidades','catalogo-tipos':'tipos'};
+            if (_catTabMap[id]) {
+                const tab = _catTabMap[id];
+                id = 'crear-producto';
+                _currentPage = id;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const pageEl = document.getElementById('page-crear-producto');
+                if (pageEl) pageEl.classList.add('active');
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                document.querySelectorAll('.nav-subitem').forEach(n => n.classList.remove('active'));
+                _openNavGroup('invGroup');
+                const si = document.getElementById('nav-crear-producto');
+                if (si) si.classList.add('active');
+                if (typeof cpTab === 'function') cpTab(tab);
+                // cargar datos del catálogo
+                if (tab === 'categorias') { if (typeof loadCategorias === 'function') loadCategorias(); }
+                else { if (typeof renderCatalogo === 'function' && window.CATALOGO_POR_PAGE) { const key = Object.keys(CATALOGO_POR_PAGE||{}).find(k=>k===('catalogo-'+tab)||k===id); if(key) renderCatalogo(CATALOGO_POR_PAGE[key]); } if (typeof loadCatalogos === 'function') loadCatalogos(); }
+                document.getElementById('pageTitle').textContent = 'Crear producto';
+                document.getElementById('ctaLabel').textContent = 'Nuevo producto';
+                document.getElementById('searchInput').value = '';
+                return;
+            }
+
             _currentPage = id;
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const pageEl = document.getElementById('page-' + id);
@@ -3623,6 +3535,12 @@
                 const si = document.getElementById('nav-inventario-list');
                 if (si) si.classList.add('active');
                 loadInventario();
+            } else if (id === 'crear-producto') {
+                _openNavGroup('invGroup');
+                const si = document.getElementById('nav-crear-producto');
+                if (si) si.classList.add('active');
+                if (typeof cpTab === 'function') cpTab('nuevo-producto');
+                if (typeof loadCatalogos === 'function') loadCatalogos();
             } else if (id === 'categorias') {
                 _openNavGroup('invGroup');
                 const si = document.getElementById('nav-categorias');
@@ -3655,6 +3573,29 @@
             const ch = document.getElementById('chevron-' + groupId);
             if (ch) ch.style.transform = open ? '' : 'rotate(180deg)';
         }
+
+        // Tabs internos del módulo Crear Producto
+        const _cpTabs = ['nuevo-producto','categorias','marcas','lineas','familias','unidades','tipos'];
+        const _cpTabToPage = {categorias:'categorias',marcas:'catalogo-marcas',lineas:'catalogo-lineas',familias:'catalogo-familias',unidades:'catalogo-unidades',tipos:'catalogo-tipos'};
+        function cpTab(tab) {
+            _cpTabs.forEach(t => {
+                const p = document.getElementById('cppanel-' + t);
+                const b = document.getElementById('cptab-' + t);
+                if (!p || !b) return;
+                const active = t === tab;
+                p.style.display = active ? '' : 'none';
+                b.style.color = active ? 'var(--text-primary)' : 'var(--text-muted)';
+                b.style.borderBottomColor = active ? 'var(--accent)' : 'transparent';
+            });
+            // Cargar datos del tab activo
+            if (tab === 'categorias') { if (typeof loadCategorias === 'function') loadCategorias(); }
+            else if (_cpTabToPage[tab] && window.CATALOGO_POR_PAGE) {
+                const key = CATALOGO_POR_PAGE[_cpTabToPage[tab]];
+                if (key && typeof renderCatalogo === 'function') renderCatalogo(key);
+                if (typeof loadCatalogos === 'function') loadCatalogos();
+            }
+        }
+
         function toggleNavGroup(groupId, navEl, pageId) {
             const grp = document.getElementById(groupId);
             if (!grp) return;
