@@ -2059,8 +2059,8 @@
             if (elNav)    elNav.style.display  = esAdmin() ? 'flex' : 'none';
             var elNavSub = document.getElementById('nav-suscripciones');
             var elNavSubSec = document.getElementById('nav-section-suscripciones');
-            if (elNavSub) elNavSub.style.display = esAdmin() ? 'flex' : 'none';
-            if (elNavSubSec) elNavSubSec.style.display = esAdmin() ? 'block' : 'none';
+            if (elNavSub) elNavSub.style.display = 'none';   // solo se muestra si _subInit confirma SUPER_ADMIN
+            if (elNavSubSec) elNavSubSec.style.display = 'none';
             _aplicarAvatarSidebar();
 
             // ── 3. Restaurar sesión en Supabase Auth ANTES de cargar datos ──
@@ -2125,7 +2125,7 @@
             loadEncuestas();
             loadCotizaciones();
             if (esAdmin()) loadUsuarios();
-            if (esAdmin()) _subInit();
+            _subInit();
             _initContabilidad();
         }
 
@@ -6985,9 +6985,25 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
     }
 
     /* ── Init ── */
+    var _esSuper = false;
+    function _mostrarNavSub(v) {
+        var n = document.getElementById('nav-suscripciones');
+        var sec = document.getElementById('nav-section-suscripciones');
+        if (n) n.style.display = v ? 'flex' : 'none';
+        if (sec) sec.style.display = v ? 'block' : 'none';
+    }
+    async function _checkSuper() {
+        try {
+            var r = await _sb().rpc('sub_es_admin');
+            _esSuper = !r.error && r.data === true;
+        } catch (e) { _esSuper = false; }
+        _mostrarNavSub(_esSuper);
+        return _esSuper;
+    }
     async function _subInit() {
+        if (!(await _checkSuper())) return;
         await _loadAll();
-        if (_tablesExist) window._subTab(_tabActual);
+        if (_tablesExist && _currentPage === 'suscripciones') window._subTab(_tabActual);
     }
 
     window._subInit = _subInit;
@@ -7753,6 +7769,12 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
     /* ── Hook en showPage ── */
     var _origShowPage = window.showPage;
     window.showPage = function(id, navEl) {
+        if (id === 'suscripciones' && !_esSuper) {
+            showToast('Acceso solo para Super Admin', '#F59E0B');
+            var _n = document.getElementById('nav-overview');
+            _origShowPage('overview', _n);
+            return;
+        }
         _origShowPage(id, navEl);
         if (id === 'suscripciones') {
             var cta = document.getElementById('mainCta');
