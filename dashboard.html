@@ -14,6 +14,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="dashboard.css">
+<style id="sub-fix-css">
+/* Suscripciones: modales reales, filtros y formularios */
+.modal-overlay[id^="sub-"]{opacity:1;pointer-events:all;z-index:600;align-items:center}
+.modal[id^="sub-"]{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:601;width:calc(100% - 32px);max-height:90vh;background:var(--card);border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.28);flex-direction:column;overflow:hidden}
+.modal[id^="sub-"] .modal-body{overflow-y:auto;flex:1}
+.modal[id^="sub-"] .modal-footer{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px;border-top:1px solid var(--border)}
+.filter-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.filter-chip{padding:6px 14px;border-radius:20px;border:1px solid var(--border);background:var(--card);color:var(--text-secondary);font:inherit;font-size:12.5px;font-weight:500;cursor:pointer}
+.filter-chip:hover{border-color:var(--accent)}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+@media(max-width:600px){.form-grid-2{grid-template-columns:1fr}}
+.sub-rep-bar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px;margin-bottom:14px}
+.sub-rep-bar label{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase}
+.sub-rep-bar .form-select,.sub-rep-bar .form-input{height:36px;font-size:13px;padding:0 10px;min-width:130px}
+.sub-sec-title{font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin:18px 0 8px}
+@media print{body *{visibility:hidden}#sub-view-reporte,#sub-view-reporte *{visibility:visible}#sub-view-reporte{position:absolute;left:0;top:0;width:100%}.sub-rep-bar{display:none}}
+</style>
 </head>
 
 <body>
@@ -1111,64 +1129,22 @@
 
             <!-- ── Reporte de suscripciones ── -->
             <div id="sub-view-reporte">
-                <div class="kpi-grid" style="margin-bottom:18px">
-                    <div class="kpi-card">
-                        <div class="kpi-label">Empresas activas</div>
-                        <div class="kpi-value" id="sub-kpi-activas">—</div>
-                        <div class="kpi-delta up"><svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> Estado ACTIVE</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">En período de prueba</div>
-                        <div class="kpi-value" id="sub-kpi-trial">—</div>
-                        <div class="kpi-delta" style="color:var(--accent)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> TRIAL activo</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Próximas a vencer</div>
-                        <div class="kpi-value" id="sub-kpi-proximas">—</div>
-                        <div class="kpi-delta" style="color:var(--warning)"><svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Vencen en 7 días</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Pagos pendientes</div>
-                        <div class="kpi-value" id="sub-kpi-pastdue">—</div>
-                        <div class="kpi-delta" style="color:var(--warning)"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> PAST_DUE</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Suspendidas</div>
-                        <div class="kpi-value" id="sub-kpi-suspendidas">—</div>
-                        <div class="kpi-delta" style="color:var(--danger)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> SUSPENDED</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">MRR Estimado</div>
-                        <div class="kpi-value" id="sub-kpi-mrr">—</div>
-                        <div class="kpi-delta up"><svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Ingresos mensuales</div>
+                <div class="sub-rep-bar">
+                    <label>Estado<select class="form-select" id="sub-rep-estado" onchange="_renderReporte()"><option value="">Todos</option><option value="ACTIVE">Activa</option><option value="TRIAL">Prueba</option><option value="PAST_DUE">Pago pendiente</option><option value="SUSPENDED">Suspendida</option><option value="CANCELLED">Cancelada</option></select></label>
+                    <label>Plan<select class="form-select" id="sub-rep-plan" onchange="_renderReporte()"></select></label>
+                    <label>Vence desde<input class="form-input" type="date" id="sub-rep-desde" onchange="_renderReporte()"/></label>
+                    <label>Vence hasta<input class="form-input" type="date" id="sub-rep-hasta" onchange="_renderReporte()"/></label>
+                    <div style="margin-left:auto;display:flex;gap:8px">
+                        <button class="btn-ghost" onclick="_subReporteCSV()">Exportar CSV</button>
+                        <button class="topbar-btn" onclick="window.print()"><span>Imprimir</span></button>
                     </div>
                 </div>
-
-                <!-- Próximas a vencer -->
-                <div class="card" style="margin-bottom:16px">
-                    <div class="table-toolbar" style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--border);">
-                        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--warning);stroke-width:2;fill:none;flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
-                        <span style="font-weight:600;font-size:14px;">Próximas a vencer (7 días)</span>
-                    </div>
-                    <div class="table-scroll">
-                        <table class="data-table">
-                            <thead><tr><th>Empresa</th><th>Plan</th><th>Vence</th><th>Estado</th><th>Acciones</th></tr></thead>
-                            <tbody id="sub-tbody-proximas"><tr><td colspan="5" class="empty-cell">Cargando…</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Canceladas/Suspendidas recientes -->
                 <div class="card">
-                    <div class="table-toolbar" style="display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--border);">
-                        <span style="font-weight:600;font-size:14px;">Canceladas / Suspendidas</span>
-                    </div>
-                    <div class="table-scroll">
-                        <table class="data-table">
-                            <thead><tr><th>Empresa</th><th>Plan</th><th>Estado</th><th>Última acción</th><th>Acciones</th></tr></thead>
-                            <tbody id="sub-tbody-inactivas"><tr><td colspan="5" class="empty-cell">Cargando…</td></tr></tbody>
-                        </table>
-                    </div>
+                    <div class="table-scroll"><table class="data-table">
+                        <thead><tr><th>Empresa</th><th>Plan</th><th>Estado</th><th>Ciclo</th><th>Precio</th><th>Inicio</th><th>Vencimiento</th><th>Último pago</th></tr></thead>
+                        <tbody id="sub-tbody-reporte"><tr><td colspan="8" class="empty-cell">Cargando…</td></tr></tbody>
+                    </table></div>
+                    <div class="table-foot" id="sub-foot-reporte"></div>
                 </div>
             </div>
 
@@ -6891,7 +6867,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
 
     /* ── Helpers ── */
     function _sb() { return window._sb; }
-    function _usuario() { return window._usuario || ''; }
+    function _usuario() { try { var ss = JSON.parse(localStorage.getItem('azyvion_session') || 'null'); return (ss && (ss.nombre || ss.usuario)) || 'Admin'; } catch (e) { return 'Admin'; } }
 
     function _fmtFecha(iso) {
         if (!iso) return '—';
@@ -6933,6 +6909,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         try {
             var r = await _sb().from('sub_empresas').select('id').limit(1);
             _tablesExist = !r.error;
+            if (r.error) console.warn('[Suscripciones]', r.error.message);
         } catch(e) {
             _tablesExist = false;
         }
@@ -6943,13 +6920,12 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
     async function _loadAll() {
         var ok = await _checkTables();
         if (!ok) return;
-        await Promise.all([_loadEmpresas(), _loadPlanes(), _loadPagos(), _loadAuditoria()]);
+        await Promise.all([_loadEmpresas(), _loadPlanes(), _loadSubs(), _loadPagos(), _loadAuditoria()]);
     }
 
     async function _loadEmpresas() {
-        var r = await _sb().from('sub_empresas').select('*, sub_planes(nombre,precio,moneda)').order('nombre');
+        var r = await _sb().from('sub_empresas').select('*, sub_planes(nombre,precio,moneda,max_usuarios)').order('nombre');
         _empresas = r.data || [];
-        _loadSubs();
     }
 
     async function _loadPlanes() {
@@ -6970,6 +6946,24 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
     async function _loadAuditoria() {
         var r = await _sb().from('sub_auditoria').select('*').order('fecha', {ascending: false}).limit(200);
         _auditoria = r.data || [];
+    }
+
+
+    /* ── Mantiene sub_suscripciones coherente con sub_empresas ── */
+    async function _syncSub(empId) {
+        var r0 = await _sb().from('sub_empresas').select('*').eq('id', empId).single();
+        var e = r0.data; if (!e) return;
+        var plan = _planes.find(function(p){ return p.id === e.plan_id; }) || {};
+        var ult = _pagos.filter(function(p){ return p.empresa_id === empId && p.estado === 'SUCCESS'; })[0];
+        var row = { plan_id: e.plan_id, estado: e.estado, fecha_inicio: e.fecha_inicio, fecha_fin: e.fecha_fin,
+            proximo_cobro: (e.estado === 'CANCELLED' || e.estado === 'SUSPENDED') ? null : e.fecha_fin,
+            precio: e.precio, moneda: plan.moneda || 'USD', ciclo: e.ciclo, ultimo_pago: ult ? ult.fecha : null };
+        var ex = await _sb().from('sub_suscripciones').select('id').eq('empresa_id', empId).order('fecha_creacion', {ascending: false}).limit(1);
+        var res;
+        if (ex.data && ex.data.length) res = await _sb().from('sub_suscripciones').update(row).eq('id', ex.data[0].id);
+        else { row.id = _uuid(); row.empresa_id = empId; res = await _sb().from('sub_suscripciones').insert(row); }
+        if (res.error) console.warn('[Suscripciones] sync:', res.error.message);
+        await _loadSubs();
     }
 
     /* ── Auditoría ── */
@@ -7049,75 +7043,56 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         }
     };
 
-    /* ── Reporte ── */
-    function _renderReporte() {
-        if (!_tablesExist) { _renderSetupBanner('reporte'); return; }
-
-        var hoy = new Date(); hoy.setHours(0,0,0,0);
-        var activas     = _empresas.filter(function(e){ return e.estado === 'ACTIVE'; }).length;
-        var trial       = _empresas.filter(function(e){ return e.estado === 'TRIAL'; }).length;
-        var pastdue     = _empresas.filter(function(e){ return e.estado === 'PAST_DUE'; }).length;
-        var suspendidas = _empresas.filter(function(e){ return e.estado === 'SUSPENDED'; }).length;
-        var proximas    = _empresas.filter(function(e){
-            if (!e.fecha_fin) return false;
-            var dias = _diasHasta(e.fecha_fin);
-            return (e.estado === 'ACTIVE' || e.estado === 'TRIAL') && dias >= 0 && dias <= 7;
+    /* ── Reporte (listado filtrable, exportable) ── */
+    function _reporteFiltrado() {
+        var g = function(id){ var el = document.getElementById(id); return el ? el.value : ''; };
+        var est = g('sub-rep-estado'), plan = g('sub-rep-plan'), d = g('sub-rep-desde'), h = g('sub-rep-hasta');
+        return _empresas.filter(function(e) {
+            if (est && e.estado !== est) return false;
+            if (plan && e.plan_id !== plan) return false;
+            if (d && (!e.fecha_fin || e.fecha_fin < d)) return false;
+            if (h && (!e.fecha_fin || e.fecha_fin > h)) return false;
+            return true;
         });
-
-        // MRR: suma precios mensuales de activas
-        var mrr = _empresas.filter(function(e){ return e.estado === 'ACTIVE'; }).reduce(function(s, e) {
-            var p = parseFloat(e.precio) || 0;
-            if (e.ciclo === 'annual') p = p / 12;
-            if (e.ciclo === 'quarterly') p = p / 3;
-            return s + p;
-        }, 0);
-
-        _setEl('sub-kpi-activas', activas);
-        _setEl('sub-kpi-trial', trial);
-        _setEl('sub-kpi-proximas', proximas.length);
-        _setEl('sub-kpi-pastdue', pastdue);
-        _setEl('sub-kpi-suspendidas', suspendidas);
-        _setEl('sub-kpi-mrr', _fmtMonto(mrr, 'USD') + '/mo');
-
-        // Próximas a vencer
-        var tbProx = document.getElementById('sub-tbody-proximas');
-        if (tbProx) {
-            tbProx.innerHTML = proximas.length
-                ? proximas.map(function(e) {
-                    var dias = _diasHasta(e.fecha_fin);
-                    var planNombre = (e.sub_planes && e.sub_planes.nombre) || e.plan_id || '—';
-                    return '<tr>' +
-                        '<td><div class="cell-main">' + escHtml(e.nombre) + '</div></td>' +
-                        '<td>' + escHtml(planNombre) + '</td>' +
-                        '<td>' + _fmtFecha(e.fecha_fin) + ' <span style="color:var(--warning);font-size:11px">(' + dias + ' días)</span></td>' +
-                        '<td>' + _estadoBadge(e.estado) + '</td>' +
-                        '<td><div class="row-actions"><button class="section-action" onclick="_subVerEmpresa(\'' + e.id + '\')">Ver</button>' +
-                        '<button class="section-action" onclick="_subAccionRapida(\'extender30\',\'' + e.id + '\')">+30 días</button></div></td>' +
-                        '</tr>';
-                }).join('')
-                : '<tr><td colspan="5" class="empty-cell">Sin vencimientos próximos</td></tr>';
-        }
-
-        // Inactivas
-        var inactivas = _empresas.filter(function(e){ return e.estado === 'SUSPENDED' || e.estado === 'CANCELLED'; });
-        var tbInact = document.getElementById('sub-tbody-inactivas');
-        if (tbInact) {
-            tbInact.innerHTML = inactivas.length
-                ? inactivas.map(function(e) {
-                    var planNombre = (e.sub_planes && e.sub_planes.nombre) || e.plan_id || '—';
-                    var aud = _auditoria.find(function(a){ return a.empresa_id === e.id; });
-                    return '<tr>' +
-                        '<td><div class="cell-main">' + escHtml(e.nombre) + '</div></td>' +
-                        '<td>' + escHtml(planNombre) + '</td>' +
-                        '<td>' + _estadoBadge(e.estado) + '</td>' +
-                        '<td style="font-size:12px;color:var(--text-secondary)">' + (aud ? escHtml(aud.accion) + ' · ' + _fmtFecha(aud.fecha) : '—') + '</td>' +
-                        '<td><div class="row-actions"><button class="section-action" onclick="_subVerEmpresa(\'' + e.id + '\')">Ver</button>' +
-                        '<button class="section-action" onclick="_subAccionRapida(\'activar\',\'' + e.id + '\')">Activar</button></div></td>' +
-                        '</tr>';
-                }).join('')
-                : '<tr><td colspan="5" class="empty-cell">Sin empresas suspendidas ni canceladas</td></tr>';
-        }
     }
+    window._renderReporte = function() {
+        if (!_tablesExist) { _renderSetupBanner('reporte'); return; }
+        var selP = document.getElementById('sub-rep-plan');
+        if (selP && selP.options.length !== _planes.length + 1) {
+            var cur = selP.value;
+            selP.innerHTML = '<option value="">Todos</option>' + _planes.map(function(p){ return '<option value="' + p.id + '">' + escHtml(p.nombre) + '</option>'; }).join('');
+            selP.value = cur;
+        }
+        var lista = _reporteFiltrado();
+        var tb = document.getElementById('sub-tbody-reporte');
+        if (!tb) return;
+        tb.innerHTML = lista.length ? lista.map(function(e) {
+            var pl = (e.sub_planes && e.sub_planes.nombre) || '—';
+            var up = _pagos.filter(function(p){ return p.empresa_id === e.id && p.estado === 'SUCCESS'; })[0];
+            return '<tr><td style="cursor:pointer" onclick="_subVerEmpresa(\'' + e.id + '\')"><div class="cell-main" style="color:var(--accent)">' + escHtml(e.nombre) + '</div></td>' +
+                '<td>' + escHtml(pl) + '</td><td>' + _estadoBadge(e.estado) + '</td><td>' + _cicloLabel(e.ciclo) + '</td>' +
+                '<td>' + (e.precio ? _fmtMonto(e.precio, (e.sub_planes && e.sub_planes.moneda) || 'USD') : '—') + '</td>' +
+                '<td>' + _fmtFecha(e.fecha_inicio) + '</td><td>' + _fmtFecha(e.fecha_fin) + _alertaVenc(e) + '</td>' +
+                '<td>' + (up ? _fmtFecha(up.fecha) : '—') + '</td></tr>';
+        }).join('') : '<tr><td colspan="8" class="empty-cell">Sin resultados con estos filtros</td></tr>';
+        var mrr = lista.filter(function(e){ return e.estado === 'ACTIVE'; }).reduce(function(t, e) {
+            var v = parseFloat(e.precio) || 0;
+            if (e.ciclo === 'annual') v /= 12; else if (e.ciclo === 'quarterly') v /= 3;
+            return t + v; }, 0);
+        var f = document.getElementById('sub-foot-reporte');
+        if (f) f.textContent = lista.length + ' empresa' + (lista.length !== 1 ? 's' : '') + ' · Ingreso mensual estimado (activas): ' + _fmtMonto(mrr, 'USD');
+    };
+    window._subReporteCSV = function() {
+        var rows = [['Empresa','Plan','Estado','Ciclo','Precio','Inicio','Vencimiento']].concat(_reporteFiltrado().map(function(e) {
+            return [e.nombre, (e.sub_planes && e.sub_planes.nombre) || '', e.estado, e.ciclo || '', e.precio || '', e.fecha_inicio || '', e.fecha_fin || ''];
+        }));
+        var csv = '\ufeff' + rows.map(function(r){ return r.map(function(c){ return '"' + String(c).replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n');
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv;charset=utf-8'}));
+        a.download = 'reporte_suscripciones_' + new Date().toISOString().slice(0,10) + '.csv';
+        document.body.appendChild(a); a.click(); a.remove();
+    };
+    function _renderReporte() { window._renderReporte(); }
 
     function _setEl(id, val) {
         var el = document.getElementById(id);
@@ -7270,8 +7245,8 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
 
         document.getElementById('sub-emp-modal-title').textContent = e.nombre;
         document.getElementById('sub-emp-modal-body').innerHTML = html;
-        document.getElementById('sub-emp-overlay').style.display = '';
-        document.getElementById('sub-emp-modal').style.display = '';
+        document.getElementById('sub-emp-overlay').style.display = 'flex';
+        document.getElementById('sub-emp-modal').style.display = 'flex';
     };
 
     function _kv(label, val) {
@@ -7326,7 +7301,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         if (r.error) { showToast('Error: ' + r.error.message, '#EF4444'); return; }
 
         // Actualizar suscripción activa también
-        await _sb().from('sub_suscripciones').update({ plan_id: nuevoPlanId, precio: nuevoPrecio }).eq('empresa_id', empId).eq('estado', 'ACTIVE');
+        await _syncSub(empId);
 
         await _audit('Cambio de plan', e, 'Plan cambiado de ' + planAnterior + ' a ' + planNuevo, {plan_id: e.plan_id}, {plan_id: nuevoPlanId});
         showToast('Plan actualizado a ' + planNuevo, '#22C55E');
@@ -7362,8 +7337,8 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
             '<p style="font-size:12px;color:var(--text-muted);margin-top:10px">Esta acción quedará registrada en el historial de auditoría.</p>';
         var btn = document.getElementById('sub-confirm-btn');
         btn.className = 'topbar-btn' + (accion === 'suspender' || accion === 'cancelar' ? ' btn-danger-sm' : '');
-        document.getElementById('sub-confirm-overlay').style.display = '';
-        document.getElementById('sub-confirm-modal').style.display = '';
+        document.getElementById('sub-confirm-overlay').style.display = 'flex';
+        document.getElementById('sub-confirm-modal').style.display = 'flex';
     };
 
     window._subCerrarConfirm = function() {
@@ -7415,6 +7390,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
             await _audit(accionLabel, e, detalle, {estado: e.estado, fecha_fin: e.fecha_fin}, up);
             showToast(accionLabel + ' registrada correctamente', '#22C55E');
             await _loadEmpresas();
+            await _syncSub(e.id);
             _renderReporte();
             _renderEmpresas();
         }
@@ -7438,8 +7414,8 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         document.getElementById('sub-form-emp-ciclo').value = 'monthly';
         document.getElementById('sub-form-emp-precio').value = '';
         _poblarSelectPlanes('sub-form-emp-plan');
-        document.getElementById('sub-emp-form-overlay').style.display = '';
-        document.getElementById('sub-emp-form-modal').style.display = '';
+        document.getElementById('sub-emp-form-overlay').style.display = 'flex';
+        document.getElementById('sub-emp-form-modal').style.display = 'flex';
     };
 
     window._subEditarEmpresa = function(id) {
@@ -7458,8 +7434,8 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         document.getElementById('sub-form-emp-ciclo').value = e.ciclo || 'monthly';
         document.getElementById('sub-form-emp-precio').value = e.precio || '';
         _poblarSelectPlanes('sub-form-emp-plan', e.plan_id);
-        document.getElementById('sub-emp-form-overlay').style.display = '';
-        document.getElementById('sub-emp-form-modal').style.display = '';
+        document.getElementById('sub-emp-form-overlay').style.display = 'flex';
+        document.getElementById('sub-emp-form-modal').style.display = 'flex';
     };
 
     window._subCerrarFormEmp = function() {
@@ -7491,20 +7467,21 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         var r;
         if (_editEmpId) {
             r = await _sb().from('sub_empresas').update(datos).eq('id', _editEmpId);
-            if (!r.error) await _audit('Edición de empresa', datos, 'Datos actualizados');
+            if (!r.error) { await _audit('Edición de empresa', {id: _editEmpId, nombre: nombre}, 'Datos actualizados'); await _syncSub(_editEmpId); }
         } else {
             datos.id = _uuid();
             datos.fecha_creacion = new Date().toISOString();
             r = await _sb().from('sub_empresas').insert(datos);
-            if (!r.error) await _audit('Alta de empresa', datos, 'Nueva empresa registrada en el sistema');
+            if (!r.error) { await _audit('Alta de empresa', datos, 'Nueva empresa registrada en el sistema'); await _syncSub(datos.id); }
         }
 
         if (r.error) { showToast('Error: ' + r.error.message, '#EF4444'); return; }
-        showToast((_editEmpId ? 'Empresa actualizada' : 'Empresa creada') + ' correctamente', '#22C55E');
+        var _eraEdicion = !!_editEmpId;
+        showToast((_eraEdicion ? 'Empresa actualizada' : 'Empresa creada') + ' correctamente', '#22C55E');
         _subCerrarFormEmp();
         await _loadEmpresas();
         _renderEmpresas();
-        if (_tabActual === 'reporte') _renderReporte();
+        if (_tabActual === 'subs') _renderSubs();
     };
 
     /* ── Suscripciones ── */
@@ -7587,8 +7564,8 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         document.getElementById('sub-form-plan-moneda').value = 'USD';
         document.getElementById('sub-form-plan-ciclo').value = 'monthly';
         document.getElementById('sub-form-plan-activo').checked = true;
-        document.getElementById('sub-plan-form-overlay').style.display = '';
-        document.getElementById('sub-plan-form-modal').style.display = '';
+        document.getElementById('sub-plan-form-overlay').style.display = 'flex';
+        document.getElementById('sub-plan-form-modal').style.display = 'flex';
     };
 
     window._subEditarPlan = function(id) {
@@ -7604,8 +7581,8 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         document.getElementById('sub-form-plan-storage').value = p.max_storage_gb || '';
         document.getElementById('sub-form-plan-desc').value = p.descripcion || '';
         document.getElementById('sub-form-plan-activo').checked = p.activo !== false;
-        document.getElementById('sub-plan-form-overlay').style.display = '';
-        document.getElementById('sub-plan-form-modal').style.display = '';
+        document.getElementById('sub-plan-form-overlay').style.display = 'flex';
+        document.getElementById('sub-plan-form-modal').style.display = 'flex';
     };
 
     window._subCerrarFormPlan = function() {
@@ -7707,8 +7684,8 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         document.getElementById('sub-form-pago-metodo').value = 'Manual';
         document.getElementById('sub-form-pago-ref').value = '';
         document.getElementById('sub-form-pago-notas').value = '';
-        document.getElementById('sub-pago-form-overlay').style.display = '';
-        document.getElementById('sub-pago-form-modal').style.display = '';
+        document.getElementById('sub-pago-form-overlay').style.display = 'flex';
+        document.getElementById('sub-pago-form-modal').style.display = 'flex';
     };
 
     window._subCerrarFormPago = function() {
@@ -7734,6 +7711,8 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
             fecha_creacion: new Date().toISOString()
         };
 
+        var _sx = _subs.find(function(x){ return x.empresa_id === empId; });
+        if (_sx) datos.suscripcion_id = _sx.id;
         var r = await _sb().from('sub_pagos').insert(datos);
         if (r.error) { showToast('Error: ' + r.error.message, '#EF4444'); return; }
 
@@ -7748,9 +7727,9 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         showToast('Pago registrado correctamente', '#22C55E');
         _subCerrarFormPago();
         await _loadPagos();
+        await _syncSub(empId);
         await _loadEmpresas();
         _renderPagos();
-        _renderReporte();
     };
 
     /* ── Auditoría ── */
