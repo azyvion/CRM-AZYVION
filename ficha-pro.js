@@ -3,14 +3,13 @@
    
    ARQUITECTURA:
    · Extiende (no reemplaza) las funciones de ficha del dashboard.html
-   · Usa window._sb (Supabase) directamente para Storage y operaciones
-     que el backend GAS no soporta (logo upload)
+   · Usa window._sb (Supabase) directamente para historial de cambios
    · Mantiene window.api para las operaciones existentes (actividades,
      notas, contactos, etc.)
    · Inyecta estilos CSS directamente al <head>
    · Sobreescribe: renderFicha, _fichaResumen, _fichaContactos, 
      _fichaActividad, _fichaNotas + agrega tabs: cotizaciones, historial
-   · Agrega: subida de logo, header mejorado, breadcrumb, KPIs
+   · Agrega: header mejorado, breadcrumb, KPIs, avatar de iniciales
    
    DEPENDENCIAS (ya presentes en dashboard.html):
      window._sb, window.api, _ficha, _fichaRef, _fichaTab,
@@ -54,56 +53,22 @@
     align-items: flex-start;
     margin-bottom: 16px;
 }
-.ficha-logo-wrap {
+.ficha-avatar-wrap {
     flex-shrink: 0;
-    position: relative;
-    width: 72px;
-    height: 72px;
 }
-.ficha-logo-img {
-    width: 72px;
-    height: 72px;
+.ficha-avatar-big {
+    width: 62px;
+    height: 62px;
     border-radius: 12px;
-    border: 1.5px solid var(--border);
-    object-fit: contain;
-    background: var(--bg);
-    display: block;
-}
-.ficha-logo-placeholder {
-    width: 72px;
-    height: 72px;
-    border-radius: 12px;
-    border: 1.5px dashed var(--border);
-    background: var(--bg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 700;
     color: #fff;
     letter-spacing: -1px;
-    cursor: pointer;
-    transition: opacity .15s;
     user-select: none;
 }
-.ficha-logo-placeholder:hover { opacity: .85; }
-.ficha-logo-upload-btn {
-    position: absolute;
-    bottom: -4px;
-    right: -4px;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: 2px solid var(--card);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform .15s;
-}
-.ficha-logo-upload-btn:hover { transform: scale(1.12); }
-.ficha-logo-upload-btn svg { width: 11px; height: 11px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 
 .ficha-pro-name-block { flex: 1; min-width: 0; }
 .ficha-pro-empresa { font-size: 20px; font-weight: 700; letter-spacing: -.3px; line-height: 1.2; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -266,52 +231,11 @@
 .ficha-contact-link:hover { text-decoration: underline; }
 .ficha-contact-link svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
 
-/* ── Logo upload overlay ─────────────────────────────────── */
-.ficha-logo-menu {
-    position: absolute;
-    z-index: 200;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,.15);
-    min-width: 170px;
-    overflow: hidden;
-}
-.ficha-logo-menu-item {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 10px 14px;
-    font-size: 13px;
-    cursor: pointer;
-    color: var(--text-primary);
-}
-.ficha-logo-menu-item:hover { background: var(--accent-bg); }
-.ficha-logo-menu-item.danger { color: var(--danger); }
-.ficha-logo-menu-item svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.ficha-logo-uploading {
-    position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    background: rgba(0,0,0,.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.ficha-logo-uploading svg {
-    width: 20px; height: 20px;
-    stroke: #fff;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    animation: az-spin .8s linear infinite;
-}
-@keyframes az-spin { to { transform: rotate(360deg); } }
+
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 600px) {
     .ficha-pro-empresa { font-size: 16px; }
-    .ficha-logo-wrap, .ficha-logo-img, .ficha-logo-placeholder { width: 54px; height: 54px; }
     .ficha-kpi-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
@@ -359,206 +283,19 @@
             edit: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/>',
             plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
             clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
-            camera: '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
             trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
-            upload: '<polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>',
             check: '<polyline points="20 6 9 17 4 12"/>',
             file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
-            spin: '<line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>',
             wa: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
         };
         return `<svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">${icons[name] || ''}</svg>`;
     }
 
-    /* ── Logo: subida real a Supabase Storage ──────────────── */
-    let _logoMenu = null;
-
-    function _closeLogoMenu() {
-        if (_logoMenu) { _logoMenu.remove(); _logoMenu = null; }
-    }
-
-    async function _subirLogo(file) {
-        const sb = _sb();
-        if (!sb) { showToast('Sin conexión a Supabase', '#FF453A'); return; }
-        const f = window._ficha;
-        if (!f) return;
-        const clienteId = f.entidad.id;
-        const orgId = _orgId();
-
-        // Validar
-        const TIPOS = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-        const MAX = 2 * 1024 * 1024; // 2 MB
-        if (!TIPOS.includes(file.type)) {
-            showToast('Solo PNG, JPG, JPEG o WebP', '#FF9F0A'); return;
-        }
-        if (file.size > MAX) {
-            showToast('El archivo no puede superar 2 MB', '#FF9F0A'); return;
-        }
-
-        // Mostrar spinner
-        const wrap = document.getElementById('fichaLogoWrap');
-        if (wrap) {
-            const ov = document.createElement('div');
-            ov.className = 'ficha-logo-uploading';
-            ov.id = 'fichaLogoSpinner';
-            ov.innerHTML = `<svg viewBox="0 0 24 24">${_icon('spin').replace(/<svg[^>]+>/,'').replace('</svg>','')}</svg>`;
-            wrap.appendChild(ov);
-        }
-
-        try {
-            // Eliminar logo anterior si existe
-            const logoActual = f.entidad.logoUrl;
-            if (logoActual) {
-                const pathAnterior = logoActual.split('/customer-logos/')[1];
-                if (pathAnterior) {
-                    await sb.storage.from('customer-logos').remove([pathAnterior]);
-                }
-            }
-
-            // Nombre de archivo seguro
-            const ext = file.name.split('.').pop().toLowerCase();
-            const path = `${orgId}/${clienteId}/logo.${ext}`;
-
-            const { error: upErr } = await sb.storage
-                .from('customer-logos')
-                .upload(path, file, { upsert: true, contentType: file.type });
-
-            if (upErr) throw upErr;
-
-            // Obtener URL pública
-            const { data: urlData } = sb.storage.from('customer-logos').getPublicUrl(path);
-            const newUrl = urlData.publicUrl + '?t=' + Date.now();
-
-            // Guardar en Clientes.logoUrl
-            const { error: dbErr } = await sb
-                .from('Clientes')
-                .update({ logoUrl: newUrl })
-                .eq('id', clienteId);
-
-            if (dbErr) throw dbErr;
-
-            showToast('Logo actualizado', '#30D158');
-            // Actualizar en memoria y re-render parcial
-            f.entidad.logoUrl = newUrl;
-            _actualizarLogoDOM(newUrl);
-
-        } catch (err) {
-            console.error('[Azyvion] Error subiendo logo:', err);
-            showToast('No se pudo subir el logo', '#FF453A');
-        } finally {
-            const sp = document.getElementById('fichaLogoSpinner');
-            if (sp) sp.remove();
-        }
-    }
-
-    async function _eliminarLogo() {
-        const f = window._ficha;
-        if (!f || !f.entidad.logoUrl) return;
-        const sb = _sb();
-        if (!sb) return;
-
-        _closeLogoMenu();
-        const clienteId = f.entidad.id;
-
-        try {
-            const pathAnterior = f.entidad.logoUrl.split('/customer-logos/')[1];
-            if (pathAnterior) {
-                const cleanPath = pathAnterior.split('?')[0];
-                await sb.storage.from('customer-logos').remove([cleanPath]);
-            }
-            const { error: dbErr } = await sb
-                .from('Clientes')
-                .update({ logoUrl: '' })
-                .eq('id', clienteId);
-            if (dbErr) throw dbErr;
-            showToast('Logo eliminado', '#FF9F0A');
-            f.entidad.logoUrl = '';
-            _actualizarLogoDOM('');
-        } catch (err) {
-            showToast('No se pudo eliminar el logo', '#FF453A');
-        }
-    }
-
-    function _actualizarLogoDOM(url) {
-        const wrap = document.getElementById('fichaLogoWrap');
-        if (!wrap) return;
-        const f = window._ficha;
-        const e = f.entidad;
-        wrap.innerHTML = _htmlLogo(e, !!f.permisos.puedeEditar);
-        _bindLogoEvents();
-    }
-
-    function _htmlLogo(e, puedeEditar) {
+    function _htmlAvatar(e) {
         const color = e.color || '#0A84FF';
         const initls = (typeof initials === 'function' ? initials(e.empresa || e.nombre || 'A') : (e.empresa || 'A').substring(0, 2).toUpperCase());
-
-        if (e.logoUrl) {
-            return `
-            <img class="ficha-logo-img" id="fichaLogoImg" src="${escAttr(e.logoUrl)}"
-                 alt="${escAttr(e.empresa || e.nombre)}"
-                 onerror="this.style.display='none';document.getElementById('fichaLogoFallback').style.display='flex'">
-            <div class="ficha-logo-placeholder" id="fichaLogoFallback"
-                 style="display:none;background:${escAttr(color)};font-size:22px"
-                 ${puedeEditar ? 'onclick="_fichaProLogoClick()"' : ''}>
-                ${escHtml(initls)}
-            </div>
-            ${puedeEditar ? `<div class="ficha-logo-upload-btn" onclick="_fichaProLogoClick()" title="Cambiar logo">
-                ${_icon('camera').replace('width:14px;height:14px;', 'width:11px;height:11px;')}
-            </div>` : ''}`;
-        }
-
-        return `
-        <div class="ficha-logo-placeholder" id="fichaLogoFallback"
-             style="background:${escAttr(color)}"
-             ${puedeEditar ? 'onclick="_fichaProLogoClick()" title="Subir logo"' : ''}>
-            ${escHtml(initls)}
-        </div>
-        ${puedeEditar ? `<div class="ficha-logo-upload-btn" onclick="_fichaProLogoClick()" title="Subir logo">
-            ${_icon('camera').replace('width:14px;height:14px;', 'width:11px;height:11px;')}
-        </div>` : ''}`;
+        return `<div class="ficha-avatar-big" style="background:${escAttr(color)}">${escHtml(initls)}</div>`;
     }
-
-    window._fichaProLogoClick = function () {
-        _closeLogoMenu();
-        const f = window._ficha;
-        if (!f) return;
-        const wrap = document.getElementById('fichaLogoWrap');
-        if (!wrap) return;
-
-        if (f.entidad.logoUrl) {
-            // Mostrar menú
-            _logoMenu = document.createElement('div');
-            _logoMenu.className = 'ficha-logo-menu';
-            _logoMenu.style.cssText = 'position:absolute;top:80px;left:0;z-index:300';
-            _logoMenu.innerHTML = `
-            <div class="ficha-logo-menu-item" onclick="_fichaProLogoSelectFile()">
-                ${_icon('upload')} Cambiar logo
-            </div>
-            <div class="ficha-logo-menu-item danger" onclick="_eliminarLogo()">
-                ${_icon('trash')} Eliminar logo
-            </div>`;
-            wrap.style.position = 'relative';
-            wrap.appendChild(_logoMenu);
-            setTimeout(() => document.addEventListener('click', function _cl(e) {
-                if (!_logoMenu || !_logoMenu.contains(e.target)) { _closeLogoMenu(); document.removeEventListener('click', _cl); }
-            }), 0);
-        } else {
-            _fichaProLogoSelectFile();
-        }
-    };
-
-    window._fichaProLogoSelectFile = function () {
-        _closeLogoMenu();
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/png,image/jpeg,image/jpg,image/webp';
-        input.onchange = function () {
-            if (this.files && this.files[0]) _subirLogo(this.files[0]);
-        };
-        input.click();
-    };
-
-    function _bindLogoEvents() { /* los events son inline en el HTML */ }
 
     /* ── Render principal del header ──────────────────────── */
     function _renderFichaHeader(f) {
@@ -568,7 +305,7 @@
         const shell = document.querySelector('.ficha-shell');
         if (shell) shell.classList.add('ficha-shell-pro');
 
-        const logoHtml = _htmlLogo(e, puede);
+        const avatarHtml = _htmlAvatar(e);
 
         const metaItems = [
             e.telefono ? `<span class="ficha-pro-dato-inline">${_icon('phone')}<a href="tel:${escAttr(String(e.telefono).replace(/\s/g, ''))}" class="cell-link">${escHtml(e.telefono)}</a></span>` : '',
@@ -620,8 +357,8 @@
     </div>
 
     <div class="ficha-pro-identity">
-        <div class="ficha-logo-wrap" id="fichaLogoWrap">
-            ${logoHtml}
+        <div class="ficha-avatar-wrap">
+            ${avatarHtml}
         </div>
         <div class="ficha-pro-name-block">
             <div class="ficha-pro-empresa">${escHtml(e.empresa || e.nombre || '—')}</div>
