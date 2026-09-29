@@ -2568,6 +2568,14 @@
         let _fichaOrigen  = 'clientes';
         let _fichaRef     = null;   // {tipo, id}
 
+        // Exponer en window para que ficha-pro.js pueda leerlas y escribirlas
+        Object.defineProperties(window, {
+            _ficha:       { get: () => _ficha,       set: v => { _ficha = v; },       configurable: true },
+            _fichaTab:    { get: () => _fichaTab,    set: v => { _fichaTab = v; },    configurable: true },
+            _fichaRef:    { get: () => _fichaRef,    set: v => { _fichaRef = v; },    configurable: true },
+            _fichaOrigen: { get: () => _fichaOrigen, set: v => { _fichaOrigen = v; }, configurable: true },
+        });
+
         const FICHA_TABS = ['resumen', 'contactos', 'actividad', 'prospectos', 'notas'];
         const CAT_ACT = ['Llamada', 'Correo', 'Reunión', 'Visita', 'Seguimiento', 'Otro'];
         const CAT_ACT_COLOR = {
