@@ -120,14 +120,25 @@
             <span>Cotizaciones</span>
             <span class="badge" id="badgeCotizaciones">—</span>
         </div>
-        <div class="nav-item" id="nav-inventario" onclick="showPage('inventario',this)">
+        <!-- Grupo Inventario -->
+        <div class="nav-item" id="nav-inventario" onclick="toggleNavGroup('invGroup',this,'inventario')">
             <svg viewBox="0 0 24 24">
-                <path
-                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                 <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
                 <line x1="12" y1="22.08" x2="12" y2="12" />
             </svg>
             Inventario
+            <svg class="nav-chevron" id="chevron-invGroup" viewBox="0 0 24 24" style="width:14px;height:14px;margin-left:auto;transition:transform .2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="nav-subgroup" id="invGroup" style="display:none;overflow:hidden">
+            <div class="nav-subitem" id="nav-inventario-list" onclick="showPage('inventario',document.getElementById('nav-inventario'))">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                Ver inventario
+            </div>
+            <div class="nav-subitem" id="nav-categorias" onclick="showPage('categorias',document.getElementById('nav-inventario'))">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/><rect x="2" y="4" width="4" height="4" rx="1"/><rect x="2" y="12" width="4" height="4" rx="1"/></svg>
+                Categorías
+            </div>
         </div>
         <div class="nav-item" id="nav-encuestas" onclick="showPage('encuestas',this)">
             <svg viewBox="0 0 24 24">
@@ -797,6 +808,35 @@
             </div>
 
 
+
+            <!-- ══════════════════════ CATEGORÍAS INVENTARIO ══════════════════════ -->
+            <div class="page" id="page-categorias">
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Categorías de inventario</span>
+                        </div>
+                        <button class="topbar-btn" onclick="newCategoria()" style="height:32px;font-size:12px">
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Nueva categoría
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Productos</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriasTbody">
+                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
             <!-- ── FICHA DE CLIENTE / PROSPECTO ── -->
             <div class="page" id="page-ficha">
@@ -1786,6 +1826,10 @@
         async function _deleteInventario(id,u){const{error}=await _sb.from('Inventario').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
         async function _getEncuestas(){const{data,error}=await _sb.from('Encuestas').select('*').order('fechaEnvio',{ascending:false});if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
+        async function _getCategorias(){const{data,error}=await _sb.from('CategoriasInventario').select('*').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
+        async function _addCategoria(p,u){if(!p.nombre||!String(p.nombre).trim())return{ok:false,error:'El nombre es requerido.'};const nombre=String(p.nombre).trim();const{data:ex}=await _sb.from('CategoriasInventario').select('id').eq('organization_id',_currentOrgId).ilike('nombre',nombre).maybeSingle();if(ex)return{ok:false,error:'Ya existe una categoría con ese nombre.'};const r={id:_uuid(),nombre,descripcion:p.descripcion||'',color:p.color||'#8E8E93',activa:true,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('CategoriasInventario').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
+        async function _updateCategoria(id,p,u){const{data:ex}=await _sb.from('CategoriasInventario').select('*').eq('id',id).single();if(!ex)return{ok:false,error:'Categoría no encontrada.'};const up={};if(p.nombre!==undefined)up.nombre=String(p.nombre).trim();if(p.descripcion!==undefined)up.descripcion=p.descripcion;if(p.color!==undefined)up.color=p.color;if(p.activa!==undefined)up.activa=p.activa===true||String(p.activa)==='true';const{error}=await _sb.from('CategoriasInventario').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
+        async function _deleteCategoria(id,u){const{data:uso}=await _sb.from('Inventario').select('id').eq('categoria',(await _sb.from('CategoriasInventario').select('nombre').eq('id',id).single()).data?.nombre||'').limit(1);if(uso&&uso.length>0)return{ok:false,error:'No se puede eliminar: hay productos asignados a esta categoría.'};const{error}=await _sb.from('CategoriasInventario').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _addEncuesta(p,u){if(!p.nombre)return{ok:false,error:'El nombre es requerido.'};const r={id:_uuid(),nombre:p.nombre,estado:'Borrador',fechaEnvio:new Date().toISOString(),totalEnviadas:0,respuestas:0,tipo:p.tipo||'NPS',pregConf:0,pregTotal:Number(p.pregTotal)||12,organization_id:_currentOrgId};const{error}=await _sb.from('Encuestas').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
         async function _updateEncuesta(id,p,u){const up={};['nombre','estado','fechaEnvio','tipo'].forEach(k=>{if(p[k]!==undefined)up[k]=p[k];});if(p.totalEnviadas!==undefined)up.totalEnviadas=Number(p.totalEnviadas)||0;if(p.respuestas!==undefined)up.respuestas=Number(p.respuestas)||0;if(p.pregConf!==undefined)up.pregConf=Number(p.pregConf)||0;if(p.pregTotal!==undefined)up.pregTotal=Number(p.pregTotal)||12;const{error}=await _sb.from('Encuestas').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteEncuesta(id,u){const{error}=await _sb.from('Encuestas').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
@@ -1899,6 +1943,10 @@
                 case 'addInventario':return await _addInventario(args[0],usuario);
                 case 'updateInventario':return await _updateInventario(args[0],args[1],usuario);
                 case 'deleteInventario':return await _deleteInventario(args[0],usuario);
+                case 'getCategorias':return await _getCategorias();
+                case 'addCategoria':return await _addCategoria(args[0],usuario);
+                case 'updateCategoria':return await _updateCategoria(args[0],args[1],usuario);
+                case 'deleteCategoria':return await _deleteCategoria(args[0],usuario);
                 case 'getEncuestas':return await _getEncuestas();
                 case 'addEncuesta':return await _addEncuesta(args[0],usuario);
                 case 'updateEncuesta':return await _updateEncuesta(args[0],args[1],usuario);
@@ -1953,7 +2001,7 @@
                 withSuccessHandler:fn=>api(fn,onFailure),
                 withFailureHandler:fn=>api(onSuccess,fn)
             };
-            const METHODS=['logout','getResumen','getActividad','getClientes','addCliente','updateCliente','deleteCliente','getProspectos','addProspecto','updateProspecto','deleteProspecto','convertirProspecto','getInventario','addInventario','updateInventario','deleteInventario','getEncuestas','addEncuesta','updateEncuesta','deleteEncuesta','getUsuarios','addUsuario','updateUsuario','deleteUsuario','getCuentasBancarias','addCuentaBancaria','updateCuentaBancaria','deleteCuentaBancaria','getPlanCuentas','addCuentaContable','updateCuentaContable','deleteCuentaContable','getTransacciones','addTransaccion','deleteTransaccion','getResumenContable','getCotizaciones','getCotizacion','getCotizacionHtml','addCotizacion','updateCotizacion','updateEstadoCotizacion','deleteCotizacion','enviarCotizacion','getResumenCotizaciones','getFicha','addContacto','updateContacto','deleteContacto','addNotaCRM','deleteNotaCRM','addActividadCRM','deleteActividadCRM','getPerfil','updatePerfil','updatePreferencias','changePasswordPropio','uploadFotoPerfil','deleteFotoPerfil','getDashboardInit'];
+            const METHODS=['logout','getResumen','getActividad','getClientes','addCliente','updateCliente','deleteCliente','getProspectos','addProspecto','updateProspecto','deleteProspecto','convertirProspecto','getInventario','addInventario','updateInventario','deleteInventario','getCategorias','addCategoria','updateCategoria','deleteCategoria','getEncuestas','addEncuesta','updateEncuesta','deleteEncuesta','getUsuarios','addUsuario','updateUsuario','deleteUsuario','getCuentasBancarias','addCuentaBancaria','updateCuentaBancaria','deleteCuentaBancaria','getPlanCuentas','addCuentaContable','updateCuentaContable','deleteCuentaContable','getTransacciones','addTransaccion','deleteTransaccion','getResumenContable','getCotizaciones','getCotizacion','getCotizacionHtml','addCotizacion','updateCotizacion','updateEstadoCotizacion','deleteCotizacion','enviarCotizacion','getResumenCotizaciones','getFicha','addContacto','updateContacto','deleteContacto','addNotaCRM','deleteNotaCRM','addActividadCRM','deleteActividadCRM','getPerfil','updatePerfil','updatePreferencias','changePasswordPropio','uploadFotoPerfil','deleteFotoPerfil','getDashboardInit'];
             METHODS.forEach(name=>{
                 runner[name]=function(){
                     const args=Array.from(arguments);
@@ -1978,6 +2026,7 @@
         ═══════════════════════════════════════════════════════ */
         let _clientes = [];
         let _inventario = [];
+        let _categorias = [];
         let _encuestas = [];
         let _usuarios = [];
         let _currentPage = 'overview';
@@ -1996,8 +2045,8 @@
         let _currentOrgId = null;    // organization_id del usuario autenticado
         let _usuario = '';
 
-        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', ficha: 'Ficha', cotizaciones: 'Cotizaciones', inventario: 'Inventario', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad', perfil: 'Ajustes', suscripciones: 'Suscripciones', 'sub-empresas': 'Empresas', 'sub-planes': 'Planes', 'sub-pagos': 'Pagos'};
-        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', cotizaciones: 'Nueva cotización', inventario: 'Nuevo ítem', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria', perfil: '', suscripciones: '', 'sub-empresas': 'Nueva empresa', 'sub-planes': 'Nuevo plan', 'sub-pagos': ''};
+        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', ficha: 'Ficha', cotizaciones: 'Cotizaciones', inventario: 'Inventario', categorias: 'Categorías', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad', perfil: 'Ajustes', suscripciones: 'Suscripciones', 'sub-empresas': 'Empresas', 'sub-planes': 'Planes', 'sub-pagos': 'Pagos'};
+        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', cotizaciones: 'Nueva cotización', inventario: '', categorias: 'Nueva categoría', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria', perfil: '', suscripciones: '', 'sub-empresas': 'Nueva empresa', 'sub-planes': 'Nuevo plan', 'sub-pagos': ''};
 
         const ETAPAS = ['Nuevo', 'Contactado', 'Calificado', 'Propuesta', 'Negociación', 'Perdido'];
         const ORIGENES = ['Referido', 'Sitio web', 'Llamada fría', 'Evento', 'Redes sociales', 'Otro'];
@@ -2131,6 +2180,7 @@
             loadClientes();
             loadProspectos();
             loadInventario();
+            loadCategorias();
             loadEncuestas();
             loadCotizaciones();
             if (esAdmin()) loadUsuarios();
@@ -2143,6 +2193,7 @@
             if (_currentPage === 'clientes')   {loadClientes(); loadResumen();}
             if (_currentPage === 'prospectos') {loadProspectos(); loadResumen();}
             if (_currentPage === 'inventario') {loadInventario(); loadResumen();}
+            if (_currentPage === 'categorias') {loadCategorias();}
             if (_currentPage === 'cotizaciones') {loadCotizaciones(); loadInventario(); loadClientes();}
             if (_currentPage === 'ficha') {recargarFicha();}
             if (_currentPage === 'encuestas')  {loadEncuestas(); loadResumen();}
@@ -2459,6 +2510,101 @@
                 el.classList.add('active');
             }
             renderInventario(filtro);
+        }
+
+        /* ═══════════════════════════════════════════════════════
+           CATEGORÍAS DE INVENTARIO
+        ═══════════════════════════════════════════════════════ */
+        function loadCategorias() {
+            window.api
+                .withSuccessHandler(function(r) {
+                    if (!r.ok) { showToast('Error cargando categorías: ' + (r.error || ''), '#FF453A'); return; }
+                    _categorias = r.data || [];
+                    renderCategorias();
+                })
+                .withFailureHandler(function(err) { _onApiError('categorias', err); })
+                .getCategorias();
+        }
+
+        function renderCategorias() {
+            const tbody = document.getElementById('categoriasTbody');
+            if (!tbody) return;
+            if (!_categorias.length) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:32px">No hay categorías aún. Crea una para organizar tu inventario.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = _categorias.map(c => {
+                const usadas = _inventario.filter(i => i.categoria === c.nombre).length;
+                const estado = c.activa !== false
+                    ? '<span class="tag tag-success">Activa</span>'
+                    : '<span class="tag tag-gray">Inactiva</span>';
+                const dot = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${escAttr(c.color||'#8E8E93')};margin-right:6px;vertical-align:middle"></span>`;
+                return `<tr>
+                    <td><div style="display:flex;align-items:center">${dot}<strong>${escHtml(c.nombre)}</strong></div></td>
+                    <td style="color:var(--text-secondary)">${escHtml(c.descripcion||'—')}</td>
+                    <td style="text-align:center">${usadas}</td>
+                    <td>${estado}</td>
+                    <td style="text-align:right">
+                        <button class="btn-icon" title="Editar" onclick="editCategoria('${escAttr(c.id)}')">
+                            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="btn-icon btn-danger-icon" title="Eliminar" onclick="deleteCategoria('${escAttr(c.id)}','${escAttr(c.nombre)}')">
+                            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function newCategoria() {
+            openModal('Nueva categoría', _formCategoria({}));
+            _modalMode = {type: 'categoria', action: 'add', id: null};
+        }
+
+        function editCategoria(id) {
+            const c = _categorias.find(x => x.id === id);
+            if (!c) return;
+            openModal('Editar categoría', _formCategoria(c));
+            _modalMode = {type: 'categoria', action: 'edit', id};
+        }
+
+        function deleteCategoria(id, nombre) {
+            if (!confirm('¿Eliminar la categoría "' + nombre + '"?\nSolo se puede eliminar si no tiene productos asignados.')) return;
+            window.api
+                .withSuccessHandler(function(r) {
+                    if (r.ok) { showToast('Categoría eliminada', '#FF453A'); loadCategorias(); }
+                    else showToast('No se puede eliminar: ' + r.error, '#FF9F0A');
+                })
+                .withFailureHandler(function(err) { showToast('Error: ' + err, '#FF453A'); })
+                .deleteCategoria(id);
+        }
+
+        function _formCategoria(c) {
+            const activa = c.activa === undefined ? true : c.activa !== false;
+            const color = c.color || '#8E8E93';
+            const colores = ['#0A84FF','#30D158','#FF9F0A','#BF5AF2','#FF453A','#5e5ce6','#32ADE6','#8E8E93'];
+            const swatches = colores.map(col =>
+                `<span onclick="_selColor(this,'${col}')" style="display:inline-block;width:22px;height:22px;border-radius:50%;background:${col};cursor:pointer;border:2.5px solid ${col===color?'var(--text)':'transparent'};margin:2px" data-color="${col}"></span>`
+            ).join('');
+            return `
+            <div class="form-field"><label class="form-label">NOMBRE *</label>
+              <input class="form-input" id="mCatNombre" value="${escAttr(c.nombre||'')}" placeholder="Ej. Equipos, Servicios, Accesorios…"/></div>
+            <div class="form-field"><label class="form-label">DESCRIPCIÓN</label>
+              <input class="form-input" id="mCatDesc" value="${escAttr(c.descripcion||'')}" placeholder="Opcional"/></div>
+            <div class="form-field"><label class="form-label">COLOR</label>
+              <div style="display:flex;gap:2px;flex-wrap:wrap;margin-bottom:4px" id="mCatSwatches">${swatches}</div>
+              <input type="hidden" id="mCatColor" value="${escAttr(color)}"/>
+            </div>
+            <div class="switch-field">
+              <div><div class="sf-txt">Activa</div><div class="sf-sub">Las categorías inactivas no aparecen al crear productos.</div></div>
+              <label class="switch${activa?' on':''}"><input type="checkbox" id="mCatActiva" ${activa?'checked':''} onchange="this.closest('label').classList.toggle('on',this.checked)"/><span class="knob"></span></label>
+            </div>`;
+        }
+
+        function _selColor(el, color) {
+            document.getElementById('mCatColor').value = color;
+            el.closest('#mCatSwatches').querySelectorAll('span').forEach(s => s.style.borderColor = 'transparent');
+            el.style.borderColor = 'var(--text)';
         }
 
         /* ═══════════════════════════════════════════════════════
@@ -2914,6 +3060,12 @@
         ═══════════════════════════════════════════════════════ */
         // Categorías dinámicas: se derivan del inventario existente + 'Otro' siempre presente
         function _getCategoriasInv() {
+            // Lee de _categorias (tabla CategoriasInventario). Si aún vacío, fallback con categorías en inventario existente.
+            if (_categorias && _categorias.length > 0) {
+                const activas = _categorias.filter(c => c.activa !== false).map(c => c.nombre);
+                if (!activas.includes('Otro')) activas.push('Otro');
+                return activas.sort((a, b) => a === 'Otro' ? 1 : b === 'Otro' ? -1 : a.localeCompare(b, 'es'));
+            }
             const cats = new Set(_inventario.map(i => i.categoria).filter(Boolean));
             cats.add('Otro');
             return Array.from(cats).sort((a, b) => a === 'Otro' ? 1 : b === 'Otro' ? -1 : a.localeCompare(b, 'es'));
@@ -3213,6 +3365,24 @@
                     });
                 }
             }
+            else if (m.type === 'categoria') {
+                const nombre = document.getElementById('mCatNombre').value.trim();
+                if (!nombre) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return;}
+                const data = {
+                    nombre,
+                    descripcion: document.getElementById('mCatDesc').value.trim(),
+                    color: document.getElementById('mCatColor').value || '#8E8E93',
+                    activa: document.getElementById('mCatActiva').checked
+                };
+                const fn = m.action === 'add'
+                    ? (cb => window.api.withSuccessHandler(cb).addCategoria(data))
+                    : (cb => window.api.withSuccessHandler(cb).updateCategoria(m.id, data));
+                fn(res => {
+                    closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
+                    if (res.ok) {showToast(m.action === 'add' ? 'Categoría creada' : 'Categoría actualizada', '#30D158'); loadCategorias();}
+                    else showToast('Error: ' + res.error, '#FF453A');
+                });
+            }
         }
 
         /* ═══════════════════════════════════════════════════════
@@ -3236,25 +3406,65 @@
         function showPage(id, navEl) {
             _currentPage = id;
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + id).classList.add('active');
+            const pageEl = document.getElementById('page-' + id);
+            if (pageEl) pageEl.classList.add('active');
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelectorAll('.nav-subitem').forEach(n => n.classList.remove('active'));
             if (navEl) navEl.classList.add('active');
+
+            // Sub-items de inventario
+            if (id === 'inventario') {
+                _openNavGroup('invGroup');
+                const si = document.getElementById('nav-inventario-list');
+                if (si) si.classList.add('active');
+                loadInventario();
+            } else if (id === 'categorias') {
+                _openNavGroup('invGroup');
+                const si = document.getElementById('nav-categorias');
+                if (si) si.classList.add('active');
+                loadCategorias();
+            }
+
             document.getElementById('pageTitle').textContent = PAGE_TITLES[id] || id;
-            document.getElementById('ctaLabel').textContent = CTA_LABELS[id] || 'Nuevo';
+            const ctaLabel = CTA_LABELS[id];
+            document.getElementById('ctaLabel').textContent = ctaLabel || 'Nuevo';
             document.getElementById('searchInput').value = '';
 
-            // La ficha es una vista interna: sin CTA y sin modo ampliado al salir
             const cta = document.getElementById('mainCta');
-            if (cta) cta.style.display = (id === 'ficha' || id === 'perfil') ? 'none' : '';
+            if (cta) cta.style.display = (id === 'ficha' || id === 'perfil' || ctaLabel === '') ? 'none' : '';
             if (id !== 'ficha') document.body.classList.remove('ficha-max');
             if (id === 'perfil') loadPerfil();
+        }
+
+        function toggleNavGroup(groupId, navEl, pageId) {
+            const grp = document.getElementById(groupId);
+            if (!grp) return;
+            const isOpen = grp.style.display !== 'none';
+            if (isOpen) {
+                grp.style.display = 'none';
+                _rotateChevron(groupId, false);
+            } else {
+                _openNavGroup(groupId);
+                // Navegar al primer sub-item automáticamente
+                if (pageId) showPage(pageId, navEl);
+            }
+        }
+
+        function _openNavGroup(groupId) {
+            const grp = document.getElementById(groupId);
+            if (grp) { grp.style.display = 'block'; _rotateChevron(groupId, true); }
+        }
+
+        function _rotateChevron(groupId, open) {
+            const ch = document.getElementById('chevron-' + groupId);
+            if (ch) ch.style.transform = open ? 'rotate(180deg)' : '';
         }
 
         function ctaAction() {
             if (_currentPage === 'clientes' || _currentPage === 'overview') newCliente();
             else if (_currentPage === 'prospectos') newProspecto();
             else if (_currentPage === 'cotizaciones') nuevaCotizacion();
-            else if (_currentPage === 'inventario') newInv();
+            else if (_currentPage === 'categorias') newCategoria();
             else if (_currentPage === 'encuestas') newEncuesta();
             else if (_currentPage === 'usuarios') newUsuario();
             else if (_currentPage === 'contabilidad') openNuevaCuentaBancaria();
