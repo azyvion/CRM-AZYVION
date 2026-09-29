@@ -2060,6 +2060,49 @@
 
     </script>
     <script src="clientes.js"></script>
+    <script>
+    // ── Guardia anti-duplicados: módulo Clientes v6.0 ──────────────────────────
+    // clientes.js (_patchClientesDOM) puede insertar tarjetas KPI extras si los
+    // IDs ya existen en el HTML. Este script elimina cualquier duplicado justo
+    // después de que el DOM esté listo, conservando únicamente el PRIMER elemento
+    // con cada ID y el PRIMER select de cada filtro.
+    (function deduplicateClientesKPIs() {
+        const dedup = (id) => {
+            const els = document.querySelectorAll('#' + id);
+            if (els.length > 1) {
+                for (let i = 1; i < els.length; i++) {
+                    // Subir hasta el kpi-card padre y eliminarlo
+                    let node = els[i];
+                    while (node && !node.classList.contains('kpi-card')) node = node.parentElement;
+                    if (node) node.remove(); else els[i].remove();
+                }
+            }
+        };
+
+        const dedupSelect = (id) => {
+            const els = document.querySelectorAll('#' + id);
+            if (els.length > 1) {
+                for (let i = 1; i < els.length; i++) els[i].remove();
+            }
+        };
+
+        const run = () => {
+            // KPIs nuevos que el JS patch puede duplicar
+            ['cli-inactivos','cli-en-riesgo','cli-valor-total','cli-ticket'].forEach(dedup);
+            // Selects que el patch puede reinsertar
+            ['cliFiltroFuente','cliFiltroSeg','cliOrden'].forEach(dedupSelect);
+        };
+
+        // Ejecutar tras DOMContentLoaded y también tras un breve delay
+        // por si el patch corre de forma asíncrona
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => { run(); setTimeout(run, 400); });
+        } else {
+            run(); setTimeout(run, 400);
+        }
+    })();
+    // ──────────────────────────────────────────────────────────────────────────
+    </script>
     <script src="prospectos.js"></script>
     <script src="inventario.js"></script>
     <script src="encuestas.js"></script>
