@@ -327,8 +327,8 @@
                 </div>
 
                 <!-- KPIs principales — 6 tarjetas con indicadores -->
-                <div class="ov-kpi-grid">
-                    <div class="ov-kpi-card" onclick="showPage('clientes',document.getElementById('nav-clientes'))">
+                <div class="ov-kpi-grid" id="ovKpiGrid">
+                    <div class="ov-kpi-card" id="ovCard-clientes" onclick="showPage('clientes',document.getElementById('nav-clientes'))">
                         <div class="ov-kpi-icon" style="background:rgba(59,110,245,.12)">
                             <svg viewBox="0 0 24 24" style="stroke:#3B6EF5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                         </div>
@@ -339,7 +339,7 @@
                         </div>
                         <canvas class="ov-spark" id="spark-cli" width="64" height="32"></canvas>
                     </div>
-                    <div class="ov-kpi-card" onclick="showPage('prospectos',document.getElementById('nav-prospectos'))">
+                    <div class="ov-kpi-card" id="ovCard-prospectos" onclick="showPage('prospectos',document.getElementById('nav-prospectos'))">
                         <div class="ov-kpi-icon" style="background:rgba(139,92,246,.12)">
                             <svg viewBox="0 0 24 24" style="stroke:#8B5CF6"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                         </div>
@@ -350,7 +350,7 @@
                         </div>
                         <canvas class="ov-spark" id="spark-pro" width="64" height="32"></canvas>
                     </div>
-                    <div class="ov-kpi-card" onclick="showPage('cotizaciones',document.getElementById('nav-cotizaciones'))">
+                    <div class="ov-kpi-card" id="ovCard-cotizaciones" onclick="showPage('cotizaciones',document.getElementById('nav-cotizaciones'))">
                         <div class="ov-kpi-icon" style="background:rgba(34,197,94,.12)">
                             <svg viewBox="0 0 24 24" style="stroke:#22C55E"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
                         </div>
@@ -361,7 +361,7 @@
                         </div>
                         <canvas class="ov-spark" id="spark-cot" width="64" height="32"></canvas>
                     </div>
-                    <div class="ov-kpi-card" style="border-top-color:var(--warning)">
+                    <div class="ov-kpi-card" id="ovCard-pipeline" style="border-top-color:var(--warning)">
                         <div class="ov-kpi-icon" style="background:rgba(245,158,11,.12)">
                             <svg viewBox="0 0 24 24" style="stroke:#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                         </div>
@@ -371,7 +371,7 @@
                             <div class="ov-kpi-sub" id="ov-pond-d">— potencial total</div>
                         </div>
                     </div>
-                    <div class="ov-kpi-card" onclick="showPage('inventario',document.getElementById('nav-inventario'))">
+                    <div class="ov-kpi-card" id="ovCard-inventario" onclick="showPage('inventario',document.getElementById('nav-inventario'))">
                         <div class="ov-kpi-icon" style="background:rgba(239,68,68,.12)">
                             <svg viewBox="0 0 24 24" style="stroke:#EF4444"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                         </div>
@@ -381,7 +381,7 @@
                             <div class="ov-kpi-sub" id="ov-crit-d">— productos bajo</div>
                         </div>
                     </div>
-                    <div class="ov-kpi-card" onclick="showPage('encuestas',document.getElementById('nav-encuestas'))">
+                    <div class="ov-kpi-card" id="ovCard-encuestas" onclick="showPage('encuestas',document.getElementById('nav-encuestas'))">
                         <div class="ov-kpi-icon" style="background:rgba(20,184,166,.12)">
                             <svg viewBox="0 0 24 24" style="stroke:#14B8A6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                         </div>
@@ -458,7 +458,7 @@
                         </div>
                         <div style="margin-top:16px">
                             <div class="section-title" style="margin-bottom:10px">Acciones rápidas</div>
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                            <div id="ovQuickActions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                                 <button class="ov-quick-btn" onclick="showPage('clientes',document.getElementById('nav-clientes')); ctaAction()">
                                     <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                                     Nuevo cliente
@@ -6707,6 +6707,57 @@ function _aplicarDashboardInit(r) {
         if (navSec)  navSec.style.display  = esContAccess ? '' : 'none';
         if (navItem) navItem.style.display = esContAccess ? 'flex' : 'none';
     })();
+
+    /* ── Aplicar visibilidad por rol en el overview ──────── */
+    _ovApplyRoles();
+
+    /* ── Renderizar overview si está activo ──────────────── */
+    if (typeof renderOverview === 'function') {
+        setTimeout(renderOverview, 80);
+    }
+}
+
+/* ── Visibilidad de KPIs del overview por rol ───────────── */
+function _ovApplyRoles() {
+    // Reglas de visibilidad por módulo y rol
+    // SUPER_ADMIN / ADMIN / GERENTE ven todo
+    // Rol estándar: ve todos los módulos excepto usuarios y contabilidad
+    const rol = _rol || '';
+    const esPrivilegiado = (rol === 'Admin' || rol === 'Gerente' || window._esSuperAdmin);
+
+    // Módulos accesibles según rol (estándar ve todo excepto contabilidad/usuarios)
+    const puedeProspectos   = true; // todos
+    const puedeCotizaciones = true; // todos
+    const puedeInventario   = true; // todos
+    const puedeEncuestas    = true; // todos
+    const puedePipeline     = puedeProspectos; // mismo acceso que prospectos
+
+    function _showCard(id, show) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = show ? '' : 'none';
+    }
+    _showCard('ovCard-clientes',    true);
+    _showCard('ovCard-prospectos',  puedeProspectos);
+    _showCard('ovCard-cotizaciones',puedeCotizaciones);
+    _showCard('ovCard-pipeline',    puedePipeline);
+    _showCard('ovCard-inventario',  puedeInventario);
+    _showCard('ovCard-encuestas',   puedeEncuestas);
+
+    // Acciones rápidas: reemplazar con las que apliquen al usuario
+    var qaGrid = document.getElementById('ovQuickActions');
+    if (!qaGrid) return;
+    var acciones = [
+        { label: 'Nuevo cliente',   icon: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>', fn: "showPage('clientes',document.getElementById('nav-clientes')); ctaAction()", show: true },
+        { label: 'Nuevo prospecto', icon: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>', fn: "showPage('prospectos',document.getElementById('nav-prospectos')); ctaAction()", show: puedeProspectos },
+        { label: 'Cotización',      icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>', fn: "showPage('cotizaciones',document.getElementById('nav-cotizaciones')); ctaAction()", show: puedeCotizaciones },
+        { label: 'Nuevo ítem',      icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>', fn: "showPage('inventario',document.getElementById('nav-inventario')); ctaAction()", show: puedeInventario },
+    ];
+    var visibles = acciones.filter(function(a){ return a.show; });
+    qaGrid.style.gridTemplateColumns = visibles.length <= 2 ? '1fr' : '1fr 1fr';
+    qaGrid.innerHTML = visibles.map(function(a) {
+        return '<button class="ov-quick-btn" onclick="' + a.fn + '">' +
+            '<svg viewBox="0 0 24 24">' + a.icon + '</svg>' + escHtml(a.label) + '</button>';
+    }).join('');
 }
 
 /* ── Handlers internos reutilizables ─────────────────────── */
@@ -8916,6 +8967,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         if (typeof _prospectos !== 'undefined') renderChartPipeline(_prospectos);
         if (typeof _cotizaciones !== 'undefined') renderChartCotizaciones(_cotizaciones);
         if (typeof _clientes !== 'undefined') renderChartSegmentos(_clientes);
+        if (typeof _ovApplyRoles === 'function') _ovApplyRoles();
     }
 
     /* Hook en loadAll/loadResumen para refrescar overview */
