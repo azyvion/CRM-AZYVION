@@ -130,7 +130,7 @@
             Inventario
             <svg class="nav-chevron" id="chevron-invGroup" viewBox="0 0 24 24" style="width:14px;height:14px;margin-left:auto;transition:transform .2s;flex-shrink:0"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
-        <div class="nav-subgroup" id="invGroup" style="display:none;overflow:hidden">
+        <div class="nav-subgroup" id="invGroup" style="display:none">
             <div class="nav-subitem" id="nav-inventario-list" onclick="showPage('inventario',document.getElementById('nav-inventario'))">
                 <svg viewBox="0 0 24 24" style="width:14px;height:14px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
                 Ver inventario
@@ -3644,6 +3644,8 @@
                 _openNavGroup(groupId);
                 // Navegar al primer sub-item automáticamente
                 if (pageId) showPage(pageId, navEl);
+                // Asegurar que todo el submenú quede visible en pantallas bajas
+                setTimeout(function () { try { grp.scrollIntoView({block: 'nearest', behavior: 'smooth'}); } catch (e) {} }, 60);
             }
         }
 
