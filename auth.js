@@ -606,17 +606,3 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
             if (_currentPage === 'contabilidad') { loadCuentasBancarias(); loadPlanCuentas(); loadTransacciones(); loadResumenContable(); }
             showToast('Datos actualizados', '#30D158');
         }
-
-        /* ═══════════════════════════════════════════════════════
-           CARGA DE DATOS
-        ═══════════════════════════════════════════════════════ */
-        function loadResumen() {
-            window.api
-                .withSuccessHandler(function (r) {
-                    if (!r.ok) { showToast('Error al cargar resumen: ' + (r.error || ''), '#FF453A'); return; }
-                    const c   = r.clientes   || {};
-                    const inv = r.inventario || {};
-                    const enc = r.encuestas  || {};
-                    const pro = r.prospectos || {};
-
-                    // Normalizar campos que pueden venir con nombre distinto según versión del backend
