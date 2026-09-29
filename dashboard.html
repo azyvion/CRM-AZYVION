@@ -139,6 +139,26 @@
                 <svg viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/><rect x="2" y="4" width="4" height="4" rx="1"/><rect x="2" y="12" width="4" height="4" rx="1"/></svg>
                 Categorías
             </div>
+            <div class="nav-subitem" id="nav-catalogo-marcas" onclick="showPage('catalogo-marcas',document.getElementById('nav-inventario'))">
+                <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                Marcas
+            </div>
+            <div class="nav-subitem" id="nav-catalogo-lineas" onclick="showPage('catalogo-lineas',document.getElementById('nav-inventario'))">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                Líneas
+            </div>
+            <div class="nav-subitem" id="nav-catalogo-familias" onclick="showPage('catalogo-familias',document.getElementById('nav-inventario'))">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Familias
+            </div>
+            <div class="nav-subitem" id="nav-catalogo-unidades" onclick="showPage('catalogo-unidades',document.getElementById('nav-inventario'))">
+                <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Unidades de negocio
+            </div>
+            <div class="nav-subitem" id="nav-catalogo-tipos" onclick="showPage('catalogo-tipos',document.getElementById('nav-inventario'))">
+                <svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+                Tipos de producto
+            </div>
         </div>
         <div class="nav-item" id="nav-encuestas" onclick="showPage('encuestas',this)">
             <svg viewBox="0 0 24 24">
@@ -833,6 +853,167 @@
                         </thead>
                         <tbody id="categoriasTbody">
                             <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- ══════════════════════ CATÁLOGO: MARCAS ══════════════════════ -->
+            <div class="page" id="page-catalogo-marcas">
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Marcas</span>
+                            <span class="cat-count" id="cat-count-marcas"></span>
+                            <span id="cat-filtro-marcas" style="display:none"></span>
+                        </div>
+                        <button class="topbar-btn" onclick="nuevoCatalogo('marcas')" style="height:32px;font-size:12px">
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Nueva marca
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th style="text-align:center">Ítems</th>
+                                <th id="cat-th-emp-marcas" style="display:none">Empresa</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cat-tbody-marcas">
+                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ CATÁLOGO: LÍNEAS ══════════════════════ -->
+            <div class="page" id="page-catalogo-lineas">
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Líneas</span>
+                            <span class="cat-count" id="cat-count-lineas"></span>
+                            <span id="cat-filtro-lineas" style="display:none"></span>
+                        </div>
+                        <button class="topbar-btn" onclick="nuevoCatalogo('lineas')" style="height:32px;font-size:12px">
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Nueva línea
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th style="text-align:center">Ítems</th>
+                                <th id="cat-th-emp-lineas" style="display:none">Empresa</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cat-tbody-lineas">
+                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ CATÁLOGO: FAMILIAS ══════════════════════ -->
+            <div class="page" id="page-catalogo-familias">
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Familias</span>
+                            <span class="cat-count" id="cat-count-familias"></span>
+                            <span id="cat-filtro-familias" style="display:none"></span>
+                        </div>
+                        <button class="topbar-btn" onclick="nuevoCatalogo('familias')" style="height:32px;font-size:12px">
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Nueva familia
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th style="text-align:center">Ítems</th>
+                                <th id="cat-th-emp-familias" style="display:none">Empresa</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cat-tbody-familias">
+                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ CATÁLOGO: UNIDADES DE NEGOCIO ══════════════════════ -->
+            <div class="page" id="page-catalogo-unidades">
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Unidades de negocio</span>
+                            <span class="cat-count" id="cat-count-unidades"></span>
+                            <span id="cat-filtro-unidades" style="display:none"></span>
+                        </div>
+                        <button class="topbar-btn" onclick="nuevoCatalogo('unidades')" style="height:32px;font-size:12px">
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Nueva unidad de negocio
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th style="text-align:center">Ítems</th>
+                                <th id="cat-th-emp-unidades" style="display:none">Empresa</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cat-tbody-unidades">
+                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ══════════════════════ CATÁLOGO: TIPOS DE PRODUCTO ══════════════════════ -->
+            <div class="page" id="page-catalogo-tipos">
+                <div class="table-card">
+                    <div class="table-toolbar">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                            <span style="font-size:13px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px">Tipos de producto</span>
+                            <span class="cat-count" id="cat-count-tipos"></span>
+                            <span id="cat-filtro-tipos" style="display:none"></span>
+                        </div>
+                        <button class="topbar-btn" onclick="nuevoCatalogo('tipos')" style="height:32px;font-size:12px">
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Nuevo tipo de producto
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th style="text-align:center">Ítems</th>
+                                <th id="cat-th-emp-tipos" style="display:none">Empresa</th>
+                                <th>Estado</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="cat-tbody-tipos">
+                            <tr class="skeleton-row"><td>&nbsp;</td><td></td><td></td><td style="display:none"></td><td></td><td></td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1821,8 +2002,8 @@
         async function _convertirProspecto(id,p,u){const{data:pr}=await _sb.from('Prospectos').select('*').eq('id',id).single();if(!pr)return{ok:false,error:'Prospecto no encontrado.'};const C=['#0A84FF','#30D158','#FF9F0A','#BF5AF2','#FF453A','#5e5ce6','#8E8E93','#32ADE6'];const nc={id:_uuid(),nombre:pr.nombre,empresa:pr.empresa,segmento:p.segmento||pr.segmento||'Estándar',correo:pr.correo,telefono:pr.telefono,direccion:pr.direccion,estado:p.estado||'Activo',valorTotal:Number(p.valorTotal)||Number(pr.valorEstimado)||0,color:C[Math.floor(Math.random()*C.length)],fechaReg:new Date().toISOString()};await Promise.all([_sb.from('Clientes').insert(nc),_sb.from('Prospectos').delete().eq('id',id)]);return{ok:true};}
 
         async function _getInventario(){const{data,error}=await _sb.from('Inventario').select('*').order('producto');if(error)return{ok:false,error:error.message};const items=(data||[]).map(i=>{i.tipo=String(i.tipo||'')==='Servicio'?'Servicio':'Producto';i.activo=(i.activo===''||i.activo===undefined||i.activo===null)?true:(i.activo===true||String(i.activo).toLowerCase()==='true');i.sku=i.sku||'';i.descripcion=i.descripcion||'';i.unidad=i.unidad||(i.tipo==='Servicio'?'Servicio':'Unidad');if(i.tipo==='Servicio'){i.unidades=0;i.stockMax=0;}i.estado=_estadoItem(i.tipo,i.unidades,i.stockMax);return i;});return{ok:true,data:items};}
-        async function _addInventario(p,u){if(!p.producto)return{ok:false,error:'El nombre del ítem es requerido.'};const t=p.tipo==='Servicio'?'Servicio':'Producto';const un=t==='Servicio'?0:(Number(p.unidades)||0);const m=t==='Servicio'?0:(Number(p.stockMax)||100);const r={id:_uuid(),producto:String(p.producto).trim(),categoria:p.categoria||'Otro',unidades:un,stockMax:m,precioUnit:Number(p.precioUnit)||0,estado:_estadoItem(t,un,m),tipo:t,sku:p.sku||'',descripcion:p.descripcion||'',unidad:p.unidad||(t==='Servicio'?'Servicio':'Unidad'),activo:p.activo==='false'||p.activo===false?false:true,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('Inventario').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
-        async function _updateInventario(id,p,u){const{data:ex}=await _sb.from('Inventario').select('*').eq('id',id).single();if(!ex)return{ok:false,error:'Ítem no encontrado.'};const t=p.tipo!==undefined?(p.tipo==='Servicio'?'Servicio':'Producto'):(ex.tipo==='Servicio'?'Servicio':'Producto');const un=t==='Servicio'?0:Number(p.unidades!==undefined?p.unidades:ex.unidades)||0;const m=t==='Servicio'?0:Number(p.stockMax!==undefined?p.stockMax:ex.stockMax)||1;const up={producto:p.producto!==undefined?String(p.producto).trim():ex.producto,categoria:p.categoria!==undefined?p.categoria:ex.categoria,unidades:un,stockMax:m,precioUnit:Number(p.precioUnit!==undefined?p.precioUnit:ex.precioUnit)||0,estado:_estadoItem(t,un,m),tipo:t,sku:p.sku!==undefined?p.sku:ex.sku,descripcion:p.descripcion!==undefined?p.descripcion:ex.descripcion,unidad:p.unidad!==undefined?p.unidad:ex.unidad,activo:p.activo!==undefined?(p.activo===true||String(p.activo)==='true'):(ex.activo===true||String(ex.activo).toLowerCase()==='true')};const{error}=await _sb.from('Inventario').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
+        async function _addInventario(p,u){if(!p.producto)return{ok:false,error:'El nombre del ítem es requerido.'};const t=p.tipo==='Servicio'?'Servicio':'Producto';const un=t==='Servicio'?0:(Number(p.unidades)||0);const m=t==='Servicio'?0:(Number(p.stockMax)||100);const r={id:_uuid(),producto:String(p.producto).trim(),categoria:p.categoria||'Otro',unidades:un,stockMax:m,precioUnit:Number(p.precioUnit)||0,estado:_estadoItem(t,un,m),tipo:t,sku:p.sku||'',descripcion:p.descripcion||'',unidad:p.unidad||(t==='Servicio'?'Servicio':'Unidad'),activo:p.activo==='false'||p.activo===false?false:true,fechaReg:new Date().toISOString(),organization_id:p.organization_id||_currentOrgId,marca_id:p.marca_id||null,linea_id:p.linea_id||null,familia_id:p.familia_id||null,unidad_negocio_id:p.unidad_negocio_id||null,tipo_producto_id:p.tipo_producto_id||null};if(!r.organization_id)return{ok:false,error:'No se pudo determinar la empresa del ítem.'};const{error}=await _sb.from('Inventario').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
+        async function _updateInventario(id,p,u){const{data:ex}=await _sb.from('Inventario').select('*').eq('id',id).single();if(!ex)return{ok:false,error:'Ítem no encontrado.'};const t=p.tipo!==undefined?(p.tipo==='Servicio'?'Servicio':'Producto'):(ex.tipo==='Servicio'?'Servicio':'Producto');const un=t==='Servicio'?0:Number(p.unidades!==undefined?p.unidades:ex.unidades)||0;const m=t==='Servicio'?0:Number(p.stockMax!==undefined?p.stockMax:ex.stockMax)||1;const up={producto:p.producto!==undefined?String(p.producto).trim():ex.producto,categoria:p.categoria!==undefined?p.categoria:ex.categoria,unidades:un,stockMax:m,precioUnit:Number(p.precioUnit!==undefined?p.precioUnit:ex.precioUnit)||0,estado:_estadoItem(t,un,m),tipo:t,sku:p.sku!==undefined?p.sku:ex.sku,descripcion:p.descripcion!==undefined?p.descripcion:ex.descripcion,unidad:p.unidad!==undefined?p.unidad:ex.unidad,activo:p.activo!==undefined?(p.activo===true||String(p.activo)==='true'):(ex.activo===true||String(ex.activo).toLowerCase()==='true'),marca_id:p.marca_id!==undefined?(p.marca_id||null):ex.marca_id,linea_id:p.linea_id!==undefined?(p.linea_id||null):ex.linea_id,familia_id:p.familia_id!==undefined?(p.familia_id||null):ex.familia_id,unidad_negocio_id:p.unidad_negocio_id!==undefined?(p.unidad_negocio_id||null):ex.unidad_negocio_id,tipo_producto_id:p.tipo_producto_id!==undefined?(p.tipo_producto_id||null):ex.tipo_producto_id};const{error}=await _sb.from('Inventario').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteInventario(id,u){const{error}=await _sb.from('Inventario').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
         async function _getEncuestas(){const{data,error}=await _sb.from('Encuestas').select('*').order('fechaEnvio',{ascending:false});if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
@@ -2045,8 +2226,8 @@
         let _currentOrgId = null;    // organization_id del usuario autenticado
         let _usuario = '';
 
-        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', ficha: 'Ficha', cotizaciones: 'Cotizaciones', inventario: 'Inventario', categorias: 'Categorías', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad', perfil: 'Ajustes', suscripciones: 'Suscripciones', 'sub-empresas': 'Empresas', 'sub-planes': 'Planes', 'sub-pagos': 'Pagos'};
-        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', cotizaciones: 'Nueva cotización', inventario: '', categorias: 'Nueva categoría', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria', perfil: '', suscripciones: '', 'sub-empresas': 'Nueva empresa', 'sub-planes': 'Nuevo plan', 'sub-pagos': ''};
+        const PAGE_TITLES = {overview: 'Inicio', clientes: 'Clientes', prospectos: 'Prospectos', ficha: 'Ficha', cotizaciones: 'Cotizaciones', inventario: 'Inventario', categorias: 'Categorías', 'catalogo-marcas': 'Marcas', 'catalogo-lineas': 'Líneas', 'catalogo-familias': 'Familias', 'catalogo-unidades': 'Unidades de negocio', 'catalogo-tipos': 'Tipos de producto', encuestas: 'Encuestas', usuarios: 'Usuarios', contabilidad: 'Contabilidad', perfil: 'Ajustes', suscripciones: 'Suscripciones', 'sub-empresas': 'Empresas', 'sub-planes': 'Planes', 'sub-pagos': 'Pagos'};
+        const CTA_LABELS = {overview: 'Nuevo cliente', clientes: 'Nuevo cliente', prospectos: 'Nuevo prospecto', cotizaciones: 'Nueva cotización', inventario: 'Nuevo ítem', categorias: 'Nueva categoría', 'catalogo-marcas': 'Nueva marca', 'catalogo-lineas': 'Nueva línea', 'catalogo-familias': 'Nueva familia', 'catalogo-unidades': 'Nueva unidad de negocio', 'catalogo-tipos': 'Nuevo tipo de producto', encuestas: 'Nueva encuesta', usuarios: 'Nuevo usuario', contabilidad: 'Nueva cuenta bancaria', perfil: '', suscripciones: '', 'sub-empresas': 'Nueva empresa', 'sub-planes': 'Nuevo plan', 'sub-pagos': ''};
 
         const ETAPAS = ['Nuevo', 'Contactado', 'Calificado', 'Propuesta', 'Negociación', 'Perdido'];
         const ORIGENES = ['Referido', 'Sitio web', 'Llamada fría', 'Evento', 'Redes sociales', 'Otro'];
@@ -2473,7 +2654,7 @@
                         ? '<span style="color:var(--text-muted)">No aplica</span>'
                         : `<div class="progress-wrap"><div class="progress-bar"><div class="progress-fill ${cls}" style="width:${Math.max(pct, 1)}%"></div></div><span class="progress-val">${pct}%</span></div>`;
                     return `<tr>
-          <td><div class="cell-main">${escHtml(i.producto)}${inactivo}</div>${i.sku ? `<div class="cell-sub">SKU: ${escHtml(i.sku)}</div>` : ''}</td>
+          <td><div class="cell-main">${escHtml(i.producto)}${inactivo}</div>${_invCellSub(i)}</td>
           <td><span class="tag ${esServicio ? 'tag-servicio' : 'tag-producto'}">${esServicio ? 'Servicio' : 'Producto'}</span></td>
           <td>${tagCat(i.categoria)}</td>
           <td>${esServicio ? '—' : i.unidades}</td>
@@ -3076,6 +3257,7 @@
             const esServicio = i.tipo === 'Servicio';
             const cat = i.categoria || 'Otro';
             return `
+    ${_invFormEmpresa(i)}
     <div class="switch-field">
       <div>
         <div class="sf-txt">Es un servicio</div>
@@ -3090,6 +3272,7 @@
       <input class="form-input" id="mProd" value="${escAttr(i.producto || '')}" placeholder="Ej. Router Mikrotik RB450G" required/></div>
     <div class="form-field"><label class="form-label">CÓDIGO / SKU</label>
       <input class="form-input" id="mSku" value="${escAttr(i.sku || '')}" placeholder="Opcional"/></div>
+    ${_invFormClasificacion(i)}
     <div class="form-field"><label class="form-label">CATEGORÍA</label>
       <select class="form-select" id="mCatSel" onchange="_syncCatInput(this)" style="margin-bottom:6px">
         ${_getCategoriasInv().map(c => `<option value="${c}"${c === cat ? ' selected' : ''}>${c}</option>`).join('')}
@@ -3229,6 +3412,7 @@
             if (_handleModalSaveContabilidad(m, saveBtn)) return;
             if (_handleModalSaveCotizaciones(m, saveBtn)) return;
             if (_handleModalSaveFicha(m, saveBtn)) return;
+            if (_handleModalSaveCatalogo(m, saveBtn)) return;
 
             if (m.type === 'cliente') {
                 if (m.action === 'delete') {
@@ -3299,8 +3483,15 @@
                     const categoriaFinal = (catInput && catInput.value.trim())
                         ? catInput.value.trim()
                         : (catSel && catSel.value !== '__nueva__' ? catSel.value : 'Otro') || 'Otro';
+                    if (m.action === 'add' && !(_catEsSA ? v('mInvEmpresa') : _currentOrgId)) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('Selecciona la empresa del ítem', '#FF9F0A'); return;}
                     const data = {
                         producto: prod,
+                        organization_id: _catEsSA ? (v('mInvEmpresa') || undefined) : undefined,
+                        marca_id: v('mMarca') || null,
+                        linea_id: v('mLinea') || null,
+                        familia_id: v('mFamilia') || null,
+                        unidad_negocio_id: v('mUnidadNeg') || null,
+                        tipo_producto_id: v('mTipoProd') || null,
                         categoria: categoriaFinal,
                         tipo: esServ ? 'Servicio' : 'Producto',
                         sku: v('mSku'),
@@ -3423,6 +3614,12 @@
                 const si = document.getElementById('nav-categorias');
                 if (si) si.classList.add('active');
                 loadCategorias();
+            } else if (window.CATALOGO_POR_PAGE && CATALOGO_POR_PAGE[id]) {
+                _openNavGroup('invGroup');
+                const si = document.getElementById('nav-' + id);
+                if (si) si.classList.add('active');
+                renderCatalogo(CATALOGO_POR_PAGE[id]);
+                loadCatalogos();
             }
 
             document.getElementById('pageTitle').textContent = PAGE_TITLES[id] || id;
@@ -3464,7 +3661,9 @@
             if (_currentPage === 'clientes' || _currentPage === 'overview') newCliente();
             else if (_currentPage === 'prospectos') newProspecto();
             else if (_currentPage === 'cotizaciones') nuevaCotizacion();
+            else if (_currentPage === 'inventario') newInv();
             else if (_currentPage === 'categorias') newCategoria();
+            else if (window.CATALOGO_POR_PAGE && CATALOGO_POR_PAGE[_currentPage]) nuevoCatalogo(CATALOGO_POR_PAGE[_currentPage]);
             else if (_currentPage === 'encuestas') newEncuesta();
             else if (_currentPage === 'usuarios') newUsuario();
             else if (_currentPage === 'contabilidad') openNuevaCuentaBancaria();
@@ -8631,6 +8830,282 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
             }
         }, 2000);
     });
+
+    </script>
+
+    <script>
+/* ═══════════════════════════════════════════════════════
+   CATÁLOGOS DE INVENTARIO
+   Marca · Línea · Familia · Unidad de negocio · Tipo de producto
+   Todo se lee/escribe directo en Supabase; RLS aísla por empresa
+   (empresa principal y contratadas). El super admin ve todas.
+═══════════════════════════════════════════════════════ */
+const CATALOGOS = {
+    marcas:   {tabla:'MarcasInventario',   page:'catalogo-marcas',   campo:'marca_id',          fid:'mMarca',      singular:'marca',              plural:'Marcas',              un:'una marca',              nueva:'Nueva marca',              editar:'Editar marca',              creado:'Marca creada',              actualizado:'Marca actualizada',              eliminado:'Marca eliminada',              ejemplo:'Ej. Mikrotik, Ubiquiti, Cisco…'},
+    lineas:   {tabla:'LineasInventario',   page:'catalogo-lineas',   campo:'linea_id',          fid:'mLinea',      singular:'línea',              plural:'Líneas',              un:'una línea',              nueva:'Nueva línea',              editar:'Editar línea',              creado:'Línea creada',              actualizado:'Línea actualizada',              eliminado:'Línea eliminada',              ejemplo:'Ej. Networking, Videovigilancia, Energía…'},
+    familias: {tabla:'FamiliasInventario', page:'catalogo-familias', campo:'familia_id',        fid:'mFamilia',    singular:'familia',            plural:'Familias',            un:'una familia',            nueva:'Nueva familia',            editar:'Editar familia',            creado:'Familia creada',            actualizado:'Familia actualizada',            eliminado:'Familia eliminada',            ejemplo:'Ej. Routers, Antenas, Cámaras…'},
+    unidades: {tabla:'UnidadesNegocio',    page:'catalogo-unidades', campo:'unidad_negocio_id', fid:'mUnidadNeg',  singular:'unidad de negocio',  plural:'Unidades de negocio', un:'una unidad de negocio',  nueva:'Nueva unidad de negocio',  editar:'Editar unidad de negocio',  creado:'Unidad de negocio creada',  actualizado:'Unidad de negocio actualizada',  eliminado:'Unidad de negocio eliminada',  ejemplo:'Ej. Redes, Software, Consultoría…'},
+    tipos:    {tabla:'TiposProducto',      page:'catalogo-tipos',    campo:'tipo_producto_id',  fid:'mTipoProd',   singular:'tipo de producto',   plural:'Tipos de producto',   un:'un tipo de producto',    nueva:'Nuevo tipo de producto',   editar:'Editar tipo de producto',   creado:'Tipo de producto creado',   actualizado:'Tipo de producto actualizado',   eliminado:'Tipo de producto eliminado',   ejemplo:'Ej. Equipo, Licencia, Accesorio…'}
+};
+const CATALOGO_POR_PAGE = {};
+Object.keys(CATALOGOS).forEach(k => { CATALOGO_POR_PAGE[CATALOGOS[k].page] = k; });
+
+let _catData = {marcas: [], lineas: [], familias: [], unidades: [], tipos: []};
+let _catEmpresas = [];
+let _catEsSA = false;
+let _catEmpFiltro = '';
+
+function catEmpresaNombre(id) { const e = _catEmpresas.find(x => x.id === id); return e ? e.nombre : (id || ''); }
+function catNombre(key, id) { if (!id) return ''; const c = (_catData[key] || []).find(x => x.id === id); return c ? c.nombre : ''; }
+
+async function catInit() {
+    try { const r = await window._sb.rpc('is_super_admin'); _catEsSA = r.data === true; } catch (e) { _catEsSA = false; }
+    if (_catEsSA) {
+        try {
+            const r = await window._sb.from('sub_empresas').select('id,nombre,estado').order('nombre');
+            _catEmpresas = r.data || [];
+        } catch (e) { _catEmpresas = []; }
+    }
+    catRenderFiltros();
+    await loadCatalogos();
+}
+
+async function loadCatalogos() {
+    const keys = Object.keys(CATALOGOS);
+    const res = await Promise.all(keys.map(k => window._sb.from(CATALOGOS[k].tabla).select('*').order('nombre')));
+    res.forEach((r, idx) => {
+        if (r.error) { console.warn('[Azyvion] catálogo', keys[idx], r.error.message); return; }
+        _catData[keys[idx]] = r.data || [];
+    });
+    keys.forEach(renderCatalogo);
+    if (typeof renderInventario === 'function') renderInventario(_filtroInvActual);
+}
+
+/* ── Filtro de empresa (solo super admin) ── */
+function catEmpresasOrdenadas() {
+    return _catEmpresas.slice().sort((a, b) => (a.estado === 'INTERNAL' ? -1 : 0) - (b.estado === 'INTERNAL' ? -1 : 0) || String(a.nombre).localeCompare(String(b.nombre), 'es'));
+}
+function catRenderFiltros() {
+    Object.keys(CATALOGOS).forEach(k => {
+        const el = document.getElementById('cat-filtro-' + k);
+        if (!el) return;
+        if (!_catEsSA) { el.style.display = 'none'; el.innerHTML = ''; return; }
+        el.style.display = '';
+        el.innerHTML = '<select class="form-select cat-filtro-sel" onchange="catFiltrarEmpresa(this.value)">' +
+            '<option value="">Todas las empresas</option>' +
+            catEmpresasOrdenadas().map(e => `<option value="${escAttr(e.id)}"${e.id === _catEmpFiltro ? ' selected' : ''}>${escHtml(e.nombre)}</option>`).join('') +
+            '</select>';
+    });
+}
+function catFiltrarEmpresa(val) {
+    _catEmpFiltro = val || '';
+    catRenderFiltros();
+    Object.keys(CATALOGOS).forEach(renderCatalogo);
+}
+
+/* ── Render de cada catálogo ── */
+function renderCatalogo(key) {
+    const cfg = CATALOGOS[key];
+    const tbody = document.getElementById('cat-tbody-' + key);
+    if (!tbody) return;
+    let rows = _catData[key] || [];
+    if (_catEsSA && _catEmpFiltro) rows = rows.filter(r => r.organization_id === _catEmpFiltro);
+
+    const th = document.getElementById('cat-th-emp-' + key);
+    if (th) th.style.display = _catEsSA ? '' : 'none';
+    const cnt = document.getElementById('cat-count-' + key);
+    if (cnt) cnt.textContent = rows.length + (rows.length === 1 ? ' registro' : ' registros');
+
+    if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="cat-empty">
+            <div class="cat-empty-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
+            <div class="cat-empty-t">Aún no hay ${escHtml(cfg.plural.toLowerCase())}</div>
+            <div class="cat-empty-s">Crea ${escHtml(cfg.un)} para poder asignarla${key === 'tipos' ? '' : ''} a tus productos.<br>${escHtml(cfg.ejemplo)}</div>
+            <button class="topbar-btn" onclick="nuevoCatalogo('${key}')" style="height:34px;font-size:12.5px">${escHtml(cfg.nueva)}</button>
+        </div></td></tr>`;
+        return;
+    }
+    tbody.innerHTML = rows.map(c => {
+        const usados = (_inventario || []).filter(i => i[cfg.campo] === c.id).length;
+        const estado = c.activa !== false ? '<span class="tag tag-success">Activa</span>' : '<span class="tag tag-gray">Inactiva</span>';
+        const ini = escHtml(String(c.nombre || '?').trim().charAt(0).toUpperCase());
+        return `<tr>
+            <td><div class="cat-row-name"><span class="cat-badge">${ini}</span><strong>${escHtml(c.nombre)}</strong></div></td>
+            <td style="color:var(--text-secondary)">${escHtml(c.descripcion || '—')}</td>
+            <td style="text-align:center">${usados}</td>
+            <td style="${_catEsSA ? '' : 'display:none'}"><span class="tag tag-gray">${escHtml(catEmpresaNombre(c.organization_id))}</span></td>
+            <td>${estado}</td>
+            <td style="text-align:right;white-space:nowrap">
+                <button class="btn-icon" title="Editar" onclick="editarCatalogo('${key}','${escAttr(c.id)}')">
+                    <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="btn-icon btn-danger-icon" title="Eliminar" onclick="confirmarEliminarCatalogo('${key}','${escAttr(c.id)}')">
+                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+/* ── Formulario / modal de catálogo ── */
+function _catEmpresaOpts(selected) {
+    const list = catEmpresasOrdenadas();
+    const sel = selected || (list[0] && list[0].id);
+    return list.map(e => `<option value="${escAttr(e.id)}"${e.id === sel ? ' selected' : ''}>${escHtml(e.nombre)}${e.estado === 'INTERNAL' ? ' (principal)' : ''}</option>`).join('');
+}
+
+function _formCatalogo(key, c) {
+    c = c || {};
+    const cfg = CATALOGOS[key];
+    const activa = c.activa === undefined ? true : c.activa !== false;
+    let emp = '';
+    if (_catEsSA) {
+        emp = c.id
+            ? `<div class="form-field"><label class="form-label">EMPRESA</label><div class="cat-readonly">${escHtml(catEmpresaNombre(c.organization_id))}</div></div>`
+            : `<div class="form-field"><label class="form-label">EMPRESA *</label><select class="form-select" id="mCgEmpresa">${_catEmpresaOpts(_catEmpFiltro)}</select></div>`;
+    }
+    return emp + `
+    <div class="form-field"><label class="form-label">NOMBRE *</label>
+      <input class="form-input" id="mCgNombre" value="${escAttr(c.nombre || '')}" placeholder="${escAttr(cfg.ejemplo)}" maxlength="80"/></div>
+    <div class="form-field"><label class="form-label">DESCRIPCIÓN</label>
+      <input class="form-input" id="mCgDesc" value="${escAttr(c.descripcion || '')}" placeholder="Opcional"/></div>
+    <div class="switch-field">
+      <div><div class="sf-txt">Activa</div><div class="sf-sub">Los registros inactivos no aparecen al crear productos.</div></div>
+      <label class="switch${activa ? ' on' : ''}"><input type="checkbox" id="mCgActiva" ${activa ? 'checked' : ''} onchange="this.closest('label').classList.toggle('on',this.checked)"/><span class="knob"></span></label>
+    </div>`;
+}
+
+function nuevoCatalogo(key) {
+    _modalMode = {type: 'catalogo', key, action: 'add', id: null};
+    openModal(CATALOGOS[key].nueva, _formCatalogo(key, {}));
+    setTimeout(() => { const el = document.getElementById('mCgNombre'); if (el) el.focus(); }, 60);
+}
+function editarCatalogo(key, id) {
+    const c = (_catData[key] || []).find(x => x.id === id);
+    if (!c) return;
+    _modalMode = {type: 'catalogo', key, action: 'edit', id};
+    openModal(CATALOGOS[key].editar, _formCatalogo(key, c));
+}
+function confirmarEliminarCatalogo(key, id) {
+    const cfg = CATALOGOS[key];
+    const c = (_catData[key] || []).find(x => x.id === id);
+    if (!c) return;
+    const usados = (_inventario || []).filter(i => i[cfg.campo] === id).length;
+    _modalMode = {type: 'catalogo', key, action: 'delete', id};
+    openModal('Eliminar ' + cfg.singular, `<div style="text-align:center;padding:10px 0">
+    <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:var(--danger);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-bottom:12px;display:block;margin-inline:auto"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+    <div style="font-size:15px;font-weight:600;margin-bottom:6px">¿Eliminar ${escHtml(cfg.singular)}?</div>
+    <div style="font-size:13px;color:var(--text-secondary)">Se eliminará <strong>${escHtml(c.nombre)}</strong>.${usados ? `<br>Está asignada a <strong>${usados}</strong> ítem${usados === 1 ? '' : 's'} del inventario, que quedarán sin ${escHtml(cfg.singular)}.` : ''}<br>Esta acción no se puede deshacer.</div>
+  </div>`);
+    const b = document.getElementById('modalSaveBtn');
+    b.textContent = 'Eliminar'; b.style.background = 'var(--danger)';
+}
+
+/* Llamado desde modalSave(); devuelve true si maneja el modal */
+function _handleModalSaveCatalogo(m, btn) {
+    if (!m || m.type !== 'catalogo') return false;
+    const cfg = CATALOGOS[m.key];
+    const reset = () => { btn.disabled = false; btn.textContent = m.action === 'delete' ? 'Eliminar' : 'Guardar'; };
+    (async () => {
+        try {
+            if (m.action === 'delete') {
+                const r = await window._sb.from(cfg.tabla).delete().eq('id', m.id);
+                if (r.error) throw r.error;
+                closeModal(); showToast(cfg.eliminado, '#FF453A');
+            } else {
+                const nombre = v('mCgNombre').trim();
+                if (!nombre) { reset(); showToast('El nombre es requerido', '#FF9F0A'); return; }
+                const row = {nombre, descripcion: v('mCgDesc').trim(), activa: !!(document.getElementById('mCgActiva') || {}).checked};
+                if (m.action === 'add') {
+                    const org = _catEsSA ? v('mCgEmpresa') : _currentOrgId;
+                    if (!org) { reset(); showToast('Selecciona la empresa', '#FF9F0A'); return; }
+                    row.organization_id = org;
+                    const r = await window._sb.from(cfg.tabla).insert(row);
+                    if (r.error) throw r.error;
+                    closeModal(); showToast(cfg.creado, '#30D158');
+                } else {
+                    const r = await window._sb.from(cfg.tabla).update(row).eq('id', m.id);
+                    if (r.error) throw r.error;
+                    closeModal(); showToast(cfg.actualizado, '#30D158');
+                }
+            }
+            btn.disabled = false; btn.textContent = 'Guardar';
+            await loadCatalogos();
+        } catch (e) {
+            reset();
+            showToast(e && e.code === '23505' ? 'Ya existe ' + cfg.un + ' con ese nombre en esta empresa' : 'Error: ' + (e && e.message || e), '#FF453A');
+        }
+    })();
+    return true;
+}
+
+/* ── Formulario de ítem: empresa + clasificación (desde la BD) ── */
+function _invEmpresaActual(i) {
+    if (i && i.organization_id) return i.organization_id;
+    if (_catEsSA) { const l = catEmpresasOrdenadas(); return _catEmpFiltro || (l[0] && l[0].id) || ''; }
+    return _currentOrgId;
+}
+function _catOpts(key, orgId, sel) {
+    const list = (_catData[key] || []).filter(c => c.organization_id === orgId && (c.activa !== false || c.id === sel));
+    return '<option value="">— Sin asignar —</option>' + list.map(c =>
+        `<option value="${escAttr(c.id)}"${c.id === sel ? ' selected' : ''}>${escHtml(c.nombre)}${c.activa === false ? ' (inactiva)' : ''}</option>`).join('');
+}
+function _invHint(org) {
+    const vac = Object.keys(CATALOGOS).filter(k => !(_catData[k] || []).some(c => c.organization_id === org && c.activa !== false));
+    if (!vac.length) return '';
+    return '<div class="cat-hint">Aún sin registros de: ' + vac.map(k =>
+        `<a onclick="closeModal();showPage('${CATALOGOS[k].page}',document.getElementById('nav-inventario'))">${escHtml(CATALOGOS[k].plural.toLowerCase())}</a>`).join(', ') +
+        '. Créalos desde el submenú de Inventario.</div>';
+}
+function _invFormEmpresa(i) {
+    if (!_catEsSA) return '';
+    i = i || {};
+    if (i.id) return `<div class="form-field"><label class="form-label">EMPRESA</label><div class="cat-readonly">${escHtml(catEmpresaNombre(i.organization_id))}</div></div>`;
+    return `<div class="form-field"><label class="form-label">EMPRESA *</label>
+      <select class="form-select" id="mInvEmpresa" onchange="_invEmpresaChange(this)">${_catEmpresaOpts(_invEmpresaActual(i))}</select></div>`;
+}
+function _invFormClasificacion(i) {
+    i = i || {};
+    const org = _invEmpresaActual(i);
+    const labels = {marcas: 'MARCA', lineas: 'LÍNEA', familias: 'FAMILIA', unidades: 'UNIDAD DE NEGOCIO', tipos: 'TIPO DE PRODUCTO'};
+    const campo = (k, extra) => `<div class="form-field"${extra ? ' style="' + extra + '"' : ''}><label class="form-label">${labels[k]}</label>
+        <select class="form-select" id="${CATALOGOS[k].fid}">${_catOpts(k, org, i[CATALOGOS[k].campo])}</select></div>`;
+    return `<div class="cat-section-title">Clasificación</div>
+    <div class="form-grid-2">${campo('tipos')}${campo('unidades')}${campo('marcas')}${campo('lineas')}${campo('familias', 'grid-column:1/-1')}</div>
+    <div id="mClasHint">${_invHint(org)}</div>`;
+}
+function _invEmpresaChange(sel) {
+    const org = sel.value;
+    Object.keys(CATALOGOS).forEach(k => {
+        const el = document.getElementById(CATALOGOS[k].fid);
+        if (el) el.innerHTML = _catOpts(k, org, '');
+    });
+    const h = document.getElementById('mClasHint');
+    if (h) h.innerHTML = _invHint(org);
+}
+
+/* ── Sub-línea en la tabla de inventario ── */
+function _invCellSub(i) {
+    const l1 = [];
+    if (i.sku) l1.push('SKU: ' + escHtml(i.sku));
+    ['marcas', 'lineas', 'familias'].forEach(k => { const n = catNombre(k, i[CATALOGOS[k].campo]); if (n) l1.push(escHtml(n)); });
+    const chips = [];
+    const tp = catNombre('tipos', i.tipo_producto_id); if (tp) chips.push('<span class="cat-chip">' + escHtml(tp) + '</span>');
+    const un = catNombre('unidades', i.unidad_negocio_id); if (un) chips.push('<span class="cat-chip cat-chip-alt">' + escHtml(un) + '</span>');
+    if (_catEsSA && i.organization_id) chips.push('<span class="tag tag-gray" style="font-size:10px;padding:2px 7px">' + escHtml(catEmpresaNombre(i.organization_id)) + '</span>');
+    return (l1.length ? `<div class="cell-sub">${l1.join(' · ')}</div>` : '') + (chips.length ? `<div class="cat-chips">${chips.join('')}</div>` : '');
+}
+
+/* ── Arranque: espera a que la sesión esté restaurada ── */
+(async function catBoot() {
+    for (let n = 0; n < 60; n++) {
+        try {
+            const r = await window._sb.auth.getSession();
+            if (r && r.data && r.data.session) { await catInit(); return; }
+        } catch (e) {}
+        await new Promise(res => setTimeout(res, 500));
+    }
+})();
 
     </script>
 
