@@ -3239,7 +3239,9 @@
                       <td><div class="cell-main">${escHtml(u.usuario)}</div></td>
                       <td>${escHtml(u.nombre)}</td>
                       <td style="font-size:12px;color:var(--text-secondary)">${escHtml(u.correo || '—')}</td>
-                      <td><span class="tag ${u.rol==='Admin'?'tag-danger':u.rol==='Gerente'?'tag-accent':'tag-gray'}">${u.rol}</span></td>
+                      <td>${(window._superIds && u.auth_uid && window._superIds.indexOf(u.auth_uid) !== -1)
+                          ? '<span class="tag tag-danger">Super Admin</span>'
+                          : `<span class="tag ${u.rol==='Admin'?'tag-danger':u.rol==='Gerente'?'tag-accent':'tag-gray'}">${u.rol}</span>`}</td>
                       <td>${activo
                           ? '<span class="tag tag-success">Activo</span>'
                           : '<span class="tag tag-gray">Inactivo</span>'}</td>
@@ -6998,6 +7000,15 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
             _esSuper = !r.error && r.data === true;
         } catch (e) { _esSuper = false; }
         _mostrarNavSub(_esSuper);
+        if (_esSuper) {
+            try {
+                var er = document.getElementById('userRole');
+                if (er) er.textContent = 'Super Admin';
+                var sr = await _sb().from('user_roles').select('user_id').eq('role', 'SUPER_ADMIN').is('organization_id', null);
+                window._superIds = (sr.data || []).map(function(x){ return x.user_id; });
+                if (typeof renderUsuarios === 'function') renderUsuarios();
+            } catch (e) {}
+        }
         return _esSuper;
     }
     async function _subInit() {
