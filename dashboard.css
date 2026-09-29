@@ -3323,3 +3323,26 @@ body.theme-dark .sub-estado-INTERNAL { background: rgba(94,53,177,.25); color: #
 body.theme-dark .cat-chip { color: #8fb0ff; }
 body.theme-dark .cat-chip-alt { color: #b9a4ff; }
 body.theme-dark .cat-badge { color: #8fb0ff; }
+
+/* ── Sidebar: nada se encoge; si no cabe, hace scroll ── */
+.sidebar > * { flex-shrink: 0; }
+.nav-subgroup { flex-shrink: 0; overflow: visible; }
+.sidebar { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.16) transparent; }
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 6px; border: 0; background-clip: border-box; }
+.sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.28); }
+
+/* Pantallas bajas (laptops, monitores chicos): menú más compacto */
+@media (max-height: 900px) {
+    .sidebar-logo { padding-bottom: 14px; }
+    .nav-section { padding: 12px 20px 4px; }
+    .nav-item { padding-top: 8px; padding-bottom: 8px; }
+    .nav-subitem { padding-top: 6px; padding-bottom: 6px; }
+}
+@media (max-height: 740px) {
+    .sidebar-logo { padding-bottom: 8px; }
+    .nav-section { padding: 8px 20px 2px; }
+    .nav-item { padding-top: 6px; padding-bottom: 6px; font-size: 13px; }
+    .nav-subitem { padding-top: 5px; padding-bottom: 5px; font-size: 12.5px; }
+}
