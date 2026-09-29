@@ -36,7 +36,6 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
     }, delay);
 }
 
-    <script>
     (function () {
         const SUPABASE_URL      = 'https://dwtykzporgjjvdustjfq.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable__sKrMJxAHySP1qqHZ5v6mQ_6BTligkc';
@@ -461,7 +460,6 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
         window.api = api(null, null);
 
     })();
-    </script>
 
         function esAdmin() {return String(_rol).trim().toLowerCase() === 'admin';}
 
