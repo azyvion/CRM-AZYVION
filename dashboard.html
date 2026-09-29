@@ -760,13 +760,10 @@
                 </div>
                 <div class="table-card">
                     <div class="table-toolbar">
-                        <div class="filter-tabs">
+                        <div class="filter-tabs" id="invFilterTabs">
                             <button class="filter-tab active" onclick="filtrarInv('Todos',this)">Todos</button>
                             <button class="filter-tab" onclick="filtrarInv('Productos',this)">Productos</button>
                             <button class="filter-tab" onclick="filtrarInv('Servicios',this)">Servicios</button>
-                            <button class="filter-tab" onclick="filtrarInv('Redes',this)">Redes</button>
-                            <button class="filter-tab" onclick="filtrarInv('Hardware',this)">Hardware</button>
-                            <button class="filter-tab" onclick="filtrarInv('Cableado',this)">Cableado</button>
                             <button class="filter-tab" onclick="filtrarInv('Crítico',this)">Crítico</button>
                         </div>
                     </div>
@@ -1752,12 +1749,7 @@
         }
 
         async function _getResumen() {
-            const orgFilter = _currentOrgId ? (q => q.eq('organization_id', _currentOrgId)) : (q => q);
-            const [cR,iR,eR]=await Promise.all([
-                orgFilter(_sb.from('Clientes').select('*')),
-                orgFilter(_sb.from('Inventario').select('*')),
-                orgFilter(_sb.from('Encuestas').select('*'))
-            ]);
+            const [cR,iR,eR]=await Promise.all([_sb.from('Clientes').select('*'),_sb.from('Inventario').select('*'),_sb.from('Encuestas').select('*')]);
             const pR=await _getProspectos();
             const cli=cR.data||[],pro=pR.data||[],inv=iR.data||[],enc=eR.data||[];
             inv.forEach(i=>{i.tipo=String(i.tipo||'')==='Servicio'?'Servicio':'Producto';i.estado=_estadoItem(i.tipo,i.unidades,i.stockMax);});
@@ -1773,58 +1765,56 @@
         }
 
         async function _getActividad(limit) {
-            let q = _sb.from('Actividad').select('*');
-            if (_currentOrgId) q = q.eq('organization_id', _currentOrgId);
-            const {data} = await q.order('fecha',{ascending:false}).limit(Number(limit)||20);
+            const {data}=await _sb.from('Actividad').select('*').order('fecha',{ascending:false}).limit(Number(limit)||20);
             return {ok:true,data:data||[]};
         }
 
-        async function _getClientes(){let q=_sb.from('Clientes').select('*');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);const{data,error}=await q.order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
+        async function _getClientes(){const{data,error}=await _sb.from('Clientes').select('*').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
         async function _addCliente(p,u){if(!p.nombre)return{ok:false,error:'El nombre es requerido.'};const C=['#0A84FF','#30D158','#FF9F0A','#BF5AF2','#FF453A','#5e5ce6','#8E8E93','#32ADE6'];const r={id:_uuid(),nombre:p.nombre,empresa:p.empresa||'',segmento:p.segmento||'Estándar',correo:p.correo||'',telefono:p.telefono||'',direccion:p.direccion||'',estado:p.estado||'Activo',valorTotal:Number(p.valorTotal)||0,color:C[Math.floor(Math.random()*C.length)],fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('Clientes').insert(r);if(error)return{ok:false,error:error.message};await _sb.from('Actividad').insert({id:_uuid(),tipo:'cliente',usuario:u,descripcion:'Nuevo cliente: '+p.nombre,fecha:new Date().toISOString(),organization_id:_currentOrgId});return{ok:true,id:r.id};}
         async function _updateCliente(id,p,u){const{error}=await _sb.from('Clientes').update({nombre:p.nombre,empresa:p.empresa,segmento:p.segmento,correo:p.correo,telefono:p.telefono,direccion:p.direccion,estado:p.estado,valorTotal:Number(p.valorTotal)||0}).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteCliente(id,u){const{error}=await _sb.from('Clientes').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
-        async function _getProspectos(){const PAGE=1000;var todos=[];var desde=0;while(true){let q=_sb.from('Prospectos').select('*');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);const{data,error}=await q.order('nombre').range(desde,desde+PAGE-1);if(error)return{ok:false,error:error.message};if(data&&data.length>0){todos=todos.concat(data);}if(!data||data.length<PAGE)break;desde+=PAGE;}return{ok:true,data:todos};}
+        async function _getProspectos(){const PAGE=1000;var todos=[];var desde=0;while(true){const{data,error}=await _sb.from('Prospectos').select('*').order('nombre').range(desde,desde+PAGE-1);if(error)return{ok:false,error:error.message};if(data&&data.length>0){todos=todos.concat(data);}if(!data||data.length<PAGE)break;desde+=PAGE;}return{ok:true,data:todos};}
         async function _addProspecto(p,u){if(!p.nombre)return{ok:false,error:'El nombre es requerido.'};const C=['#0A84FF','#30D158','#FF9F0A','#BF5AF2','#FF453A','#5e5ce6','#8E8E93','#32ADE6'];const r={id:_uuid(),nombre:p.nombre,empresa:p.empresa||'',segmento:p.segmento||'Estándar',correo:p.correo||'',telefono:p.telefono||'',direccion:p.direccion||'',origen:p.origen||'Otro',etapa:p.etapa||'Nuevo',valorEstimado:Number(p.valorEstimado)||0,probabilidad:Number(p.probabilidad)||50,notas:p.notas||'',color:C[Math.floor(Math.random()*C.length)],fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('Prospectos').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
         async function _updateProspecto(id,p,u){const up={};['nombre','empresa','segmento','correo','telefono','direccion','origen','etapa','notas'].forEach(k=>{if(p[k]!==undefined)up[k]=p[k];});if(p.valorEstimado!==undefined)up.valorEstimado=Number(p.valorEstimado)||0;if(p.probabilidad!==undefined)up.probabilidad=Number(p.probabilidad)||0;const{error}=await _sb.from('Prospectos').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteProspecto(id,u){const{error}=await _sb.from('Prospectos').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
-        async function _convertirProspecto(id,p,u){const{data:pr}=await _sb.from('Prospectos').select('*').eq('id',id).single();if(!pr)return{ok:false,error:'Prospecto no encontrado.'};const C=['#0A84FF','#30D158','#FF9F0A','#BF5AF2','#FF453A','#5e5ce6','#8E8E93','#32ADE6'];const nc={id:_uuid(),nombre:pr.nombre,empresa:pr.empresa,segmento:p.segmento||pr.segmento||'Estándar',correo:pr.correo,telefono:pr.telefono,direccion:pr.direccion,estado:p.estado||'Activo',valorTotal:Number(p.valorTotal)||Number(pr.valorEstimado)||0,color:C[Math.floor(Math.random()*C.length)],fechaReg:new Date().toISOString(),organization_id:_currentOrgId};await Promise.all([_sb.from('Clientes').insert(nc),_sb.from('Prospectos').delete().eq('id',id)]);await _sb.from('Actividad').insert({id:_uuid(),tipo:'cliente',usuario:u,descripcion:'Prospecto convertido a cliente: '+pr.nombre,fecha:new Date().toISOString(),organization_id:_currentOrgId});return{ok:true};}
+        async function _convertirProspecto(id,p,u){const{data:pr}=await _sb.from('Prospectos').select('*').eq('id',id).single();if(!pr)return{ok:false,error:'Prospecto no encontrado.'};const C=['#0A84FF','#30D158','#FF9F0A','#BF5AF2','#FF453A','#5e5ce6','#8E8E93','#32ADE6'];const nc={id:_uuid(),nombre:pr.nombre,empresa:pr.empresa,segmento:p.segmento||pr.segmento||'Estándar',correo:pr.correo,telefono:pr.telefono,direccion:pr.direccion,estado:p.estado||'Activo',valorTotal:Number(p.valorTotal)||Number(pr.valorEstimado)||0,color:C[Math.floor(Math.random()*C.length)],fechaReg:new Date().toISOString()};await Promise.all([_sb.from('Clientes').insert(nc),_sb.from('Prospectos').delete().eq('id',id)]);return{ok:true};}
 
-        async function _getInventario(){let q=_sb.from('Inventario').select('*');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);const{data,error}=await q.order('producto');if(error)return{ok:false,error:error.message};const items=(data||[]).map(i=>{i.tipo=String(i.tipo||'')==='Servicio'?'Servicio':'Producto';i.activo=(i.activo===''||i.activo===undefined||i.activo===null)?true:(i.activo===true||String(i.activo).toLowerCase()==='true');i.sku=i.sku||'';i.descripcion=i.descripcion||'';i.unidad=i.unidad||(i.tipo==='Servicio'?'Servicio':'Unidad');if(i.tipo==='Servicio'){i.unidades=0;i.stockMax=0;}i.estado=_estadoItem(i.tipo,i.unidades,i.stockMax);return i;});return{ok:true,data:items};}
+        async function _getInventario(){const{data,error}=await _sb.from('Inventario').select('*').order('producto');if(error)return{ok:false,error:error.message};const items=(data||[]).map(i=>{i.tipo=String(i.tipo||'')==='Servicio'?'Servicio':'Producto';i.activo=(i.activo===''||i.activo===undefined||i.activo===null)?true:(i.activo===true||String(i.activo).toLowerCase()==='true');i.sku=i.sku||'';i.descripcion=i.descripcion||'';i.unidad=i.unidad||(i.tipo==='Servicio'?'Servicio':'Unidad');if(i.tipo==='Servicio'){i.unidades=0;i.stockMax=0;}i.estado=_estadoItem(i.tipo,i.unidades,i.stockMax);return i;});return{ok:true,data:items};}
         async function _addInventario(p,u){if(!p.producto)return{ok:false,error:'El nombre del ítem es requerido.'};const t=p.tipo==='Servicio'?'Servicio':'Producto';const un=t==='Servicio'?0:(Number(p.unidades)||0);const m=t==='Servicio'?0:(Number(p.stockMax)||100);const r={id:_uuid(),producto:String(p.producto).trim(),categoria:p.categoria||'Otro',unidades:un,stockMax:m,precioUnit:Number(p.precioUnit)||0,estado:_estadoItem(t,un,m),tipo:t,sku:p.sku||'',descripcion:p.descripcion||'',unidad:p.unidad||(t==='Servicio'?'Servicio':'Unidad'),activo:p.activo==='false'||p.activo===false?false:true,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('Inventario').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
         async function _updateInventario(id,p,u){const{data:ex}=await _sb.from('Inventario').select('*').eq('id',id).single();if(!ex)return{ok:false,error:'Ítem no encontrado.'};const t=p.tipo!==undefined?(p.tipo==='Servicio'?'Servicio':'Producto'):(ex.tipo==='Servicio'?'Servicio':'Producto');const un=t==='Servicio'?0:Number(p.unidades!==undefined?p.unidades:ex.unidades)||0;const m=t==='Servicio'?0:Number(p.stockMax!==undefined?p.stockMax:ex.stockMax)||1;const up={producto:p.producto!==undefined?String(p.producto).trim():ex.producto,categoria:p.categoria!==undefined?p.categoria:ex.categoria,unidades:un,stockMax:m,precioUnit:Number(p.precioUnit!==undefined?p.precioUnit:ex.precioUnit)||0,estado:_estadoItem(t,un,m),tipo:t,sku:p.sku!==undefined?p.sku:ex.sku,descripcion:p.descripcion!==undefined?p.descripcion:ex.descripcion,unidad:p.unidad!==undefined?p.unidad:ex.unidad,activo:p.activo!==undefined?(p.activo===true||String(p.activo)==='true'):(ex.activo===true||String(ex.activo).toLowerCase()==='true')};const{error}=await _sb.from('Inventario').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteInventario(id,u){const{error}=await _sb.from('Inventario').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
-        async function _getEncuestas(){let q=_sb.from('Encuestas').select('*');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);const{data,error}=await q.order('fechaEnvio',{ascending:false});if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
+        async function _getEncuestas(){const{data,error}=await _sb.from('Encuestas').select('*').order('fechaEnvio',{ascending:false});if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
         async function _addEncuesta(p,u){if(!p.nombre)return{ok:false,error:'El nombre es requerido.'};const r={id:_uuid(),nombre:p.nombre,estado:'Borrador',fechaEnvio:new Date().toISOString(),totalEnviadas:0,respuestas:0,tipo:p.tipo||'NPS',pregConf:0,pregTotal:Number(p.pregTotal)||12,organization_id:_currentOrgId};const{error}=await _sb.from('Encuestas').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
         async function _updateEncuesta(id,p,u){const up={};['nombre','estado','fechaEnvio','tipo'].forEach(k=>{if(p[k]!==undefined)up[k]=p[k];});if(p.totalEnviadas!==undefined)up.totalEnviadas=Number(p.totalEnviadas)||0;if(p.respuestas!==undefined)up.respuestas=Number(p.respuestas)||0;if(p.pregConf!==undefined)up.pregConf=Number(p.pregConf)||0;if(p.pregTotal!==undefined)up.pregTotal=Number(p.pregTotal)||12;const{error}=await _sb.from('Encuestas').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteEncuesta(id,u){const{error}=await _sb.from('Encuestas').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
-        async function _getUsuarios(){let q=_sb.from('Usuarios').select('id,usuario,nombre,rol,activo,auth_uid,correo,organization_id');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);const{data,error}=await q.order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:(data||[])};}
+        async function _getUsuarios(){const{data,error}=await _sb.from('Usuarios').select('id,usuario,nombre,rol,activo,auth_uid,correo,organization_id').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:(data||[])};}
         async function _addUsuario(p,authU){if(!p.usuario||!p.nombre||!p.contrasena||!p.rol)return{ok:false,error:'Campos requeridos.'};if(!p.correo||!p.correo.trim())return{ok:false,error:'El correo es obligatorio para crear el usuario en Supabase Auth.'};if(!['Admin','Gerente','Agente'].includes(p.rol))return{ok:false,error:'Rol inválido.'};const{data,error}=await _sb.functions.invoke('admin-user-manager',{body:{action:'createUser',usuario:p.usuario.trim(),nombre:p.nombre.trim(),email:p.correo.trim(),password:p.contrasena,rol:p.rol,organization_id:_currentOrgId}});if(error)return{ok:false,error:error.message};if(data&&data.error)return{ok:false,error:data.error};return{ok:true};}
         async function _updateUsuario(id,p,authU){const up={};if(p.nombre!==undefined)up.nombre=p.nombre.trim();if(p.rol!==undefined&&['Admin','Gerente','Agente'].includes(p.rol))up.rol=p.rol;if(p.activo!==undefined)up.activo=p.activo==='true'||p.activo===true;const uObj=(_usuarios||[]).find(u=>String(u.id)===String(id));const authUid=uObj&&uObj.auth_uid;if(p.nuevaContrasena&&p.nuevaContrasena.trim()){if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede restablecer la contraseña.'};const{data:pwData,error:pwError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'resetUserPassword',user_id:authUid,password:p.nuevaContrasena.trim()}});if(pwError)return{ok:false,error:pwError.message};if(pwData&&pwData.error)return{ok:false,error:pwData.error};}if(p.correo&&p.correo.trim()){const nuevoCorreo=p.correo.trim();if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede cambiar el correo.'};const{data:emData,error:emError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'updateUserEmail',user_id:authUid,email:nuevoCorreo}});if(emError)return{ok:false,error:emError.message};if(emData&&emData.error)return{ok:false,error:emData.error};up.correo=nuevoCorreo;}if(Object.keys(up).length===0)return{ok:true};const{error}=await _sb.from('Usuarios').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteUsuario(id,authU){const{error}=await _sb.from('Usuarios').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
-        async function _getCuentasBancarias(){let q=_sb.from('CuentasBancarias').select('*');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);const{data,error}=await q.order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
+        async function _getCuentasBancarias(){const{data,error}=await _sb.from('CuentasBancarias').select('*').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
         async function _addCuentaBancaria(p,u){const reqs=['nombre','banco','numeroCuenta','aNombreDe','logo'];for(const f of reqs)if(!p[f])return{ok:false,error:'Campo requerido: '+f};const s=Number(p.saldoInicial)||0;const r={id:_uuid(),nombre:p.nombre.trim(),banco:p.banco.trim(),numeroCuenta:String(p.numeroCuenta).trim(),aNombreDe:p.aNombreDe.trim(),logo:p.logo,cuentaContable:p.cuentaContable||'',rubro:p.rubro||'',saldoInicial:s,saldo:s,activa:true,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('CuentasBancarias').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
         async function _updateCuentaBancaria(p,u){const up={};['nombre','banco','numeroCuenta','aNombreDe','logo','cuentaContable','rubro'].forEach(k=>{if(p[k]!==undefined)up[k]=p[k];});if(p.activa!==undefined)up.activa=p.activa==='true'||p.activa===true;const{error}=await _sb.from('CuentasBancarias').update(up).eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteCuentaBancaria(p,u){const{data:t}=await _sb.from('Transacciones').select('id').eq('cuentaBancariaId',p.id).limit(1);if(t&&t.length)return{ok:false,error:'No se puede eliminar: tiene transacciones. Desactívela.'};const{error}=await _sb.from('CuentasBancarias').delete().eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
-        async function _getPlanCuentas(){let q=_sb.from('PlanCuentas').select('*');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);const{data,error}=await q.order('codigo');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
+        async function _getPlanCuentas(){const{data,error}=await _sb.from('PlanCuentas').select('*').order('codigo');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
         async function _addCuentaContable(p,u){if(!p.codigo||!p.nombre)return{ok:false,error:'Código y nombre requeridos.'};const{data:ex}=await _sb.from('PlanCuentas').select('id').eq('codigo',p.codigo.trim()).single();if(ex)return{ok:false,error:'Ya existe una cuenta con ese código.'};const r={id:_uuid(),codigo:p.codigo.trim(),nombre:p.nombre.trim(),tipo:p.tipo||'Activo',rubro:p.rubro||'',descripcion:p.descripcion||'',activa:true,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('PlanCuentas').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
         async function _updateCuentaContable(p,u){const up={};['codigo','nombre','tipo','rubro','descripcion'].forEach(k=>{if(p[k]!==undefined)up[k]=p[k];});if(p.activa!==undefined)up.activa=p.activa==='true'||p.activa===true;const{error}=await _sb.from('PlanCuentas').update(up).eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteCuentaContable(p,u){const{data:c}=await _sb.from('Transacciones').select('id').eq('cuentaContableId',p.id).limit(1);if(c&&c.length)return{ok:false,error:'No se puede eliminar: hay transacciones.'};const{error}=await _sb.from('PlanCuentas').delete().eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
-        async function _getTransacciones(f){let q=_sb.from('Transacciones').select('*');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);if(f&&f.cuentaBancariaId)q=q.eq('cuentaBancariaId',f.cuentaBancariaId);if(f&&f.tipo)q=q.eq('tipo',f.tipo);if(f&&f.desde)q=q.gte('fecha',f.desde);if(f&&f.hasta)q=q.lte('fecha',f.hasta);q=q.order('fecha',{ascending:false});const{data,error}=await q;if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
+        async function _getTransacciones(f){let q=_sb.from('Transacciones').select('*');if(f&&f.cuentaBancariaId)q=q.eq('cuentaBancariaId',f.cuentaBancariaId);if(f&&f.tipo)q=q.eq('tipo',f.tipo);if(f&&f.desde)q=q.gte('fecha',f.desde);if(f&&f.hasta)q=q.lte('fecha',f.hasta);q=q.order('fecha',{ascending:false});const{data,error}=await q;if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
         async function _addTransaccion(p,u){const tipos=['Ingreso','Egreso','Transferencia','Ajuste'];if(!tipos.includes(p.tipo))return{ok:false,error:'Tipo inválido.'};if(!p.concepto)return{ok:false,error:'El concepto es requerido.'};const m=Number(p.monto);if(!m||m<=0)return{ok:false,error:'El monto debe ser mayor a 0.'};if(!p.cuentaBancariaId)return{ok:false,error:'La cuenta bancaria es requerida.'};if(!p.fecha)return{ok:false,error:'La fecha es requerida.'};const{data:cb}=await _sb.from('CuentasBancarias').select('saldo').eq('id',p.cuentaBancariaId).single();if(!cb)return{ok:false,error:'Cuenta bancaria no encontrada.'};let s=Number(cb.saldo)||0;if(p.tipo==='Ingreso'||p.tipo==='Transferencia')s+=m;else if(p.tipo==='Egreso')s-=m;else if(p.tipo==='Ajuste')s+=m*(p.ajusteSigno==='-'?-1:1);const r={id:_uuid(),fecha:p.fecha,tipo:p.tipo,concepto:p.concepto.trim(),monto:m,cuentaBancariaId:p.cuentaBancariaId,cuentaContableId:p.cuentaContableId||'',referencia:p.referencia||'',descripcion:p.descripcion||'',creadoPor:u,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const[r1,r2]=await Promise.all([_sb.from('Transacciones').insert(r),_sb.from('CuentasBancarias').update({saldo:s}).eq('id',p.cuentaBancariaId)]);if(r1.error)return{ok:false,error:r1.error.message};return{ok:true,id:r.id};}
         async function _deleteTransaccion(p,u){const{data:t}=await _sb.from('Transacciones').select('*').eq('id',p.id).single();if(!t)return{ok:false,error:'Transacción no encontrada.'};const{data:cb}=await _sb.from('CuentasBancarias').select('saldo').eq('id',t.cuentaBancariaId).single();if(cb){let s=Number(cb.saldo)||0;if(t.tipo==='Ingreso'||t.tipo==='Transferencia')s-=Number(t.monto);else if(t.tipo==='Egreso')s+=Number(t.monto);await _sb.from('CuentasBancarias').update({saldo:s}).eq('id',t.cuentaBancariaId);}const{error}=await _sb.from('Transacciones').delete().eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
-        async function _getResumenContable(){const _orgQ=(t)=>{let q=_sb.from(t).select('*');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);return q;};const[cbR,trR,plR]=await Promise.all([_orgQ('CuentasBancarias'),_orgQ('Transacciones'),_orgQ('PlanCuentas')]);const cb=cbR.data||[],tr=trR.data||[],pl=plR.data||[];const sT=cb.filter(c=>c.activa===true||c.activa==='true').reduce((s,c)=>s+Number(c.saldo||0),0);const tI=tr.filter(t=>t.tipo==='Ingreso').reduce((s,t)=>s+Number(t.monto||0),0);const tE=tr.filter(t=>t.tipo==='Egreso').reduce((s,t)=>s+Number(t.monto||0),0);const h=new Date(),mes=h.getMonth(),anio=h.getFullYear();const trM=tr.filter(t=>{const d=new Date(t.fecha);return d.getMonth()===mes&&d.getFullYear()===anio;});const iM=trM.filter(t=>t.tipo==='Ingreso').reduce((s,t)=>s+Number(t.monto||0),0);const eM=trM.filter(t=>t.tipo==='Egreso').reduce((s,t)=>s+Number(t.monto||0),0);return{ok:true,saldoTotal:Math.round(sT*100)/100,cuentasActivas:cb.filter(c=>c.activa===true||c.activa==='true').length,totalCuentas:cb.length,totalIngresos:Math.round(tI*100)/100,totalEgresos:Math.round(tE*100)/100,utilidadBruta:Math.round((tI-tE)*100)/100,ingresosMes:Math.round(iM*100)/100,egresosMes:Math.round(eM*100)/100,utilidadMes:Math.round((iM-eM)*100)/100,totalTransacciones:tr.length,transaccionesMes:trM.length,totalCuentasContables:pl.length};}
+        async function _getResumenContable(){const[cbR,trR,plR]=await Promise.all([_sb.from('CuentasBancarias').select('*'),_sb.from('Transacciones').select('*'),_sb.from('PlanCuentas').select('*')]);const cb=cbR.data||[],tr=trR.data||[],pl=plR.data||[];const sT=cb.filter(c=>c.activa===true||c.activa==='true').reduce((s,c)=>s+Number(c.saldo||0),0);const tI=tr.filter(t=>t.tipo==='Ingreso').reduce((s,t)=>s+Number(t.monto||0),0);const tE=tr.filter(t=>t.tipo==='Egreso').reduce((s,t)=>s+Number(t.monto||0),0);const h=new Date(),mes=h.getMonth(),anio=h.getFullYear();const trM=tr.filter(t=>{const d=new Date(t.fecha);return d.getMonth()===mes&&d.getFullYear()===anio;});const iM=trM.filter(t=>t.tipo==='Ingreso').reduce((s,t)=>s+Number(t.monto||0),0);const eM=trM.filter(t=>t.tipo==='Egreso').reduce((s,t)=>s+Number(t.monto||0),0);return{ok:true,saldoTotal:Math.round(sT*100)/100,cuentasActivas:cb.filter(c=>c.activa===true||c.activa==='true').length,totalCuentas:cb.length,totalIngresos:Math.round(tI*100)/100,totalEgresos:Math.round(tE*100)/100,utilidadBruta:Math.round((tI-tE)*100)/100,ingresosMes:Math.round(iM*100)/100,egresosMes:Math.round(eM*100)/100,utilidadMes:Math.round((iM-eM)*100)/100,totalTransacciones:tr.length,transaccionesMes:trM.length,totalCuentasContables:pl.length};}
 
         const EMPRESA={nombre:'Azyvion',eslogan:'Soluciones tecnológicas',nit:'C/F',direccion:'Ciudad de Guatemala, Guatemala',telefono:'+502 0000-0000',correo:'ventas@azyvion.com',sitio:'www.azyvion.com',logoUrl:'',moneda:'Q',ivaPct:12,condicionesDefault:'Precios expresados en quetzales (GTQ). Tiempo de entrega sujeto a disponibilidad. Esta cotización no constituye una factura.'};
 
-        async function _getCotizaciones(f){let qC=_sb.from('Cotizaciones').select('*');if(_currentOrgId)qC=qC.eq('organization_id',_currentOrgId);const[cR,iR]=await Promise.all([qC.order('numero',{ascending:false}),_sb.from('CotizacionItems').select('cotizacionId')]);const cs=cR.data||[],its=iR.data||[];const ibc={};its.forEach(i=>{ibc[i.cotizacionId]=(ibc[i.cotizacionId]||0)+1;});const h=new Date();h.setHours(0,0,0,0);let d=cs.map(c=>{const v=Number(c.validezDias)||15;const ha=new Date(c.fecha);ha.setDate(ha.getDate()+v);return{...c,numItems:ibc[c.id]||0,vencida:ha<h&&['Borrador','Enviada'].includes(c.estado),validaHasta:ha.toISOString().slice(0,10)};});if(f&&f.estado)d=d.filter(c=>c.estado===f.estado);return{ok:true,data:d,empresa:EMPRESA};}
+        async function _getCotizaciones(f){const[cR,iR]=await Promise.all([_sb.from('Cotizaciones').select('*').order('numero',{ascending:false}),_sb.from('CotizacionItems').select('cotizacionId')]);const cs=cR.data||[],its=iR.data||[];const ibc={};its.forEach(i=>{ibc[i.cotizacionId]=(ibc[i.cotizacionId]||0)+1;});const h=new Date();h.setHours(0,0,0,0);let d=cs.map(c=>{const v=Number(c.validezDias)||15;const ha=new Date(c.fecha);ha.setDate(ha.getDate()+v);return{...c,numItems:ibc[c.id]||0,vencida:ha<h&&['Borrador','Enviada'].includes(c.estado),validaHasta:ha.toISOString().slice(0,10)};});if(f&&f.estado)d=d.filter(c=>c.estado===f.estado);return{ok:true,data:d,empresa:EMPRESA};}
         async function _getCotizacion(p){const[cR,iR]=await Promise.all([_sb.from('Cotizaciones').select('*').eq('id',p.id).single(),_sb.from('CotizacionItems').select('*').eq('cotizacionId',p.id)]);if(cR.error||!cR.data)return{ok:false,error:'Cotización no encontrada.'};return{ok:true,data:cR.data,items:iR.data||[],empresa:EMPRESA};}
-        async function _nextNumCot(){const y=new Date().getFullYear();let q=_sb.from('Cotizaciones').select('numero').like('numero','COT-'+y+'-%');if(_currentOrgId)q=q.eq('organization_id',_currentOrgId);const{data}=await q;let max=0;(data||[]).forEach(c=>{const m=String(c.numero||'').match(/^COT-\d{4}-(\d+)$/);if(m)max=Math.max(max,Number(m[1]));});return 'COT-'+y+'-'+String(max+1).padStart(4,'0');}
+        async function _nextNumCot(){const y=new Date().getFullYear();const{data}=await _sb.from('Cotizaciones').select('numero').like('numero','COT-'+y+'-%');let max=0;(data||[]).forEach(c=>{const m=String(c.numero||'').match(/^COT-\d{4}-(\d+)$/);if(m)max=Math.max(max,Number(m[1]));});return 'COT-'+y+'-'+String(max+1).padStart(4,'0');}
         function _calcT(items,dP,iva){const sub=items.reduce((s,i)=>s+Number(i.total||0),0);const d=sub*(Math.min(Math.max(Number(dP)||0,0),100)/100);const b=sub-d;const iv=iva?b*(EMPRESA.ivaPct/100):0;return{subtotal:Math.round(sub*100)/100,descuento:Math.round(d*100)/100,iva:Math.round(iv*100)/100,total:Math.round((b+iv)*100)/100};}
         function _normItems(raw){let a=raw;if(typeof raw==='string'){try{a=JSON.parse(raw);}catch(e){a=[];}}if(!Array.isArray(a))a=[];return a.map(it=>{const c=Number(it.cantidad)||0,p=Number(it.precioUnit)||0,dp=Math.min(Math.max(Number(it.descuentoPct)||0,0),100),b=c*p;return{itemId:it.itemId||'',tipo:it.tipo==='Servicio'?'Servicio':'Producto',descripcion:String(it.descripcion||'').trim(),detalle:String(it.detalle||'').trim(),cantidad:c,precioUnit:p,descuentoPct:dp,total:Math.round((b-b*dp/100)*100)/100};}).filter(i=>i.descripcion&&i.cantidad>0);}
         async function _addCotizacion(p,u){if(!p.cliente||!String(p.cliente).trim())return{ok:false,error:'El cliente es requerido.'};const items=_normItems(p.items);if(!items.length)return{ok:false,error:'Agrega al menos un ítem.'};const iva=p.aplicaIVA===true||String(p.aplicaIVA)==='true';const t=_calcT(items,p.descuentoPct,iva);const num=await _nextNumCot();const id=_uuid();const r={id,numero:num,clienteId:p.clienteId||'',cliente:String(p.cliente).trim(),empresa:p.empresa||'',correo:p.correo||'',telefono:p.telefono||'',direccion:p.direccion||'',fecha:(p.fecha||new Date().toISOString()).slice(0,10),validezDias:Number(p.validezDias)||15,condiciones:p.condiciones||EMPRESA.condicionesDefault,notas:p.notas||'',descuentoPct:Number(p.descuentoPct)||0,aplicaIVA:iva,...t,estado:['Borrador','Enviada','Aprobada','Rechazada','Vencida'].includes(p.estado)?p.estado:'Borrador',creadoPor:u,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('Cotizaciones').insert(r);if(error)return{ok:false,error:error.message};if(items.length){const ir=items.map(it=>({id:_uuid(),cotizacionId:id,...it,organization_id:_currentOrgId}));await _sb.from('CotizacionItems').insert(ir);}return{ok:true,id,numero:num};}
@@ -1869,7 +1859,7 @@
         }
         async function _getResumenCotizaciones(){const r=await _getCotizaciones({});const d=r.data||[];const h=new Date(),mes=h.getMonth(),anio=h.getFullYear();const dM=d.filter(c=>{const dd=new Date(c.fecha);return!isNaN(dd)&&dd.getMonth()===mes&&dd.getFullYear()===anio;});const ap=d.filter(c=>c.estado==='Aprobada'),en=d.filter(c=>c.estado==='Enviada');return{ok:true,empresa:EMPRESA,total:d.length,borradores:d.filter(c=>c.estado==='Borrador').length,enviadas:en.length,aprobadas:ap.length,rechazadas:d.filter(c=>c.estado==='Rechazada').length,vencidas:d.filter(c=>c.vencida).length,montoTotal:d.reduce((s,c)=>s+Number(c.total||0),0),montoAprobado:ap.reduce((s,c)=>s+Number(c.total||0),0),montoEnviado:en.reduce((s,c)=>s+Number(c.total||0),0),cotizacionesMes:dM.length,montoMes:dM.reduce((s,c)=>s+Number(c.total||0),0),tasaAprobacion:d.length?Math.round(ap.length/d.length*100):0};}
 
-        async function _getFicha(p,rol){if(!p||!p.id)return{ok:false,error:'ID requerido.'};const tipo=String(p.tipo||'').trim()==='Prospecto'?'Prospecto':'Cliente';const tabla=tipo==='Cliente'?'Clientes':'Prospectos';const{data:ent}=await _sb.from(tabla).select('*').eq('id',p.id).single();if(!ent)return{ok:false,error:tipo+' no encontrado.'};const _oq=(t,q)=>{if(_currentOrgId)return q.eq('organization_id',_currentOrgId);return q;};let qCon=_oq('Contactos',_sb.from('Contactos').select('*').eq('tipo',tipo).eq('refId',p.id));let qNot=_oq('NotasCRM',_sb.from('NotasCRM').select('*').eq('tipo',tipo).eq('refId',p.id).order('fecha',{ascending:false}));let qAct=_oq('ActividadesCRM',_sb.from('ActividadesCRM').select('*').eq('tipo',tipo).eq('refId',p.id).order('fecha',{ascending:false}));let qCot=_sb.from('Cotizaciones').select('id,numero,fecha,total,estado').or('clienteId.eq.'+p.id+',cliente.ilike.%'+String(ent.nombre).replace(/[%_]/g,'\\$&')+'%');if(_currentOrgId)qCot=qCot.eq('organization_id',_currentOrgId);const[cR,nR,aR,cotR]=await Promise.all([qCon,qNot,qAct,qCot]);const contactos=(cR.data||[]).sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre),'es'));const notas=nR.data||[];const actividades=(aR.data||[]).map(a=>({...a,origen:'ficha'}));const cotizaciones=(cotR.data||[]).sort((a,b)=>String(b.numero).localeCompare(String(a.numero)));const hoy=new Date();hoy.setHours(0,0,0,0);let prox=null;actividades.forEach(a=>{if(!a.fechaSeguimiento)return;const d=new Date(a.fechaSeguimiento);if(d>=hoy&&(!prox||d<new Date(prox.fecha)))prox={fecha:a.fechaSeguimiento,titulo:a.titulo||a.categoria,usuario:a.usuario};});return{ok:true,tipo,entidad:ent,contactos,notas,actividades,prospectos:[],clientes:[],cotizaciones,proximoSeguimiento:prox,resumen:{totalContactos:contactos.length,totalNotas:notas.length,totalActividades:actividades.length,totalCotizaciones:cotizaciones.length,montoCotizado:cotizaciones.reduce((s,c)=>s+Number(c.total||0),0),ultimaActividad:actividades.length?actividades[0].fecha:''},permisos:{puedeEditar:true,puedeEliminar:_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN'||_currentUserRole==='GERENTE',esAdmin:_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN'}};}
+        async function _getFicha(p,rol){if(!p||!p.id)return{ok:false,error:'ID requerido.'};const tipo=String(p.tipo||'').trim()==='Prospecto'?'Prospecto':'Cliente';const tabla=tipo==='Cliente'?'Clientes':'Prospectos';const{data:ent}=await _sb.from(tabla).select('*').eq('id',p.id).single();if(!ent)return{ok:false,error:tipo+' no encontrado.'};const[cR,nR,aR,cotR]=await Promise.all([_sb.from('Contactos').select('*').eq('tipo',tipo).eq('refId',p.id),_sb.from('NotasCRM').select('*').eq('tipo',tipo).eq('refId',p.id).order('fecha',{ascending:false}),_sb.from('ActividadesCRM').select('*').eq('tipo',tipo).eq('refId',p.id).order('fecha',{ascending:false}),_sb.from('Cotizaciones').select('id,numero,fecha,total,estado').or('clienteId.eq.'+p.id+',cliente.ilike.%'+encodeURIComponent(ent.nombre)+'%')]);const contactos=(cR.data||[]).sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre),'es'));const notas=nR.data||[];const actividades=(aR.data||[]).map(a=>({...a,origen:'ficha'}));const cotizaciones=(cotR.data||[]).sort((a,b)=>String(b.numero).localeCompare(String(a.numero)));const hoy=new Date();hoy.setHours(0,0,0,0);let prox=null;actividades.forEach(a=>{if(!a.fechaSeguimiento)return;const d=new Date(a.fechaSeguimiento);if(d>=hoy&&(!prox||d<new Date(prox.fecha)))prox={fecha:a.fechaSeguimiento,titulo:a.titulo||a.categoria,usuario:a.usuario};});return{ok:true,tipo,entidad:ent,contactos,notas,actividades,prospectos:[],clientes:[],cotizaciones,proximoSeguimiento:prox,resumen:{totalContactos:contactos.length,totalNotas:notas.length,totalActividades:actividades.length,totalCotizaciones:cotizaciones.length,montoCotizado:cotizaciones.reduce((s,c)=>s+Number(c.total||0),0),ultimaActividad:actividades.length?actividades[0].fecha:''},permisos:{puedeEditar:true,puedeEliminar:_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN'||_currentUserRole==='GERENTE',esAdmin:_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN'}};}
         async function _addContacto(p,u){if(!p.nombre||!String(p.nombre).trim())return{ok:false,error:'El nombre del contacto es requerido.'};const r={id:_uuid(),tipo:p.tipo||'Cliente',refId:p.refId,nombre:String(p.nombre).trim(),cargo:p.cargo||'',telefono:p.telefono||'',correo:p.correo||'',notas:p.notas||'',creadoPor:u,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('Contactos').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
         async function _updateContacto(p,u){const up={};['nombre','cargo','telefono','correo','notas'].forEach(k=>{if(p[k]!==undefined)up[k]=p[k];});const{error}=await _sb.from('Contactos').update(up).eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteContacto(p,u){const{error}=await _sb.from('Contactos').delete().eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
@@ -1878,10 +1868,7 @@
         async function _addActividadCRM(p,u){const cats=['Llamada','Correo','Reunión','Visita','Seguimiento','Otro'];const r={id:_uuid(),tipo:p.tipo||'Cliente',refId:p.refId,categoria:cats.includes(p.categoria)?p.categoria:'Otro',titulo:String(p.titulo||'').trim(),descripcion:p.descripcion||'',fecha:p.fecha||(new Date().toISOString().slice(0,10)),fechaSeguimiento:p.fechaSeguimiento||'',usuario:u,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('ActividadesCRM').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
         async function _deleteActividadCRM(p,u){const{error}=await _sb.from('ActividadesCRM').delete().eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
-        async function _getPerfil(sess){let q=_sb.from('Usuarios').select('*');// Intentar por auth_uid primero (más confiable)
-            const authUser=(await _sb.auth.getUser()).data?.user;if(authUser&&authUser.id){const{data:u1}=await q.eq('auth_uid',authUser.id).maybeSingle();if(u1)return{ok:true,data:{id:u1.id,usuario:u1.usuario,nombre:u1.nombre,rol:u1.rol,correo:u1.correo||'',telefono:u1.telefono||'',cargo:u1.cargo||'',fotoUrl:u1.fotoUrl||'',fechaReg:u1.fechaReg||'',fechaPerfilActualizado:u1.fechaPerfilActualizado||'',preferencias:_prefsUsuario(u1)}};}
-            // Fallback: buscar por usuario o nombre
-            const{data:usr}=await _sb.from('Usuarios').select('*').eq('usuario',sess.usuario||sess.nombre).maybeSingle();if(!usr)return{ok:false,error:'Usuario no encontrado.'};return{ok:true,data:{id:usr.id,usuario:usr.usuario,nombre:usr.nombre,rol:usr.rol,correo:usr.correo||'',telefono:usr.telefono||'',cargo:usr.cargo||'',fotoUrl:usr.fotoUrl||'',fechaReg:usr.fechaReg||'',fechaPerfilActualizado:usr.fechaPerfilActualizado||'',preferencias:_prefsUsuario(usr)}};}
+        async function _getPerfil(sess){const {data:usr}=await _sb.from('Usuarios').select('*').eq('usuario',sess.usuario||sess.nombre).single();if(!usr)return{ok:false,error:'Usuario no encontrado.'};return{ok:true,data:{id:usr.id,usuario:usr.usuario,nombre:usr.nombre,rol:usr.rol,correo:usr.correo||'',telefono:usr.telefono||'',cargo:usr.cargo||'',fotoUrl:usr.fotoUrl||'',fechaReg:usr.fechaReg||'',fechaPerfilActualizado:usr.fechaPerfilActualizado||'',preferencias:_prefsUsuario(usr)}};}
         async function _updatePerfil(p,sess){if(!p.nombre||!String(p.nombre).trim())return{ok:false,error:'El nombre es requerido.'};const up={nombre:String(p.nombre).trim(),fechaPerfilActualizado:new Date().toISOString()};if(p.correo!==undefined)up.correo=p.correo.trim();if(p.telefono!==undefined)up.telefono=p.telefono;if(p.cargo!==undefined)up.cargo=p.cargo;const{error}=await _sb.from('Usuarios').update(up).eq('usuario',sess.usuario||sess.nombre);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _updatePreferencias(p,sess){const validos={tema:['claro','oscuro'],paginaInicio:['overview','clientes','prospectos','inventario','cotizaciones','encuestas','contabilidad','usuarios'],densidadTabla:['comoda','compacta']};const up={};if(p.tema!==undefined&&validos.tema.includes(p.tema))up.tema=p.tema;if(p.paginaInicio!==undefined&&validos.paginaInicio.includes(p.paginaInicio))up.paginaInicio=p.paginaInicio;if(p.densidadTabla!==undefined&&validos.densidadTabla.includes(p.densidadTabla))up.densidadTabla=p.densidadTabla;if(p.copiarmeCotizaciones!==undefined)up.copiarmeCotizaciones=p.copiarmeCotizaciones===true||String(p.copiarmeCotizaciones)==='true';if(p.alertaStockCritico!==undefined)up.alertaStockCritico=p.alertaStockCritico===true||String(p.alertaStockCritico)==='true';const{error}=await _sb.from('Usuarios').update(up).eq('usuario',sess.usuario||sess.nombre);if(error)return{ok:false,error:error.message};return{ok:true,preferencias:up};}
         async function _changePasswordPropio(p,sess){if(!p.actual||!p.nueva)return{ok:false,error:'Contraseña actual y nueva son requeridas.'};if(String(p.nueva).length<6)return{ok:false,error:'La nueva contraseña debe tener al menos 6 caracteres.'};if(p.actual===p.nueva)return{ok:false,error:'La nueva contraseña debe ser diferente.'};const{error}=await _sb.auth.updateUser({current_password:p.actual,password:p.nueva});if(error)return{ok:false,error:error.message};return{ok:true};}
@@ -2195,14 +2182,15 @@
                     pro.valorPotencial = pro.valorPotencial || 0;
                     pro.valorPonderado = pro.valorPonderado || 0;
 
-                    // Overview KPIs — usar getElementById seguro para no romper si el elemento no existe
-                    const _setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-                    const _setHtml = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
-                    _setEl('ov-cli', c.activos);
-                    _setHtml('ov-cli-d', `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${c.total} total`);
-                    // ov-prod / ov-enc no existen en este HTML; se actualiza via renderOvKpis()
-                    _setEl('ov-tasa', enc.tasaRespuesta + '%');
-                    _setHtml('ov-tasa-d', `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.respuestas} respuestas`);
+                    // Overview KPIs — compatibilidad (ov-cli kept for renderOvKpis)
+                    if (document.getElementById('ov-cli')) document.getElementById('ov-cli').textContent = c.activos;
+                    document.getElementById('ov-cli-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${c.total} total`;
+                    document.getElementById('ov-prod').textContent = inv.totalUnidades;
+                    document.getElementById('ov-prod-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${inv.totalProductos} productos`;
+                    document.getElementById('ov-enc').textContent = enc.respuestas;
+                    document.getElementById('ov-enc-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} activas`;
+                    document.getElementById('ov-tasa').textContent = enc.tasaRespuesta + '%';
+                    document.getElementById('ov-tasa-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${enc.activas} encuestas activas`;
 
                     // Clientes KPIs
                     document.getElementById('cli-total').textContent = c.total;
@@ -2301,6 +2289,7 @@
                 .withSuccessHandler(function (r) {
                     if (!r.ok) { showToast('Error inventario: ' + (r.error || 'sin datos'), '#FF453A'); return; }
                     _inventario = r.data || [];
+                    _renderInvFilterTabs();
                     renderInventario(_filtroInvActual);
                     renderOvStock();
                     cotLlenarSelectItems();
@@ -2449,9 +2438,26 @@
                 : '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px">Sin resultados</td></tr>';
         }
 
+        function _renderInvFilterTabs() {
+            const container = document.getElementById('invFilterTabs');
+            if (!container) return;
+            const cats = _getCategoriasInv().filter(c => c !== 'Otro' || _inventario.some(i => i.categoria === 'Otro'));
+            const base = ['Todos', 'Productos', 'Servicios'];
+            const extra = cats.filter(c => !['Otro'].includes(c) || _inventario.some(i => i.categoria === c));
+            const allFilters = [...base, ...extra.filter(c => c !== 'Otros' && c !== 'Otro' || _inventario.some(i => i.categoria === c)), 'Crítico'];
+            // Keep unique
+            const seen = new Set();
+            const unique = allFilters.filter(f => { if (seen.has(f)) return false; seen.add(f); return true; });
+            container.innerHTML = unique.map(f =>
+                `<button class="filter-tab${f === _filtroInvActual ? ' active' : ''}" onclick="filtrarInv('${f}',this)">${f}</button>`
+            ).join('');
+        }
+
         function filtrarInv(filtro, el) {
-            el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
+            if (el) {
+                el.closest('.filter-tabs').querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                el.classList.add('active');
+            }
             renderInventario(filtro);
         }
 
@@ -2906,12 +2912,17 @@
         /* ═══════════════════════════════════════════════════════
            MODAL – INVENTARIO
         ═══════════════════════════════════════════════════════ */
-        const CAT_INV = ['Redes', 'Hardware', 'Cableado', 'Software', 'Instalación', 'Soporte', 'Consultoría', 'Otro'];
+        // Categorías dinámicas: se derivan del inventario existente + 'Otro' siempre presente
+        function _getCategoriasInv() {
+            const cats = new Set(_inventario.map(i => i.categoria).filter(Boolean));
+            cats.add('Otro');
+            return Array.from(cats).sort((a, b) => a === 'Otro' ? 1 : b === 'Otro' ? -1 : a.localeCompare(b, 'es'));
+        }
 
         function _formInventario(i) {
             i = i || {};
             const esServicio = i.tipo === 'Servicio';
-            const cat = i.categoria || 'Redes';
+            const cat = i.categoria || 'Otro';
             return `
     <div class="switch-field">
       <div>
@@ -2928,9 +2939,13 @@
     <div class="form-field"><label class="form-label">CÓDIGO / SKU</label>
       <input class="form-input" id="mSku" value="${escAttr(i.sku || '')}" placeholder="Opcional"/></div>
     <div class="form-field"><label class="form-label">CATEGORÍA</label>
-      <select class="form-select" id="mCat">
-        ${CAT_INV.map(c => `<option${c === cat ? ' selected' : ''}>${c}</option>`).join('')}
+      <select class="form-select" id="mCatSel" onchange="_syncCatInput(this)" style="margin-bottom:6px">
+        ${_getCategoriasInv().map(c => `<option value="${c}"${c === cat ? ' selected' : ''}>${c}</option>`).join('')}
+        ${cat && !_getCategoriasInv().includes(cat) ? `<option value="${escAttr(cat)}" selected>${escAttr(cat)}</option>` : ''}
+        <option value="__nueva__">+ Nueva categoría…</option>
       </select>
+      <input class="form-input" id="mCat" value="${escAttr(cat)}" placeholder="Escribe el nombre de la nueva categoría…"
+        style="display:${(cat && !_getCategoriasInv().includes(cat)) ? 'block' : 'none'}" />
     </div>
     <div class="form-field"><label class="form-label">DESCRIPCIÓN (APARECE EN LA COTIZACIÓN)</label>
       <textarea class="form-input" id="mDesc" rows="2" style="resize:vertical" placeholder="Opcional">${escHtml(i.descripcion || '')}</textarea></div>
@@ -2963,6 +2978,19 @@
             if (lbl) lbl.textContent = on ? 'NOMBRE DEL SERVICIO *' : 'NOMBRE DEL PRODUCTO *';
             const u = document.getElementById('mUnidad');
             if (u && (u.value === 'Unidad' || u.value === 'Servicio' || !u.value.trim())) u.value = on ? 'Servicio' : 'Unidad';
+        }
+
+        function _syncCatInput(sel) {
+            const input = document.getElementById('mCat');
+            if (!input) return;
+            if (sel.value === '__nueva__') {
+                input.style.display = 'block';
+                input.value = '';
+                input.focus();
+            } else {
+                input.style.display = 'none';
+                input.value = sel.value; // keep in sync so modalSave can read it
+            }
         }
 
         function newInv() {
@@ -3113,9 +3141,15 @@
                     const chkServ = document.getElementById('mEsServicio');
                     const esServ  = !!(chkServ && chkServ.checked);
                     const chkAct  = document.getElementById('mActivo');
+                    // mCat siempre está sincronizado con el select o el texto libre
+                    const catInput = document.getElementById('mCat');
+                    const catSel = document.getElementById('mCatSel');
+                    const categoriaFinal = (catInput && catInput.value.trim())
+                        ? catInput.value.trim()
+                        : (catSel && catSel.value !== '__nueva__' ? catSel.value : 'Otro') || 'Otro';
                     const data = {
                         producto: prod,
-                        categoria: v('mCat'),
+                        categoria: categoriaFinal,
                         tipo: esServ ? 'Servicio' : 'Producto',
                         sku: v('mSku'),
                         descripcion: v('mDesc'),
@@ -3456,9 +3490,15 @@
             const m = {Corporativo: 'tag-accent', Premium: 'tag-purple', Estándar: 'tag-gray'};
             return `<span class="tag ${m[s] || 'tag-gray'}">${s}</span>`;
         }
+        // Tag de categoría: colores rotativos automáticos basados en el nombre
+        const _catColorCache = {};
+        const _catColors = ['tag-accent','tag-purple','tag-success','tag-warning','tag-danger','tag-gray'];
         function tagCat(c) {
-            const m = {Redes: 'tag-accent', Hardware: 'tag-purple', Cableado: 'tag-gray'};
-            return `<span class="tag ${m[c] || 'tag-gray'}">${c}</span>`;
+            if (!_catColorCache[c]) {
+                const keys = Object.keys(_catColorCache);
+                _catColorCache[c] = _catColors[keys.length % _catColors.length];
+            }
+            return `<span class="tag ${_catColorCache[c]}">${escHtml(c||'—')}</span>`;
         }
         function tagEstadoInv(e) {
             const m = {Crítico: 'tag-danger', Bajo: 'tag-warning', Normal: 'tag-success'};
