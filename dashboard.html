@@ -2825,18 +2825,127 @@
             openModal('Editar contacto', _formContacto(c));
         }
 
+        /* ── País / bandera / código para el campo de teléfono ─────────────── */
+        var _FC_COUNTRIES = [
+            {code:'GT',dial:'+502',flag:'🇬🇹',name:'Guatemala'},
+            {code:'MX',dial:'+52', flag:'🇲🇽',name:'México'},
+            {code:'US',dial:'+1',  flag:'🇺🇸',name:'EE. UU.'},
+            {code:'SV',dial:'+503',flag:'🇸🇻',name:'El Salvador'},
+            {code:'HN',dial:'+504',flag:'🇭🇳',name:'Honduras'},
+            {code:'NI',dial:'+505',flag:'🇳🇮',name:'Nicaragua'},
+            {code:'CR',dial:'+506',flag:'🇨🇷',name:'Costa Rica'},
+            {code:'PA',dial:'+507',flag:'🇵🇦',name:'Panamá'},
+            {code:'CO',dial:'+57', flag:'🇨🇴',name:'Colombia'},
+            {code:'VE',dial:'+58', flag:'🇻🇪',name:'Venezuela'},
+            {code:'PE',dial:'+51', flag:'🇵🇪',name:'Perú'},
+            {code:'CL',dial:'+56', flag:'🇨🇱',name:'Chile'},
+            {code:'AR',dial:'+54', flag:'🇦🇷',name:'Argentina'},
+            {code:'EC',dial:'+593',flag:'🇪🇨',name:'Ecuador'},
+            {code:'BO',dial:'+591',flag:'🇧🇴',name:'Bolivia'},
+            {code:'PY',dial:'+595',flag:'🇵🇾',name:'Paraguay'},
+            {code:'UY',dial:'+598',flag:'🇺🇾',name:'Uruguay'},
+            {code:'BR',dial:'+55', flag:'🇧🇷',name:'Brasil'},
+            {code:'DO',dial:'+1',  flag:'🇩🇴',name:'Rep. Dominicana'},
+            {code:'CU',dial:'+53', flag:'🇨🇺',name:'Cuba'},
+            {code:'ES',dial:'+34', flag:'🇪🇸',name:'España'},
+            {code:'CA',dial:'+1',  flag:'🇨🇦',name:'Canadá'},
+            {code:'GB',dial:'+44', flag:'🇬🇧',name:'Reino Unido'},
+            {code:'DE',dial:'+49', flag:'🇩🇪',name:'Alemania'},
+            {code:'FR',dial:'+33', flag:'🇫🇷',name:'Francia'},
+            {code:'IT',dial:'+39', flag:'🇮🇹',name:'Italia'},
+            {code:'CN',dial:'+86', flag:'🇨🇳',name:'China'},
+            {code:'IN',dial:'+91', flag:'🇮🇳',name:'India'},
+            {code:'JP',dial:'+81', flag:'🇯🇵',name:'Japón'},
+        ];
+        var _fcCountryCode = 'GT'; // default, se sobreescribe con IP
+
+        function _fcGetCountry() { return _FC_COUNTRIES.find(function(c){return c.code===_fcCountryCode;}) || _FC_COUNTRIES[0]; }
+
+        function _fcDetectCountry() {
+            // Detectar país por IP (una sola vez por sesión)
+            var cached = sessionStorage.getItem('az_country');
+            if (cached) { _fcCountryCode = cached; return Promise.resolve(); }
+            return fetch('https://ipapi.co/json/')
+                .then(function(r){ return r.json(); })
+                .then(function(d){
+                    if (d && d.country_code) {
+                        _fcCountryCode = d.country_code;
+                        sessionStorage.setItem('az_country', d.country_code);
+                    }
+                })
+                .catch(function(){});
+        }
+
+        // Llamar detección al cargar (no bloqueante)
+        _fcDetectCountry();
+
+        function _fcRenderDropdown(selectedCode) {
+            return _FC_COUNTRIES.map(function(c){
+                return '<option value="'+c.code+'"'+(c.code===selectedCode?' selected':'')+'>'+c.flag+' '+c.name+' '+c.dial+'</option>';
+            }).join('');
+        }
+
+        // Parsear teléfono guardado: separar dial code y número local
+        function _fcParseTelefono(tel) {
+            tel = (tel||'').trim();
+            if (!tel) return {code:'GT', local:''};
+            for (var i=0; i<_FC_COUNTRIES.length; i++) {
+                var c = _FC_COUNTRIES[i];
+                if (tel.startsWith(c.dial+' ') || tel.startsWith(c.dial)) {
+                    return {code:c.code, local:tel.slice(c.dial.length).replace(/^\s+/,'')};
+                }
+            }
+            return {code:_fcCountryCode, local:tel};
+        }
+
         function _formContacto(c) {
+            var parsed  = _fcParseTelefono(c.telefono || '');
+            var selCode = parsed.code || _fcCountryCode;
             return `
     <div class="form-field"><label class="form-label">NOMBRE *</label>
       <input class="form-input" id="fcNombre" value="${escAttr(c.nombre || '')}" placeholder="Nombre del contacto"/></div>
     <div class="form-field"><label class="form-label">CARGO</label>
       <input class="form-input" id="fcCargo" value="${escAttr(c.cargo || '')}" placeholder="Ej. Gerente de compras"/></div>
     <div class="form-field"><label class="form-label">TELÉFONO</label>
-      <input class="form-input" id="fcTelefono" value="${escAttr(c.telefono || '')}"/></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="fcTelPais" style="flex:0 0 auto;height:40px;padding:0 8px;border:1px solid var(--border);border-radius:8px;background:var(--card);color:var(--text-primary);font-size:14px;cursor:pointer;max-width:180px">
+          ${_fcRenderDropdown(selCode)}
+        </select>
+        <input class="form-input" id="fcTelefono" type="tel" inputmode="numeric"
+          value="${escAttr(parsed.local)}"
+          placeholder="0000 0000"
+          style="flex:1;margin:0"
+          oninput="this.value=this.value.replace(/[^0-9\\s\\-]/g,'')"/>
+      </div>
+      <div id="fcTelError" style="font-size:11.5px;color:var(--danger);margin-top:4px;display:none">Solo se permiten números.</div>
+    </div>
     <div class="form-field"><label class="form-label">CORREO</label>
-      <input class="form-input" id="fcCorreo" type="email" value="${escAttr(c.correo || '')}"/></div>
+      <input class="form-input" id="fcCorreo" type="text" inputmode="email"
+        value="${escAttr(c.correo || '')}"
+        placeholder="correo@empresa.com"
+        oninput="document.getElementById('fcCorreoError').style.display='none'"/>
+      <div id="fcCorreoError" style="font-size:11.5px;color:var(--danger);margin-top:4px;display:none"></div>
+    </div>
     <div class="form-field"><label class="form-label">NOTAS</label>
       <textarea class="form-input" id="fcNotas" rows="2">${escHtml(c.notas || '')}</textarea></div>`;
+        }
+
+        function _fcValidarCorreo(val) {
+            val = (val||'').trim();
+            if (!val) return true; // correo opcional
+            // Debe tener exactamente un @
+            var parts = val.split('@');
+            if (parts.length !== 2) return false;
+            var local = parts[0], domain = parts[1];
+            if (!local || !domain) return false;
+            // Dominio debe tener al menos un punto Y caracteres válidos a ambos lados
+            var dotIdx = domain.lastIndexOf('.');
+            if (dotIdx < 1 || dotIdx >= domain.length - 1) return false;
+            // No permitir comas ni espacios
+            if (/[,\s]/.test(val)) return false;
+            // TLD mínimo 2 caracteres
+            if (domain.slice(dotIdx+1).length < 2) return false;
+            return true;
         }
 
         function fichaEliminarContacto(id, nombre) {
@@ -2942,9 +3051,30 @@
                 }
                 const nombre = (v('fcNombre') || '').trim();
                 if (!nombre) { restore('Guardar'); showToast('El nombre del contacto es requerido', '#FF9F0A'); return true; }
+
+                // Ensamblar teléfono: dial code + número local
+                var telPaisEl  = document.getElementById('fcTelPais');
+                var telLocalEl = document.getElementById('fcTelefono');
+                var telLocal   = (telLocalEl ? telLocalEl.value.replace(/[^0-9\s\-]/g,'').trim() : '');
+                var telFinal   = '';
+                if (telLocal) {
+                    var telPaisCode = telPaisEl ? telPaisEl.value : _fcCountryCode;
+                    var telPaisObj  = _FC_COUNTRIES.find(function(x){return x.code===telPaisCode;}) || _fcGetCountry();
+                    telFinal = telPaisObj.dial + ' ' + telLocal;
+                }
+
+                // Validar correo
+                var correoVal = (v('fcCorreo')||'').trim();
+                if (correoVal && !_fcValidarCorreo(correoVal)) {
+                    var correoErr = document.getElementById('fcCorreoError');
+                    if (correoErr) { correoErr.textContent = 'Correo inválido. Debe tener formato usuario@dominio.com'; correoErr.style.display='block'; }
+                    restore('Guardar');
+                    return true;
+                }
+
                 const d = {
                     tipo: ref.tipo, refId: ref.id, nombre: nombre, cargo: v('fcCargo'),
-                    telefono: v('fcTelefono'), correo: v('fcCorreo'), notas: v('fcNotas')
+                    telefono: telFinal, correo: correoVal, notas: v('fcNotas')
                 };
                 if (m.action === 'add') {
                     window.api.withSuccessHandler(done('Contacto agregado', '#30D158')).withFailureHandler(fail).addContacto(d);
