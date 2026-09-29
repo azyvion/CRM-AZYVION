@@ -2140,12 +2140,13 @@
         async function _addActividadCRM(p,u){const cats=['Llamada','Correo','Reunión','Visita','Seguimiento','Otro'];const r={id:_uuid(),tipo:p.tipo||'Cliente',refId:p.refId,categoria:cats.includes(p.categoria)?p.categoria:'Otro',titulo:String(p.titulo||'').trim(),descripcion:p.descripcion||'',fecha:p.fecha||(new Date().toISOString().slice(0,10)),fechaSeguimiento:p.fechaSeguimiento||'',usuario:u,fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('ActividadesCRM').insert(r);if(error)return{ok:false,error:error.message};return{ok:true,id:r.id};}
         async function _deleteActividadCRM(p,u){const{error}=await _sb.from('ActividadesCRM').delete().eq('id',p.id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
-        async function _getPerfil(sess){const {data:usr}=await _sb.from('Usuarios').select('*').eq('usuario',sess.usuario||sess.nombre).single();if(!usr)return{ok:false,error:'Usuario no encontrado.'};return{ok:true,data:{id:usr.id,usuario:usr.usuario,nombre:usr.nombre,rol:usr.rol,correo:usr.correo||'',telefono:usr.telefono||'',cargo:usr.cargo||'',fotoUrl:usr.fotoUrl||'',fechaReg:usr.fechaReg||'',fechaPerfilActualizado:usr.fechaPerfilActualizado||'',preferencias:_prefsUsuario(usr)}};}
-        async function _updatePerfil(p,sess){if(!p.nombre||!String(p.nombre).trim())return{ok:false,error:'El nombre es requerido.'};const up={nombre:String(p.nombre).trim(),fechaPerfilActualizado:new Date().toISOString()};if(p.correo!==undefined)up.correo=p.correo.trim();if(p.telefono!==undefined)up.telefono=p.telefono;if(p.cargo!==undefined)up.cargo=p.cargo;const{error}=await _sb.from('Usuarios').update(up).eq('usuario',sess.usuario||sess.nombre);if(error)return{ok:false,error:error.message};return{ok:true};}
-        async function _updatePreferencias(p,sess){const validos={tema:['claro','oscuro'],paginaInicio:['overview','clientes','prospectos','inventario','cotizaciones','encuestas','contabilidad','usuarios'],densidadTabla:['comoda','compacta']};const up={};if(p.tema!==undefined&&validos.tema.includes(p.tema))up.tema=p.tema;if(p.paginaInicio!==undefined&&validos.paginaInicio.includes(p.paginaInicio))up.paginaInicio=p.paginaInicio;if(p.densidadTabla!==undefined&&validos.densidadTabla.includes(p.densidadTabla))up.densidadTabla=p.densidadTabla;if(p.copiarmeCotizaciones!==undefined)up.copiarmeCotizaciones=p.copiarmeCotizaciones===true||String(p.copiarmeCotizaciones)==='true';if(p.alertaStockCritico!==undefined)up.alertaStockCritico=p.alertaStockCritico===true||String(p.alertaStockCritico)==='true';const{error}=await _sb.from('Usuarios').update(up).eq('usuario',sess.usuario||sess.nombre);if(error)return{ok:false,error:error.message};return{ok:true,preferencias:up};}
+        async function _getPerfil(sess){const{data:{session:supa}}=await _sb.auth.getSession();const authUid=supa&&supa.user&&supa.user.id;let q=_sb.from('Usuarios').select('*');if(authUid)q=q.eq('auth_uid',authUid);else q=q.eq('usuario',sess.usuario||sess.nombre).eq('organization_id',_currentOrgId);const{data:usr}=await q.single();if(!usr)return{ok:false,error:'Usuario no encontrado.'};return{ok:true,data:{id:usr.id,usuario:usr.usuario,nombre:usr.nombre,rol:usr.rol,correo:usr.correo||'',telefono:usr.telefono||'',cargo:usr.cargo||'',fotoUrl:usr.fotoUrl||'',fechaReg:usr.fechaReg||'',fechaPerfilActualizado:usr.fechaPerfilActualizado||'',preferencias:_prefsUsuario(usr)}};}
+        async function _updatePerfil(p,sess){if(!p.nombre||!String(p.nombre).trim())return{ok:false,error:'El nombre es requerido.'};const up={nombre:String(p.nombre).trim(),fechaPerfilActualizado:new Date().toISOString()};if(p.correo!==undefined)up.correo=p.correo.trim();if(p.telefono!==undefined)up.telefono=p.telefono;if(p.cargo!==undefined)up.cargo=p.cargo;const{data:{session:supa}}=await _sb.auth.getSession();const authUid=supa&&supa.user&&supa.user.id;let q=_sb.from('Usuarios').update(up);if(authUid)q=q.eq('auth_uid',authUid);else q=q.eq('usuario',sess.usuario||sess.nombre).eq('organization_id',_currentOrgId);const{error}=await q;if(error)return{ok:false,error:error.message};return{ok:true};}
+        async function _updatePreferencias(p,sess){const validos={tema:['claro','oscuro'],paginaInicio:['overview','clientes','prospectos','inventario','cotizaciones','encuestas','contabilidad','usuarios'],densidadTabla:['comoda','compacta']};const up={};if(p.tema!==undefined&&validos.tema.includes(p.tema))up.tema=p.tema;if(p.paginaInicio!==undefined&&validos.paginaInicio.includes(p.paginaInicio))up.paginaInicio=p.paginaInicio;if(p.densidadTabla!==undefined&&validos.densidadTabla.includes(p.densidadTabla))up.densidadTabla=p.densidadTabla;if(p.copiarmeCotizaciones!==undefined)up.copiarmeCotizaciones=p.copiarmeCotizaciones===true||String(p.copiarmeCotizaciones)==='true';if(p.alertaStockCritico!==undefined)up.alertaStockCritico=p.alertaStockCritico===true||String(p.alertaStockCritico)==='true';const{data:{session:supa}}=await _sb.auth.getSession();const authUid=supa&&supa.user&&supa.user.id;let q=_sb.from('Usuarios').update(up);if(authUid)q=q.eq('auth_uid',authUid);else q=q.eq('usuario',sess.usuario||sess.nombre).eq('organization_id',_currentOrgId);const{error}=await q;if(error)return{ok:false,error:error.message};return{ok:true,preferencias:up};}
         async function _changePasswordPropio(p,sess){if(!p.actual||!p.nueva)return{ok:false,error:'Contraseña actual y nueva son requeridas.'};if(String(p.nueva).length<6)return{ok:false,error:'La nueva contraseña debe tener al menos 6 caracteres.'};if(p.actual===p.nueva)return{ok:false,error:'La nueva contraseña debe ser diferente.'};const{error}=await _sb.auth.updateUser({current_password:p.actual,password:p.nueva});if(error)return{ok:false,error:error.message};return{ok:true};}
-        async function _uploadFotoPerfil(p,sess){if(!p.imagenBase64)return{ok:false,error:'No se recibió ninguna imagen.'};let datos=String(p.imagenBase64);const idx=datos.indexOf('base64,');if(idx!==-1)datos=datos.substring(idx+7);let bytes;try{bytes=Uint8Array.from(atob(datos),c=>c.charCodeAt(0));}catch(e){return{ok:false,error:'Imagen inválida.'};}if(!bytes.length)return{ok:false,error:'La imagen está vacía.'};if(bytes.length>2*1024*1024)return{ok:false,error:'La imagen no debe superar 2 MB.'};const mime=p.mimeType||'image/jpeg';const ext={'image/png':'.png','image/jpeg':'.jpg','image/webp':'.webp'}[mime]||'.jpg';const filename='perfil_'+(sess.usuario||sess.nombre)+'_'+Date.now()+ext;const blob=new Blob([bytes],{type:mime});const{data:up,error:upE}=await _sb.storage.from('fotos-perfil').upload(filename,blob,{upsert:true,contentType:mime});if(upE)return{ok:false,error:'No se pudo subir la foto: '+upE.message+'. Crea el bucket "fotos-perfil" como público en Supabase Storage.'};const{data:uD}=_sb.storage.from('fotos-perfil').getPublicUrl(filename);const fotoUrl=uD.publicUrl;await _sb.from('Usuarios').update({fotoUrl,fotoFileId:filename,fechaPerfilActualizado:new Date().toISOString()}).eq('usuario',sess.usuario||sess.nombre);return{ok:true,fotoUrl};}
-        async function _deleteFotoPerfil(p,sess){const{data:usr}=await _sb.from('Usuarios').select('fotoFileId,fotoUrl').eq('usuario',sess.usuario||sess.nombre).single();if(usr&&usr.fotoFileId)await _sb.storage.from('fotos-perfil').remove([usr.fotoFileId]);await _sb.from('Usuarios').update({fotoUrl:'',fotoFileId:'',fechaPerfilActualizado:new Date().toISOString()}).eq('usuario',sess.usuario||sess.nombre);return{ok:true};}
+        async function _getAuthUidOrFallback(){try{const{data:{session:supa}}=await _sb.auth.getSession();return supa&&supa.user&&supa.user.id;}catch(e){return null;}}
+        async function _uploadFotoPerfil(p,sess){if(!p.imagenBase64)return{ok:false,error:'No se recibió ninguna imagen.'};let datos=String(p.imagenBase64);const idx=datos.indexOf('base64,');if(idx!==-1)datos=datos.substring(idx+7);let bytes;try{bytes=Uint8Array.from(atob(datos),c=>c.charCodeAt(0));}catch(e){return{ok:false,error:'Imagen inválida.'};}if(!bytes.length)return{ok:false,error:'La imagen está vacía.'};if(bytes.length>2*1024*1024)return{ok:false,error:'La imagen no debe superar 2 MB.'};const mime=p.mimeType||'image/jpeg';const ext={'image/png':'.png','image/jpeg':'.jpg','image/webp':'.webp'}[mime]||'.jpg';const filename='perfil_'+(sess.usuario||sess.nombre)+'_'+Date.now()+ext;const blob=new Blob([bytes],{type:mime});const{data:up,error:upE}=await _sb.storage.from('fotos-perfil').upload(filename,blob,{upsert:true,contentType:mime});if(upE)return{ok:false,error:'No se pudo subir la foto: '+upE.message+'. Crea el bucket "fotos-perfil" como público en Supabase Storage.'};const{data:uD}=_sb.storage.from('fotos-perfil').getPublicUrl(filename);const fotoUrl=uD.publicUrl;const authUid=await _getAuthUidOrFallback();let qu=_sb.from('Usuarios').update({fotoUrl,fotoFileId:filename,fechaPerfilActualizado:new Date().toISOString()});if(authUid)qu=qu.eq('auth_uid',authUid);else qu=qu.eq('usuario',sess.usuario||sess.nombre).eq('organization_id',_currentOrgId);await qu;return{ok:true,fotoUrl};}
+        async function _deleteFotoPerfil(p,sess){const authUid=await _getAuthUidOrFallback();let qr=_sb.from('Usuarios').select('fotoFileId,fotoUrl');if(authUid)qr=qr.eq('auth_uid',authUid);else qr=qr.eq('usuario',sess.usuario||sess.nombre).eq('organization_id',_currentOrgId);const{data:usr}=await qr.single();if(usr&&usr.fotoFileId)await _sb.storage.from('fotos-perfil').remove([usr.fotoFileId]);let qu=_sb.from('Usuarios').update({fotoUrl:'',fotoFileId:'',fechaPerfilActualizado:new Date().toISOString()});if(authUid)qu=qu.eq('auth_uid',authUid);else qu=qu.eq('usuario',sess.usuario||sess.nombre).eq('organization_id',_currentOrgId);await qu;return{ok:true};}
 
         async function _getDashboardInit(p,sess){const rol=_rol;const promises=[_getResumen(),_getActividad(10),_getClientes(),_getProspectos(),_getInventario(),_getEncuestas(),_getCotizaciones({})];const esAdmin=_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN';const esCont=_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN'||_currentUserRole==='GERENTE';if(esAdmin)promises.push(_getUsuarios());if(esCont)promises.push(_getResumenContable(),_getCuentasBancarias(),_getPlanCuentas(),_getTransacciones({}));const results=await Promise.all(promises);let i=0;const resumen=results[i++],actividad=results[i++],clientes=results[i++],prospectos=results[i++],inventario=results[i++],encuestas=results[i++],cotizaciones=results[i++];const usuarios=esAdmin?results[i++]:null;let contabilidad=null;if(esCont){const rc=results[i++],cb=results[i++],plan=results[i++],trx=results[i++];contabilidad={resumenContable:rc,cuentasBancarias:cb.data,planCuentas:plan.data,transacciones:trx.data};}return{ok:true,ts:new Date().toISOString(),resumen,actividad,clientes,prospectos,inventario,encuestas,cotizaciones,usuarios,contabilidad,empresa:EMPRESA,rol,usuario:sess.usuario||sess.nombre};}
 
@@ -5965,184 +5966,198 @@
                     : ['overview', 'clientes', 'prospectos', 'inventario', 'cotizaciones', 'encuestas']);
 
             body.innerHTML = `
-    <div class="perfil-head card">
-        <div class="perfil-avatar-wrap">
-            <div class="perfil-avatar" id="perfilAvatarBig">${avatarHtml(p.nombre, p.fotoUrl)}</div>
-            <input type="file" id="perfilFotoInput" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="onSeleccionFoto(event)"/>
+<div class="ajustes-layout">
+  <nav class="ajustes-nav" id="ajustesNav">
+    <button class="ajustes-nav-item active" onclick="ajustesTab('perfil',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span>Perfil</span>
+    </button>
+    <button class="ajustes-nav-item" onclick="ajustesTab('apariencia',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <span>Apariencia</span>
+    </button>
+    <button class="ajustes-nav-item" onclick="ajustesTab('notificaciones',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span>Notificaciones</span>
+    </button>
+    <button class="ajustes-nav-item" onclick="ajustesTab('seguridad',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span>Seguridad</span>
+    </button>
+    ${esAdmin() ? `
+    <div class="ajustes-nav-divider"></div>
+    <button class="ajustes-nav-item" onclick="ajustesTab('empresa',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Empresa</span>
+      <span class="ajustes-nav-badge">Admin</span>
+    </button>` : ''}
+  </nav>
+
+  <div class="ajustes-content">
+    <div class="ajustes-header">
+      <div class="ajustes-avatar-wrap">
+        <div class="perfil-avatar" id="perfilAvatarBig">${avatarHtml(p.nombre, p.fotoUrl)}</div>
+        <input type="file" id="perfilFotoInput" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="onSeleccionFoto(event)"/>
+        <button class="ajustes-avatar-edit" onclick="document.getElementById('perfilFotoInput').click()" title="Cambiar foto">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
+      </div>
+      <div class="ajustes-header-info">
+        <div class="ajustes-header-nombre">${escHtml(p.nombre)}</div>
+        <div class="ajustes-header-meta">
+          <span class="tag ${(window._esSuperAdmin || p.rol === 'Admin') ? 'tag-danger' : p.rol === 'Gerente' ? 'tag-accent' : 'tag-gray'}">${escHtml(window._esSuperAdmin ? 'Super Admin' : p.rol)}</span>
+          ${p.cargo ? `<span class="cell-sub">${escHtml(p.cargo)}</span>` : ''}
+          <span class="cell-sub">@${escHtml(p.usuario)}</span>
         </div>
-        <div style="flex:1;min-width:0">
-            <div class="perfil-nombre">${escHtml(p.nombre)}</div>
-            <div class="perfil-sub">
-                <span class="tag ${(window._esSuperAdmin || p.rol === 'Admin') ? 'tag-danger' : p.rol === 'Gerente' ? 'tag-accent' : 'tag-gray'}">${escHtml(window._esSuperAdmin ? 'Super Admin' : p.rol)}</span>
-                ${p.cargo ? `<span class="ficha-sub-dato">${escHtml(p.cargo)}</span>` : ''}
-                <span class="ficha-sub-dato">Usuario: ${escHtml(p.usuario)}</span>
-            </div>
-            <div class="perfil-sub" style="margin-top:6px">
-                <span class="cell-sub">Miembro desde ${p.fechaReg ? fechaCorta(p.fechaReg) : 'siempre'}</span>
-                ${p.fechaPerfilActualizado ? `<span class="cell-sub">· Actualizado ${timeAgo(p.fechaPerfilActualizado)}</span>` : ''}
-            </div>
-        </div>
-        <div class="perfil-foto-acciones">
-            <button class="btn-ghost" onclick="document.getElementById('perfilFotoInput').click()">
-                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                ${p.fotoUrl ? 'Cambiar foto' : 'Subir foto'}
-            </button>
-            ${p.fotoUrl ? `<button class="btn-danger-sm" onclick="eliminarFotoPerfil()">Quitar foto</button>` : ''}
-        </div>
+        ${p.fotoUrl ? `<button class="btn-danger-sm" style="margin-top:8px" onclick="eliminarFotoPerfil()">Quitar foto</button>` : ''}
+      </div>
     </div>
 
-    <div class="ficha-grid" style="margin-top:14px">
-        <div class="card ficha-card">
-            <div class="ficha-card-head"><span>Información personal</span></div>
-            <div class="ficha-card-body">
-                <div class="form-field"><label class="form-label">NOMBRE COMPLETO *</label>
-                    <input class="form-input" id="pfNombre" value="${escAttr(p.nombre)}"/></div>
-                <div class="form-field"><label class="form-label">CORREO</label>
-                    <input class="form-input" id="pfCorreo" type="email" value="${escAttr(p.correo)}" placeholder="tucorreo@empresa.com"/>
-                    <div style="font-size:11.5px;color:var(--text-secondary);margin-top:5px">Se usa para notificaciones y copias de cotizaciones.</div></div>
-                <div class="form-field"><label class="form-label">TELÉFONO</label>
-                    <input class="form-input" id="pfTelefono" value="${escAttr(p.telefono)}"/></div>
-                <div class="form-field"><label class="form-label">CARGO / PUESTO</label>
-                    <input class="form-input" id="pfCargo" value="${escAttr(p.cargo)}" placeholder="Ej. Ejecutivo de ventas"/></div>
-                <div class="form-field"><label class="form-label">USUARIO DE ACCESO</label>
-                    <input class="form-input" value="${escAttr(p.usuario)}" disabled style="opacity:.6;cursor:not-allowed"/>
-                    <div style="font-size:11.5px;color:var(--text-secondary);margin-top:5px">El usuario de acceso no se puede cambiar. Contacta a un administrador si lo necesitas.</div></div>
-                <div style="display:flex;justify-content:flex-end;margin-top:6px">
-                    <button class="btn-save" id="pfGuardarBtn" onclick="guardarPerfilInfo()">Guardar cambios</button>
-                </div>
-            </div>
-        </div>
+    <div class="ajustes-section active" id="ajustes-perfil">
+      <div class="ajustes-section-title">Información personal</div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Nombre completo</div><div class="ajustes-row-desc">Tu nombre visible en el CRM</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="pfNombre" value="${escAttr(p.nombre)}"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Correo electrónico</div><div class="ajustes-row-desc">Para notificaciones y copias de cotizaciones</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="pfCorreo" type="email" value="${escAttr(p.correo)}" placeholder="tucorreo@empresa.com"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Teléfono</div><div class="ajustes-row-desc">Número de contacto</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="pfTelefono" value="${escAttr(p.telefono)}" placeholder="+502 0000-0000"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Cargo / Puesto</div><div class="ajustes-row-desc">Tu rol en la empresa</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="pfCargo" value="${escAttr(p.cargo)}" placeholder="Ej. Ejecutivo de ventas"/></div>
+      </div>
+      <div class="ajustes-row ajustes-row-disabled">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Usuario de acceso</div><div class="ajustes-row-desc">No se puede cambiar. Contacta a un administrador.</div></div>
+        <div class="ajustes-row-control"><input class="form-input" value="${escAttr(p.usuario)}" disabled style="opacity:.45;cursor:not-allowed"/></div>
+      </div>
+      <div class="ajustes-footer"><button class="btn-save" id="pfGuardarBtn" onclick="guardarPerfilInfo()">Guardar cambios</button></div>
+    </div>
 
-        <div class="card ficha-card">
-            <div class="ficha-card-head"><span>Preferencias del sistema</span></div>
-            <div class="ficha-card-body">
-                <div class="switch-field">
-                    <div><div class="sf-txt">Tema oscuro</div><div class="sf-sub">Cambia la apariencia de todo el CRM.</div></div>
-                    <label class="switch${p.preferencias.tema === 'oscuro' ? ' on' : ''}" id="prefTemaSwitch">
-                        <input type="checkbox" id="prefTema" ${p.preferencias.tema === 'oscuro' ? 'checked' : ''} onchange="onTogglePref(this,'prefTemaSwitch')"/>
-                        <span class="knob"></span>
-                    </label>
-                </div>
-                <div class="switch-field">
-                    <div><div class="sf-txt">Tablas compactas</div><div class="sf-sub">Reduce el espaciado de las filas para ver más información.</div></div>
-                    <label class="switch${p.preferencias.densidadTabla === 'compacta' ? ' on' : ''}" id="prefDensidadSwitch">
-                        <input type="checkbox" id="prefDensidad" ${p.preferencias.densidadTabla === 'compacta' ? 'checked' : ''} onchange="onTogglePref(this,'prefDensidadSwitch')"/>
-                        <span class="knob"></span>
-                    </label>
-                </div>
-                <div class="form-field" style="margin-top:4px">
-                    <label class="form-label">PÁGINA DE INICIO</label>
-                    <select class="form-select" id="prefPaginaInicio">
-                        ${paginasDisponibles.map(k => `<option value="${k}"${k === p.preferencias.paginaInicio ? ' selected' : ''}>${PAGINAS_NOMBRE[k]}</option>`).join('')}
-                    </select>
-                    <div style="font-size:11.5px;color:var(--text-secondary);margin-top:5px">La página que verás justo después de iniciar sesión.</div>
-                </div>
-                <div style="display:flex;justify-content:flex-end;margin-top:6px">
-                    <button class="btn-save" onclick="guardarPreferenciasGenerales()">Guardar preferencias</button>
-                </div>
-            </div>
-        </div>
+    <div class="ajustes-section" id="ajustes-apariencia">
+      <div class="ajustes-section-title">Apariencia y visualización</div>
+      <div class="ajustes-row ajustes-row-toggle">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Tema oscuro</div><div class="ajustes-row-desc">Cambia la apariencia de todo el CRM</div></div>
+        <label class="switch${p.preferencias.tema === 'oscuro' ? ' on' : ''}" id="prefTemaSwitch"><input type="checkbox" id="prefTema" ${p.preferencias.tema === 'oscuro' ? 'checked' : ''} onchange="onTogglePref(this,'prefTemaSwitch')"/><span class="knob"></span></label>
+      </div>
+      <div class="ajustes-row ajustes-row-toggle">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Tablas compactas</div><div class="ajustes-row-desc">Reduce el espaciado de las filas para ver más información</div></div>
+        <label class="switch${p.preferencias.densidadTabla === 'compacta' ? ' on' : ''}" id="prefDensidadSwitch"><input type="checkbox" id="prefDensidad" ${p.preferencias.densidadTabla === 'compacta' ? 'checked' : ''} onchange="onTogglePref(this,'prefDensidadSwitch')"/><span class="knob"></span></label>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Página de inicio</div><div class="ajustes-row-desc">La primera pantalla al iniciar sesión</div></div>
+        <div class="ajustes-row-control" style="max-width:200px"><select class="form-select" id="prefPaginaInicio">${paginasDisponibles.map(k => `<option value="${k}"${k === p.preferencias.paginaInicio ? ' selected' : ''}>${PAGINAS_NOMBRE[k]}</option>`).join('')}</select></div>
+      </div>
+      <div class="ajustes-footer"><button class="btn-save" id="aparienciaGuardarBtn" onclick="guardarPreferenciasGenerales()">Guardar preferencias</button></div>
+    </div>
 
-        <div class="card ficha-card">
-            <div class="ficha-card-head"><span>Notificaciones</span></div>
-            <div class="ficha-card-body">
-                <div class="switch-field">
-                    <div><div class="sf-txt">Copiarme mis cotizaciones enviadas</div><div class="sf-sub">Recibe una copia oculta cuando envíes una cotización por correo.</div></div>
-                    <label class="switch${p.preferencias.copiarmeCotizaciones ? ' on' : ''}" id="prefCopiaSwitch">
-                        <input type="checkbox" id="prefCopia" ${p.preferencias.copiarmeCotizaciones ? 'checked' : ''} onchange="onTogglePref(this,'prefCopiaSwitch')"/>
-                        <span class="knob"></span>
-                    </label>
-                </div>
-                <div class="switch-field" style="margin-bottom:0">
-                    <div><div class="sf-txt">Alertas de stock crítico</div><div class="sf-sub">Recíbe un correo cuando un producto que registres o edites entre en stock crítico.</div></div>
-                    <label class="switch${p.preferencias.alertaStockCritico ? ' on' : ''}" id="prefStockSwitch">
-                        <input type="checkbox" id="prefStock" ${p.preferencias.alertaStockCritico ? 'checked' : ''} onchange="onTogglePref(this,'prefStockSwitch')"/>
-                        <span class="knob"></span>
-                    </label>
-                </div>
-                ${!p.correo ? '<div style="font-size:11.5px;color:var(--warning);margin-top:10px">Agrega un correo en "Información personal" para poder recibir estas notificaciones.</div>' : ''}
-                <div style="display:flex;justify-content:flex-end;margin-top:12px">
-                    <button class="btn-save" onclick="guardarPreferenciasGenerales()">Guardar preferencias</button>
-                </div>
-            </div>
-        </div>
+    <div class="ajustes-section" id="ajustes-notificaciones">
+      <div class="ajustes-section-title">Notificaciones por correo</div>
+      ${!p.correo ? '<div class="ajustes-alert">⚠️ Agrega un correo en <b>Perfil</b> para recibir notificaciones.</div>' : ''}
+      <div class="ajustes-row ajustes-row-toggle">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Copiarme mis cotizaciones</div><div class="ajustes-row-desc">Recibe una copia cuando envíes una cotización por correo</div></div>
+        <label class="switch${p.preferencias.copiarmeCotizaciones ? ' on' : ''}" id="prefCopiaSwitch"><input type="checkbox" id="prefCopia" ${p.preferencias.copiarmeCotizaciones ? 'checked' : ''} onchange="onTogglePref(this,'prefCopiaSwitch')"/><span class="knob"></span></label>
+      </div>
+      <div class="ajustes-row ajustes-row-toggle">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Alertas de stock crítico</div><div class="ajustes-row-desc">Recibe un correo cuando un producto baje de stock mínimo</div></div>
+        <label class="switch${p.preferencias.alertaStockCritico ? ' on' : ''}" id="prefStockSwitch"><input type="checkbox" id="prefStock" ${p.preferencias.alertaStockCritico ? 'checked' : ''} onchange="onTogglePref(this,'prefStockSwitch')"/><span class="knob"></span></label>
+      </div>
+      <div class="ajustes-footer"><button class="btn-save" id="notifsGuardarBtn" onclick="guardarPreferenciasGenerales()">Guardar notificaciones</button></div>
+    </div>
 
-        <div class="card ficha-card">
-            <div class="ficha-card-head"><span>Seguridad</span></div>
-            <div class="ficha-card-body">
-                <div class="form-field"><label class="form-label">CONTRASEÑA ACTUAL *</label>
-                    <input class="form-input" id="pwActual" type="password" autocomplete="current-password"/></div>
-                <div class="form-field"><label class="form-label">NUEVA CONTRASEÑA *</label>
-                    <input class="form-input" id="pwNueva" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres"/></div>
-                <div class="form-field"><label class="form-label">CONFIRMAR NUEVA CONTRASEÑA *</label>
-                    <input class="form-input" id="pwConfirmar" type="password" autocomplete="new-password"/></div>
-                <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:6px">
-                    Al cambiar tu contraseña, cerraremos tus demás sesiones activas por seguridad.
-                </div>
-                <div style="display:flex;justify-content:flex-end">
-                    <button class="btn-save" id="pwGuardarBtn" onclick="guardarNuevaContrasena()">Actualizar contraseña</button>
-                </div>
-            </div>
-        </div>
+    <div class="ajustes-section" id="ajustes-seguridad">
+      <div class="ajustes-section-title">Cambiar contraseña</div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Contraseña actual</div><div class="ajustes-row-desc">Necesaria para confirmar el cambio</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="pwActual" type="password" autocomplete="current-password" placeholder="••••••••"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Nueva contraseña</div><div class="ajustes-row-desc">Mínimo 6 caracteres</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="pwNueva" type="password" autocomplete="new-password" placeholder="••••••••"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Confirmar nueva contraseña</div><div class="ajustes-row-desc">Escríbela de nuevo para confirmar</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="pwConfirmar" type="password" autocomplete="new-password" placeholder="••••••••"/></div>
+      </div>
+      <div class="ajustes-alert ajustes-alert-info">🔒 Al cambiar tu contraseña, cerraremos tus demás sesiones activas por seguridad.</div>
+      <div class="ajustes-footer"><button class="btn-save" id="pwGuardarBtn" onclick="guardarNuevaContrasena()">Actualizar contraseña</button></div>
+    </div>
 
-        ${esAdmin() ? `
-        <div class="card ficha-card" id="orgConfigCard" style="grid-column:1/-1">
-            <div class="ficha-card-head" style="display:flex;align-items:center;justify-content:space-between">
-                <span>🏢 Configuración de empresa</span>
-                <span style="font-size:11px;background:rgba(10,132,255,.12);color:#0A84FF;padding:3px 10px;border-radius:20px;font-weight:600">Solo administradores</span>
-            </div>
-            <div class="ficha-card-body">
-                <div id="orgLogoPreviewWrap" style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px;background:var(--bg-secondary,#f7f9fc);border-radius:10px">
-                    <div id="orgLogoPreview" style="width:90px;height:60px;border-radius:8px;border:1.5px dashed var(--border,#dde2ea);display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden;flex-shrink:0">
-                        <span id="orgLogoPlaceholder" style="font-size:12px;color:var(--text-muted,#aaa);text-align:center;padding:4px">Sin logo</span>
-                    </div>
-                    <div>
-                        <div style="font-weight:600;font-size:13px;margin-bottom:4px">Logo de empresa</div>
-                        <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:10px">Este logo aparecerá en todas las cotizaciones. PNG, JPG o WEBP, máx. 3 MB.</div>
-                        <div style="display:flex;gap:8px;flex-wrap:wrap">
-                            <input type="file" id="orgLogoInput" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="onSeleccionLogoOrg(event)"/>
-                            <button class="btn-ghost" onclick="document.getElementById('orgLogoInput').click()" style="font-size:12px;padding:6px 14px">📁 Subir logo</button>
-                            <button id="orgLogoDeleteBtn" class="btn-danger-sm" onclick="eliminarLogoOrg()" style="display:none;font-size:12px">Quitar logo</button>
-                        </div>
-                    </div>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-                    <div class="form-field"><label class="form-label">NOMBRE DE EMPRESA *</label>
-                        <input class="form-input" id="orgNombre" placeholder="Ej. Distribuidora Norte S.A."/></div>
-                    <div class="form-field"><label class="form-label">ESLOGAN / DESCRIPCIÓN</label>
-                        <input class="form-input" id="orgEslogan" placeholder="Ej. Tu socio de confianza"/></div>
-                    <div class="form-field"><label class="form-label">NIT</label>
-                        <input class="form-input" id="orgNit" placeholder="Ej. 1234567-8"/></div>
-                    <div class="form-field"><label class="form-label">TELÉFONO</label>
-                        <input class="form-input" id="orgTelefono" placeholder="Ej. +502 2200-0000"/></div>
-                    <div class="form-field"><label class="form-label">CORREO DE EMPRESA</label>
-                        <input class="form-input" id="orgCorreo" type="email" placeholder="ventas@miempresa.com"/></div>
-                    <div class="form-field"><label class="form-label">SITIO WEB</label>
-                        <input class="form-input" id="orgSitio" placeholder="www.miempresa.com"/></div>
-                    <div class="form-field" style="grid-column:1/-1"><label class="form-label">DIRECCIÓN</label>
-                        <input class="form-input" id="orgDireccion" placeholder="Ej. 5a Av. 10-50, Zona 1, Ciudad de Guatemala"/></div>
-                    <div class="form-field"><label class="form-label">MONEDA</label>
-                        <select class="form-select" id="orgMoneda">
-                            <option value="Q">Q — Quetzal (GTQ)</option>
-                            <option value="$">$ — Dólar (USD)</option>
-                            <option value="€">€ — Euro (EUR)</option>
-                            <option value="L">L — Lempira (HNL)</option>
-                            <option value="C$">C$ — Córdoba (NIO)</option>
-                        </select></div>
-                    <div class="form-field"><label class="form-label">% IVA</label>
-                        <input class="form-input" id="orgIva" type="number" min="0" max="50" placeholder="12"/></div>
-                    <div class="form-field" style="grid-column:1/-1"><label class="form-label">CONDICIONES POR DEFECTO EN COTIZACIONES</label>
-                        <textarea class="form-input" id="orgCondiciones" rows="2" style="resize:vertical"></textarea></div>
-                </div>
-                <div style="display:flex;justify-content:flex-end;margin-top:10px">
-                    <button class="btn-save" id="orgGuardarBtn" onclick="guardarOrgConfig()">Guardar configuración</button>
-                </div>
-            </div>
+    ${esAdmin() ? `
+    <div class="ajustes-section" id="ajustes-empresa">
+      <div class="ajustes-section-title">Configuración de empresa</div>
+      <div class="ajustes-row" style="align-items:flex-start">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Logo de empresa</div><div class="ajustes-row-desc">Aparece en cotizaciones. PNG/JPG/WEBP, máx. 3 MB.</div></div>
+        <div class="ajustes-row-control">
+          <div id="orgLogoPreview" style="width:90px;height:60px;border-radius:8px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;background:var(--card);overflow:hidden;margin-bottom:8px"><span id="orgLogoPlaceholder" style="font-size:11px;color:var(--text-muted);text-align:center;padding:4px">Sin logo</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input type="file" id="orgLogoInput" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="onSeleccionLogoOrg(event)"/>
+            <button class="btn-ghost" onclick="document.getElementById('orgLogoInput').click()" style="font-size:12px;padding:6px 14px">📁 Subir logo</button>
+            <button id="orgLogoDeleteBtn" class="btn-danger-sm" onclick="eliminarLogoOrg()" style="display:none;font-size:12px">Quitar</button>
+          </div>
         </div>
-        ` : ''}
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Nombre de empresa</div><div class="ajustes-row-desc">Nombre legal o comercial</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="orgNombre" placeholder="Ej. Distribuidora Norte S.A."/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Eslogan</div><div class="ajustes-row-desc">Descripción corta o lema</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="orgEslogan" placeholder="Ej. Tu socio de confianza"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">NIT</div><div class="ajustes-row-desc">Número de identificación tributaria</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="orgNit" placeholder="Ej. 1234567-8"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Teléfono</div><div class="ajustes-row-desc">Número de contacto de la empresa</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="orgTelefono" placeholder="Ej. +502 2200-0000"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Correo de empresa</div><div class="ajustes-row-desc">Correo de contacto oficial</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="orgCorreo" type="email" placeholder="ventas@miempresa.com"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Sitio web</div><div class="ajustes-row-desc">Dirección de la página web</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="orgSitio" placeholder="www.miempresa.com"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Dirección</div><div class="ajustes-row-desc">Dirección física de la empresa</div></div>
+        <div class="ajustes-row-control"><input class="form-input" id="orgDireccion" placeholder="Ej. 5a Av. 10-50, Zona 1"/></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Moneda</div><div class="ajustes-row-desc">Moneda usada en cotizaciones</div></div>
+        <div class="ajustes-row-control" style="max-width:220px"><select class="form-select" id="orgMoneda"><option value="Q">Q — Quetzal (GTQ)</option><option value="$">$ — Dólar (USD)</option><option value="€">€ — Euro (EUR)</option><option value="L">L — Lempira (HNL)</option><option value="C$">C$ — Córdoba (NIO)</option></select></div>
+      </div>
+      <div class="ajustes-row">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">% IVA</div><div class="ajustes-row-desc">Porcentaje de impuesto aplicado por defecto</div></div>
+        <div class="ajustes-row-control" style="max-width:120px"><input class="form-input" id="orgIva" type="number" min="0" max="50" placeholder="12"/></div>
+      </div>
+      <div class="ajustes-row" style="align-items:flex-start">
+        <div class="ajustes-row-label"><div class="ajustes-row-name">Condiciones por defecto</div><div class="ajustes-row-desc">Texto de condiciones en nuevas cotizaciones</div></div>
+        <div class="ajustes-row-control"><textarea class="form-input" id="orgCondiciones" rows="3" style="resize:vertical"></textarea></div>
+      </div>
+      <div class="ajustes-footer"><button class="btn-save" id="orgGuardarBtn" onclick="guardarOrgConfig()">Guardar empresa</button></div>
+    </div>
+    ` : ''}
 
-    </div>`;
+  </div>
+</div>`;
+
+            window.ajustesTab = function(tab, btn) {
+                document.querySelectorAll('.ajustes-nav-item').forEach(function(b){ b.classList.remove('active'); });
+                document.querySelectorAll('.ajustes-section').forEach(function(s){ s.classList.remove('active'); });
+                if (btn) btn.classList.add('active');
+                var sec = document.getElementById('ajustes-' + tab);
+                if (sec) sec.classList.add('active');
+                if (tab === 'empresa') loadOrgConfigPanel();
+            };
         }
+
 
         /* ── Cargar config de organización en el panel admin ──── */
         function loadOrgConfigPanel() {
