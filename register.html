@@ -735,6 +735,8 @@
   var SUPABASE_URL = 'https://dwtykzporgjjvdustjfq.supabase.co';
   var ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dHlrenBvcmdqanZkdXN0amZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MjM2MjIsImV4cCI6MjEwNTQ5OTYyMn0.0SXLE5HhIjHbHz2k0cgyat9bvCper_sjAiiCrkOSmF8';
   var REGISTER_URL = SUPABASE_URL + '/functions/v1/register-crm';
+  var LOGIN_URL    = SUPABASE_URL + '/functions/v1/login-crm';
+  var SESSION_KEY  = 'azyvion_session';
 
   var currentStep  = 1;
   var activePayTab = 'card';
@@ -931,7 +933,34 @@
     .then(function(res) {
       if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
       if (!res.ok) { e(errKey, res.error || 'Error al crear la cuenta. Intenta de nuevo.'); return; }
-      showSuccess(plan);
+      // Auto-login con el correo recién registrado
+      var correo   = g('f_correo');
+      var password = g('f_pwd');
+      fetch(LOGIN_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: correo, contrasena: password })
+      })
+      .then(function(lr){ return lr.json(); })
+      .then(function(lres) {
+        if (lres.ok && lres.session) {
+          var expira = new Date(lres.session.expires_at * 1000).toISOString();
+          var sesion = {
+            token: lres.session.access_token,
+            refresh_token: lres.session.refresh_token,
+            nombre: lres.nombre, usuario: lres.usuario,
+            rol: lres.rol, expira: expira,
+            fotoUrl: lres.fotoUrl || '',
+            preferencias: lres.preferencias || {}
+          };
+          try { localStorage.setItem(SESSION_KEY, JSON.stringify(sesion)); } catch(e2) {}
+          showSuccess(plan);
+        } else {
+          // El registro fue ok pero el auto-login falló; igual mostrar éxito
+          showSuccess(plan);
+        }
+      })
+      .catch(function() { showSuccess(plan); });
     })
     .catch(function() {
       if (btn) { btn.classList.remove('loading'); btn.disabled = false; }
@@ -943,6 +972,12 @@
     document.getElementById('stepsWrap').style.display = 'none';
     for (var i = 1; i <= 4; i++) { var el=document.getElementById('step'+i); if(el) el.style.display='none'; }
     document.getElementById('stepSuccess').style.display = '';
+    // Si hay sesión guardada, redirigir al dashboard tras 2.5 s
+    try {
+      if (localStorage.getItem(SESSION_KEY)) {
+        setTimeout(function(){ window.location.href = 'dashboard.html'; }, 2500);
+      }
+    } catch(e) {}
     var msgs = {free:'Tu cuenta gratuita está lista. Revisa tu correo para confirmar el acceso.',starter:'Tu prueba de 14 días ha comenzado. Revisa tu correo para activar tu cuenta.',pro:'Tu prueba de 14 días ha comenzado. Revisa tu correo para activar tu cuenta.',enterprise:'Recibimos tu solicitud. Un ejecutivo te contactará en menos de 24 horas.'};
     document.getElementById('successMsg').textContent = msgs[plan] || msgs.free;
     var names = {free:'Gratis',starter:'Starter ($29/mes)',pro:'Pro ($79/mes)',enterprise:'Enterprise'};
