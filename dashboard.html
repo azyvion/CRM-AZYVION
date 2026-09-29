@@ -6914,7 +6914,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
     }
 
     function _estadoBadge(estado) {
-        var labels = {ACTIVE:'Activa', TRIAL:'Prueba', PAST_DUE:'Pago pendiente', SUSPENDED:'Suspendida', CANCELLED:'Cancelada'};
+        var labels = {ACTIVE:'Activa', TRIAL:'Prueba', PAST_DUE:'Pago pendiente', SUSPENDED:'Suspendida', CANCELLED:'Cancelada', INTERNAL:'Interna'};
         var lbl = labels[estado] || estado;
         return '<span class="sub-estado-badge sub-estado-' + estado + '">' + escHtml(lbl) + '</span>';
     }
@@ -7151,19 +7151,23 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
             ? lista.map(function(e) {
                 var planNombre = (e.sub_planes && e.sub_planes.nombre) || '—';
                 var ultimoPago = _pagos.filter(function(p){ return p.empresa_id === e.id && p.estado === 'SUCCESS'; })[0];
+                var esInternal = e.estado === 'INTERNAL';
+                var estaActiva = e.estado === 'ACTIVE' || e.estado === 'TRIAL';
+                var toggleLabel = estaActiva ? 'Suspender' : (e.estado === 'SUSPENDED' || e.estado === 'PAST_DUE' ? 'Activar' : null);
+                var toggleAccion = estaActiva ? 'suspender' : 'activar';
                 return '<tr>' +
                     '<td><div class="cell-main">' + escHtml(e.nombre) + '</div>' +
                     (e.correo ? '<div class="cell-sub">' + escHtml(e.correo) + '</div>' : '') + '</td>' +
                     '<td>' + escHtml(planNombre) + '</td>' +
                     '<td>' + _estadoBadge(e.estado) + '</td>' +
                     '<td>' + _fmtFecha(e.fecha_inicio) + '</td>' +
-                    '<td>' + (e.fecha_fin ? _fmtFecha(e.fecha_fin) + _alertaVenc(e) : '—') + '</td>' +
-                    '<td style="font-size:12px">—</td>' +
+                    '<td>' + (esInternal ? '—' : (e.fecha_fin ? _fmtFecha(e.fecha_fin) + _alertaVenc(e) : '—')) + '</td>' +
+                    '<td style="font-size:12px">' + (e.sub_planes ? (e.sub_planes.max_usuarios === 999 ? 'Ilimitados' : (e.sub_planes.max_usuarios || '—')) : '—') + '</td>' +
                     '<td style="font-size:12px">' + (ultimoPago ? _fmtFecha(ultimoPago.fecha) : '—') + '</td>' +
-                    '<td>' +
-                    '<div class="row-actions">' +
+                    '<td><div class="row-actions">' +
                     '<button class="section-action" onclick="_subVerEmpresa(\'' + e.id + '\')">Ver</button>' +
                     '<button class="section-action" onclick="_subEditarEmpresa(\'' + e.id + '\')">Editar</button>' +
+                    (!esInternal && toggleLabel ? '<button class="section-action' + (estaActiva ? ' btn-danger-sm' : '') + '" onclick="_subAccionRapida(\'' + toggleAccion + '\',\'' + e.id + '\')"> ' + toggleLabel + '</button>' : '') +
                     '</div></td>' +
                     '</tr>';
             }).join('')
@@ -7189,32 +7193,58 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         var pagosList = _pagos.filter(function(p){ return p.empresa_id === id; });
         var ultimoPago = pagosList.find(function(p){ return p.estado === 'SUCCESS'; });
         var audList = _auditoria.filter(function(a){ return a.empresa_id === id; });
+        var esInternal = e.estado === 'INTERNAL';
+        var estaActiva = e.estado === 'ACTIVE' || e.estado === 'TRIAL';
 
         var html = '<div class="sub-emp-detail-grid">' +
             _kv('Empresa', e.nombre) +
             _kv('Correo', e.correo || '—') +
+            _kv('Teléfono', e.telefono || '—') +
             _kv('País', e.pais || '—') +
             _kv('Plan actual', planNombre) +
             _kv('Estado', _estadoBadge(e.estado)) +
             _kv('Fecha de inicio', _fmtFecha(e.fecha_inicio)) +
-            _kv('Fecha de vencimiento', _fmtFecha(e.fecha_fin)) +
-            _kv('Ciclo de facturación', _cicloLabel(e.ciclo)) +
-            _kv('Precio', e.precio ? _fmtMonto(e.precio, 'USD') : '—') +
-            _kv('Último pago', ultimoPago ? _fmtFecha(ultimoPago.fecha) + ' · ' + _fmtMonto(ultimoPago.monto, ultimoPago.moneda) : '—') +
+            _kv('Fecha de vencimiento', esInternal ? '—' : _fmtFecha(e.fecha_fin)) +
+            _kv('Ciclo de facturación', esInternal ? '—' : _cicloLabel(e.ciclo)) +
+            _kv('Precio', esInternal ? 'Sin cobro (cuenta interna)' : (e.precio ? _fmtMonto(e.precio, 'USD') : '—')) +
+            _kv('Último pago', esInternal ? '—' : (ultimoPago ? _fmtFecha(ultimoPago.fecha) + ' · ' + _fmtMonto(ultimoPago.monto, ultimoPago.moneda) : 'Sin pagos')) +
             _kv('Fecha de alta', _fmtFecha(e.fecha_creacion)) +
             (e.notas ? _kv('Notas', e.notas) : '') +
             '</div>';
 
-        // Acciones administrativas
-        html += '<div class="sub-admin-actions">' +
-            _adminBtn('activar', id, 'check', 'Activar') +
-            _adminBtn('suspender', id, 'slash', 'Suspender', 'danger') +
-            _adminBtn('extender7', id, 'clock', '+7 días') +
-            _adminBtn('extender30', id, 'clock', '+30 días') +
-            _adminBtn('renovar', id, 'refresh', 'Renovar') +
-            _adminBtn('pago', id, 'card', 'Registrar pago') +
-            _adminBtn('cancelar', id, 'x-circle', 'Cancelar', 'danger') +
-            '</div>';
+        // Cambiar plan (solo empresas no internas)
+        if (!esInternal) {
+            html += '<div style="margin-bottom:16px;padding:14px;background:var(--field-bg);border-radius:12px">' +
+                '<div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Cambiar plan</div>' +
+                '<div style="display:flex;gap:8px;align-items:center">' +
+                '<select id="sub-cambiar-plan-sel" class="form-select" style="flex:1;height:38px;font-size:13px">' +
+                '<option value="">— Sin plan —</option>' +
+                _planes.map(function(p) {
+                    return '<option value="' + p.id + '"' + (e.plan_id === p.id ? ' selected' : '') + '>' +
+                        escHtml(p.nombre) + ' · ' + _fmtMonto(p.precio, p.moneda) + '/mes' + (p.activo ? '' : ' (inactivo)') + '</option>';
+                }).join('') +
+                '</select>' +
+                '<button class="topbar-btn" style="white-space:nowrap;height:38px" onclick="_subEjecutarCambiarPlan(\'' + id + '\')">' +
+                '<svg viewBox="0 0 24 24" width="14" height="14" style="stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-right:4px;vertical-align:middle"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>Aplicar</button>' +
+                '</div></div>';
+        }
+
+        // Acciones administrativas (solo empresas no internas)
+        if (!esInternal) {
+            html += '<div class="sub-admin-actions">';
+            if (estaActiva) {
+                html += _adminBtn('suspender', id, 'slash', 'Suspender', 'danger');
+            } else if (e.estado === 'SUSPENDED' || e.estado === 'CANCELLED' || e.estado === 'PAST_DUE') {
+                html += _adminBtn('activar', id, 'check', 'Activar');
+            }
+            html +=
+                _adminBtn('extender7', id, 'clock', '+7 días') +
+                _adminBtn('extender30', id, 'clock', '+30 días') +
+                _adminBtn('renovar', id, 'refresh', 'Renovar') +
+                _adminBtn('pago', id, 'card', 'Registrar pago') +
+                _adminBtn('cancelar', id, 'x-circle', 'Cancelar', 'danger') +
+                '</div>';
+        }
 
         // Historial de pagos
         html += '<div style="font-size:13px;font-weight:600;margin-bottom:8px">Historial de pagos</div>';
@@ -7267,6 +7297,41 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
     window._subCerrarDetalleEmp = function() {
         document.getElementById('sub-emp-overlay').style.display = 'none';
         document.getElementById('sub-emp-modal').style.display = 'none';
+    };
+
+    /* ── Cambiar plan desde detalle ── */
+    window._subEjecutarCambiarPlan = async function(empId) {
+        var sel = document.getElementById('sub-cambiar-plan-sel');
+        if (!sel) return;
+        var nuevoPlanId = sel.value || null;
+        var e = _empresas.find(function(x){ return x.id === empId; });
+        if (!e) return;
+        var planAnterior = e.plan_id || 'sin plan';
+        var planNuevo = nuevoPlanId ? (_planes.find(function(p){ return p.id === nuevoPlanId; }) || {}).nombre || nuevoPlanId : 'sin plan';
+
+        // Obtener precio del nuevo plan
+        var nuevoPrecio = null;
+        if (nuevoPlanId) {
+            var plan = _planes.find(function(p){ return p.id === nuevoPlanId; });
+            if (plan) nuevoPrecio = plan.precio;
+        }
+
+        var r = await _sb().from('sub_empresas').update({
+            plan_id: nuevoPlanId,
+            precio: nuevoPrecio,
+            fecha_actualizado: new Date().toISOString()
+        }).eq('id', empId);
+
+        if (r.error) { showToast('Error: ' + r.error.message, '#EF4444'); return; }
+
+        // Actualizar suscripción activa también
+        await _sb().from('sub_suscripciones').update({ plan_id: nuevoPlanId, precio: nuevoPrecio }).eq('empresa_id', empId).eq('estado', 'ACTIVE');
+
+        await _audit('Cambio de plan', e, 'Plan cambiado de ' + planAnterior + ' a ' + planNuevo, {plan_id: e.plan_id}, {plan_id: nuevoPlanId});
+        showToast('Plan actualizado a ' + planNuevo, '#22C55E');
+        await _loadEmpresas();
+        _renderEmpresas();
+        _subCerrarDetalleEmp();
     };
 
     /* ── Acciones administrativas ── */
