@@ -325,9 +325,9 @@
       <p class="form-sub">para acceder a tu CRM</p>
 
       <div class="field-wrap">
-        <label class="field-label" for="usuario">Usuario</label>
+        <label class="field-label" for="usuario">Correo electrónico</label>
         <div class="field-inner">
-          <input class="field-input" type="text" id="usuario" placeholder="Tu nombre de usuario" autocomplete="username" />
+          <input class="field-input" type="email" id="usuario" placeholder="correo@empresa.com" autocomplete="email" />
         </div>
       </div>
 
@@ -464,7 +464,8 @@
       var btn = document.getElementById('loginBtn');
       var err = document.getElementById('errMsg');
       err.classList.remove('visible');
-      if (!usuario || !pwd) { err.textContent = 'Ingresa tu usuario y contraseña.'; err.classList.add('visible'); return; }
+      if (!usuario || !pwd) { err.textContent = 'Ingresa tu correo y contraseña.'; err.classList.add('visible'); return; }
+      if (!usuario.includes('@') || !usuario.includes('.')) { err.textContent = 'Ingresa un correo electrónico válido.'; err.classList.add('visible'); return; }
       btn.classList.add('loading'); btn.disabled = true;
       fetch(LOGIN_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ usuario: usuario, contrasena: pwd }) })
       .then(function(r){ return r.json(); })
