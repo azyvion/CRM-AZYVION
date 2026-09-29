@@ -2588,7 +2588,282 @@ body.theme-dark .crop-box { background: var(--card); }
 body.theme-dark #cropZoom { background: #3A3A3E; }
 
     </style>
-    <style id="az-desktop-patch">
+    
+/* ═══════════════════════════════════════════════════════
+   DASHBOARD OVERVIEW v2 — Métricas, Gráficas, IA
+═══════════════════════════════════════════════════════ */
+
+/* Saludo */
+.ov-greeting-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 12px;
+}
+.ov-greeting {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+.ov-greeting-sub {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+}
+
+/* KPI Grid 6 tarjetas */
+.ov-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.ov-kpi-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: box-shadow .18s, transform .18s;
+}
+.ov-kpi-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+.ov-kpi-card:nth-child(1) { border-top-color: var(--accent); }
+.ov-kpi-card:nth-child(2) { border-top-color: var(--purple); }
+.ov-kpi-card:nth-child(3) { border-top-color: var(--success); }
+.ov-kpi-card:nth-child(4) { border-top-color: var(--warning); }
+.ov-kpi-card:nth-child(5) { border-top-color: var(--danger); }
+.ov-kpi-card:nth-child(6) { border-top-color: #14B8A6; }
+
+.ov-kpi-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+.ov-kpi-icon svg {
+    width: 18px; height: 18px;
+    fill: none; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+}
+.ov-kpi-body { flex: 1; min-width: 0; }
+.ov-kpi-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); letter-spacing: .2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-kpi-value { font-size: 24px; font-weight: 800; letter-spacing: -0.8px; color: var(--text-primary); line-height: 1.15; }
+.ov-kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-spark { flex-shrink: 0; opacity: .7; }
+
+/* Fila de gráficas */
+.ov-charts-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.ov-chart-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    min-width: 0;
+}
+.ov-chart-head { margin-bottom: 14px; }
+.ov-chart-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.ov-chart-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+/* Fila inferior */
+.ov-bottom-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.ov-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    min-width: 0;
+}
+
+/* Top clientes */
+.ov-top-client {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: var(--bg);
+    transition: background .12s;
+}
+.ov-top-client:hover { background: var(--border); }
+.ov-top-rank {
+    font-size: 11px; font-weight: 700;
+    color: var(--text-muted); width: 16px; text-align: center; flex-shrink: 0;
+}
+.ov-top-bar-wrap { flex: 1; min-width: 0; }
+.ov-top-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-top-bar-track { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+.ov-top-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+.ov-top-val { font-size: 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap; flex-shrink: 0; }
+
+/* Alertas */
+.ov-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    line-height: 1.4;
+}
+.ov-alert-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.ov-alert-txt { flex: 1; }
+.ov-alert-btn {
+    font-size: 11px; font-weight: 600; color: var(--accent);
+    background: none; border: none; cursor: pointer; white-space: nowrap; font-family: inherit;
+}
+
+/* Acciones rápidas */
+.ov-quick-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 9px 12px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--bg);
+    font-family: inherit; font-size: 12.5px; font-weight: 500;
+    color: var(--text-primary); cursor: pointer;
+    transition: background .15s, border-color .15s;
+}
+.ov-quick-btn:hover { background: var(--card); border-color: var(--accent); color: var(--accent); }
+.ov-quick-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+/* Responsive overview */
+@media (max-width: 900px) {
+    .ov-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .ov-charts-row { flex-direction: column; }
+    .ov-chart-card { flex: unset !important; }
+    .ov-bottom-row { flex-direction: column; }
+}
+@media (max-width: 600px) {
+    .ov-kpi-grid { grid-template-columns: 1fr; }
+    .ov-greeting { font-size: 17px; }
+}
+
+/* ─── Asistente IA ─────────────────────────────────────── */
+.az-ai-fab {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3B6EF5, #6C47FF);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 24px rgba(59,110,245,.45);
+    z-index: 800;
+    transition: transform .2s, box-shadow .2s;
+}
+.az-ai-fab:hover { transform: scale(1.07); box-shadow: 0 8px 32px rgba(59,110,245,.55); }
+.az-ai-fab svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.az-ai-panel {
+    position: fixed;
+    bottom: 92px; right: 28px;
+    width: min(420px, calc(100vw - 32px));
+    height: min(560px, calc(100vh - 120px));
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    z-index: 800;
+    display: flex; flex-direction: column;
+    opacity: 0; pointer-events: none;
+    transform: translateY(16px) scale(.97);
+    transition: opacity .22s, transform .22s;
+}
+.az-ai-panel.open { opacity: 1; pointer-events: all; transform: none; }
+.az-ai-panel-head {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.az-ai-panel-icon {
+    width: 32px; height: 32px; border-radius: 10px;
+    background: linear-gradient(135deg, #3B6EF5, #6C47FF);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.az-ai-panel-icon svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.az-ai-panel-title { font-size: 15px; font-weight: 700; flex: 1; }
+.az-ai-close { background: none; border: none; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 7px; transition: background .12s; }
+.az-ai-close:hover { background: var(--bg); }
+.az-ai-close svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.az-ai-msgs {
+    flex: 1; overflow-y: auto; padding: 14px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+    -webkit-overflow-scrolling: touch;
+}
+.az-ai-msg {
+    max-width: 88%; line-height: 1.5;
+    font-size: 13px; border-radius: 12px; padding: 10px 13px;
+}
+.az-ai-msg.user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+.az-ai-msg.bot { align-self: flex-start; background: var(--bg); color: var(--text-primary); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.az-ai-msg.bot.typing { color: var(--text-muted); font-style: italic; }
+
+.az-ai-suggestions {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 4px 16px 8px;
+}
+.az-ai-sugg {
+    font-size: 11.5px; font-weight: 500;
+    background: var(--accent-bg); color: var(--accent);
+    border: 1px solid rgba(59,110,245,.2); border-radius: 20px;
+    padding: 5px 11px; cursor: pointer;
+    font-family: inherit; transition: background .12s;
+}
+.az-ai-sugg:hover { background: rgba(59,110,245,.18); }
+
+.az-ai-input-row {
+    display: flex; gap: 8px; align-items: flex-end;
+    padding: 10px 14px 14px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.az-ai-input {
+    flex: 1; border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 9px 13px; font-family: inherit; font-size: 13.5px;
+    color: var(--text-primary); background: var(--bg);
+    resize: none; max-height: 90px; min-height: 40px; line-height: 1.4;
+    outline: none; transition: border-color .15s;
+}
+.az-ai-input:focus { border-color: var(--accent); }
+.az-ai-send {
+    width: 38px; height: 38px; border-radius: 11px;
+    background: linear-gradient(135deg, #3B6EF5, #6C47FF);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity .15s; flex-shrink: 0;
+}
+.az-ai-send:hover { opacity: .88; }
+.az-ai-send:disabled { opacity: .45; }
+.az-ai-send svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+.az-ai-key-banner {
+    margin: 8px 14px; padding: 10px 13px;
+    background: var(--warning-bg); border-radius: 10px;
+    font-size: 12px; color: #7A4A00; line-height: 1.45;
+    display: none;
+}
+.az-ai-key-banner a { color: inherit; font-weight: 600; cursor: pointer; text-decoration: underline; }
+
+<style id="az-desktop-patch">
 /* ══════════════════════════════════════════════════════════════
    AZYVION CRM · PARCHE ESCRITORIO v1.0
    Elimina el comportamiento móvil (bottom sheets, drawer, vistas
@@ -2802,6 +3077,12 @@ textarea.form-input { height: auto; min-height: 74px; padding: 9px 11px; line-he
 .ficha-shell { height: calc(100vh - 116px); }
 body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
 .ficha-tabs { overflow-x: visible; }
+/* ── Overview v2 desktop overrides ── */
+.ov-kpi-grid { grid-template-columns: repeat(6, 1fr) !important; }
+.ov-charts-row { flex-wrap: nowrap !important; }
+.ov-bottom-row { flex-wrap: nowrap !important; }
+.ov-kpi-value { font-size: 22px; }
+
 
     </style>
     <style>
@@ -3252,102 +3533,178 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
 
             <!-- ── INICIO ── -->
             <div class="page active" id="page-overview">
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-label">Clientes activos</div>
-                        <div class="kpi-value" id="ov-cli">—</div>
-                        <div class="kpi-delta up" id="ov-cli-d"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg> Total registrados</div>
+
+                <!-- Saludo dinámico -->
+                <div class="ov-greeting-bar">
+                    <div>
+                        <div class="ov-greeting" id="ovGreeting">—</div>
+                        <div class="ov-greeting-sub" id="ovGreetingSub">—</div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Productos en stock</div>
-                        <div class="kpi-value" id="ov-prod">—</div>
-                        <div class="kpi-delta neu" id="ov-prod-d"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg> Unidades totales</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Encuestas completadas</div>
-                        <div class="kpi-value" id="ov-enc">—</div>
-                        <div class="kpi-delta up" id="ov-enc-d"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg> Respuestas recibidas</div>
-                    </div>
-                    <div class="kpi-card">
-                        <div class="kpi-label">Tasa de respuesta</div>
-                        <div class="kpi-value" id="ov-tasa">—</div>
-                        <div class="kpi-delta up" id="ov-tasa-d"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg> Encuestas activas</div>
+                    <div class="ov-greeting-actions">
+                        <button class="btn-ghost" style="gap:6px;font-size:13px" onclick="refreshCurrent()">
+                            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                            Actualizar
+                        </button>
                     </div>
                 </div>
 
-                <div class="two-col">
-                    <div>
-                        <div class="section-header">
-                            <div class="section-title">Clientes recientes</div>
-                            <button class="section-action"
-                                onclick="showPage('clientes',document.getElementById('nav-clientes'))">Ver
-                                todos</button>
+                <!-- KPIs principales — 6 tarjetas con indicadores -->
+                <div class="ov-kpi-grid">
+                    <div class="ov-kpi-card" onclick="showPage('clientes',document.getElementById('nav-clientes'))">
+                        <div class="ov-kpi-icon" style="background:rgba(59,110,245,.12)">
+                            <svg viewBox="0 0 24 24" style="stroke:#3B6EF5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                         </div>
-                        <div class="table-card">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Cliente</th>
-                                        <th>Segmento</th>
-                                        <th>Estado</th>
-                                        <th>Valor</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ovClientesTbody">
-                                    <tr class="skeleton-row">
-                                        <td>&nbsp;</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="ov-kpi-body">
+                            <div class="ov-kpi-label">Clientes activos</div>
+                            <div class="ov-kpi-value" id="ov-cli">—</div>
+                            <div class="ov-kpi-sub" id="ov-cli-d">— total</div>
                         </div>
-
-                        <div class="section-header">
-                            <div class="section-title">Stock crítico / bajo</div>
-                            <button class="section-action"
-                                onclick="showPage('inventario',document.getElementById('nav-inventario'))">Ver
-                                inventario</button>
+                        <canvas class="ov-spark" id="spark-cli" width="64" height="32"></canvas>
+                    </div>
+                    <div class="ov-kpi-card" onclick="showPage('prospectos',document.getElementById('nav-prospectos'))">
+                        <div class="ov-kpi-icon" style="background:rgba(139,92,246,.12)">
+                            <svg viewBox="0 0 24 24" style="stroke:#8B5CF6"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                         </div>
-                        <div class="table-card">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Disponibilidad</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ovStockTbody">
-                                    <tr class="skeleton-row">
-                                        <td>&nbsp;</td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="ov-kpi-body">
+                            <div class="ov-kpi-label">Prospectos activos</div>
+                            <div class="ov-kpi-value" id="ov-pro">—</div>
+                            <div class="ov-kpi-sub" id="ov-pro-d">Pipeline —</div>
+                        </div>
+                        <canvas class="ov-spark" id="spark-pro" width="64" height="32"></canvas>
+                    </div>
+                    <div class="ov-kpi-card" onclick="showPage('cotizaciones',document.getElementById('nav-cotizaciones'))">
+                        <div class="ov-kpi-icon" style="background:rgba(34,197,94,.12)">
+                            <svg viewBox="0 0 24 24" style="stroke:#22C55E"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+                        </div>
+                        <div class="ov-kpi-body">
+                            <div class="ov-kpi-label">Cotizaciones aprobadas</div>
+                            <div class="ov-kpi-value" id="ov-cot-ap">—</div>
+                            <div class="ov-kpi-sub" id="ov-cot-ap-d">— conversión</div>
+                        </div>
+                        <canvas class="ov-spark" id="spark-cot" width="64" height="32"></canvas>
+                    </div>
+                    <div class="ov-kpi-card" style="border-top-color:var(--warning)">
+                        <div class="ov-kpi-icon" style="background:rgba(245,158,11,.12)">
+                            <svg viewBox="0 0 24 24" style="stroke:#F59E0B"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <div class="ov-kpi-body">
+                            <div class="ov-kpi-label">Valor ponderado pipeline</div>
+                            <div class="ov-kpi-value" id="ov-pond">—</div>
+                            <div class="ov-kpi-sub" id="ov-pond-d">— potencial total</div>
                         </div>
                     </div>
+                    <div class="ov-kpi-card" onclick="showPage('inventario',document.getElementById('nav-inventario'))">
+                        <div class="ov-kpi-icon" style="background:rgba(239,68,68,.12)">
+                            <svg viewBox="0 0 24 24" style="stroke:#EF4444"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <div class="ov-kpi-body">
+                            <div class="ov-kpi-label">Stock crítico</div>
+                            <div class="ov-kpi-value" id="ov-crit">—</div>
+                            <div class="ov-kpi-sub" id="ov-crit-d">— productos bajo</div>
+                        </div>
+                    </div>
+                    <div class="ov-kpi-card" onclick="showPage('encuestas',document.getElementById('nav-encuestas'))">
+                        <div class="ov-kpi-icon" style="background:rgba(20,184,166,.12)">
+                            <svg viewBox="0 0 24 24" style="stroke:#14B8A6"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <div class="ov-kpi-body">
+                            <div class="ov-kpi-label">Tasa de respuesta</div>
+                            <div class="ov-kpi-value" id="ov-tasa">—</div>
+                            <div class="ov-kpi-sub" id="ov-tasa-d">— respuestas</div>
+                        </div>
+                    </div>
+                </div>
 
-                    <div>
+                <!-- Fila de gráficas -->
+                <div class="ov-charts-row">
+                    <!-- Pipeline por etapa -->
+                    <div class="ov-chart-card" style="flex:1.2">
+                        <div class="ov-chart-head">
+                            <div class="ov-chart-title">Pipeline de ventas</div>
+                            <div class="ov-chart-sub" id="ov-pipeline-sub">—</div>
+                        </div>
+                        <div style="position:relative;height:200px">
+                            <canvas id="chartPipeline"></canvas>
+                        </div>
+                    </div>
+                    <!-- Cotizaciones por estado -->
+                    <div class="ov-chart-card" style="flex:0.8">
+                        <div class="ov-chart-head">
+                            <div class="ov-chart-title">Cotizaciones</div>
+                            <div class="ov-chart-sub" id="ov-cot-sub">—</div>
+                        </div>
+                        <div style="position:relative;height:200px;display:flex;align-items:center;justify-content:center">
+                            <canvas id="chartCotizaciones" style="max-height:200px;max-width:200px"></canvas>
+                        </div>
+                    </div>
+                    <!-- Segmentos de clientes -->
+                    <div class="ov-chart-card" style="flex:0.8">
+                        <div class="ov-chart-head">
+                            <div class="ov-chart-title">Segmentos de clientes</div>
+                            <div class="ov-chart-sub" id="ov-seg-sub">—</div>
+                        </div>
+                        <div style="position:relative;height:200px;display:flex;align-items:center;justify-content:center">
+                            <canvas id="chartSegmentos" style="max-height:200px;max-width:200px"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fila inferior: top clientes + actividad + alertas -->
+                <div class="ov-bottom-row">
+                    <!-- Top clientes por valor -->
+                    <div class="ov-card" style="flex:1.2">
+                        <div class="section-header">
+                            <div class="section-title">Top clientes por valor</div>
+                            <button class="section-action" onclick="showPage('clientes',document.getElementById('nav-clientes'))">Ver todos</button>
+                        </div>
+                        <div id="ovTopClientes" style="display:flex;flex-direction:column;gap:8px">
+                            <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">Cargando…</div>
+                        </div>
+                    </div>
+                    <!-- Actividad reciente -->
+                    <div class="ov-card" style="flex:1">
                         <div class="section-header">
                             <div class="section-title">Actividad reciente</div>
                         </div>
-                        <div class="activity-feed" id="activityFeed">
-                            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px;">
-                                Cargando…</div>
+                        <div class="activity-feed" id="activityFeed" style="border:none;background:none;box-shadow:none;padding:0">
+                            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px">Cargando…</div>
+                        </div>
+                    </div>
+                    <!-- Alertas y acciones rápidas -->
+                    <div class="ov-card" style="flex:0.9">
+                        <div class="section-header">
+                            <div class="section-title">Alertas y acciones</div>
+                        </div>
+                        <div id="ovAlertas" style="display:flex;flex-direction:column;gap:8px">
+                            <div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">Cargando…</div>
+                        </div>
+                        <div style="margin-top:16px">
+                            <div class="section-title" style="margin-bottom:10px">Acciones rápidas</div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                                <button class="ov-quick-btn" onclick="showPage('clientes',document.getElementById('nav-clientes')); ctaAction()">
+                                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                                    Nuevo cliente
+                                </button>
+                                <button class="ov-quick-btn" onclick="showPage('prospectos',document.getElementById('nav-prospectos')); ctaAction()">
+                                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                                    Nuevo prospecto
+                                </button>
+                                <button class="ov-quick-btn" onclick="showPage('cotizaciones',document.getElementById('nav-cotizaciones')); ctaAction()">
+                                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                    Cotización
+                                </button>
+                                <button class="ov-quick-btn" onclick="showPage('inventario',document.getElementById('nav-inventario')); ctaAction()">
+                                    <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                                    Nuevo ítem
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Hidden elements kept for backward compatibility with JS -->
+                <div style="display:none" id="ovClientesTbody"></div>
+                <div style="display:none" id="ovStockTbody"></div>
             </div>
 
             <!-- ── CLIENTES ── -->
@@ -5091,8 +5448,8 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
                     pro.valorPotencial = pro.valorPotencial || 0;
                     pro.valorPonderado = pro.valorPonderado || 0;
 
-                    // Overview KPIs
-                    document.getElementById('ov-cli').textContent = c.activos;
+                    // Overview KPIs — compatibilidad (ov-cli kept for renderOvKpis)
+                    if (document.getElementById('ov-cli')) document.getElementById('ov-cli').textContent = c.activos;
                     document.getElementById('ov-cli-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${c.total} total`;
                     document.getElementById('ov-prod').textContent = inv.totalUnidades;
                     document.getElementById('ov-prod-d').innerHTML = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg> ${inv.totalProductos} productos`;
@@ -5222,8 +5579,9 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
            RENDER – OVERVIEW
         ═══════════════════════════════════════════════════════ */
         function renderOvClientes() {
+            renderOvTopClientes();
             const rows = _clientes.slice(0, 4);
-            document.getElementById('ovClientesTbody').innerHTML = rows.length
+            var el = document.getElementById('ovClientesTbody'); if (!el) return; el.innerHTML = rows.length
                 ? rows.map(c => `<tr>
         <td><div class="client-name"><div class="mini-avatar" style="background:${c.color}">${initials(c.nombre)}</div>${escHtml(c.nombre)}</div></td>
         <td>${tagSegmento(c.segmento)}</td>
@@ -8965,7 +9323,7 @@ function _setSplashStatus(txt) {
     }, 240);
 }
 
-function _hideSplash() {
+function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._ovGreeting(); }, 100);
     if (_splashHidden) return;
     var splash  = document.getElementById('az-splash');
     var elapsed = Date.now() - _splashShownAt;
@@ -10617,6 +10975,562 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
 
 })();
 </script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+    <!-- ═══════════════════════════════════════════════════════
+         AZYVION DASHBOARD v2 — Saludo, Gráficas y Asistente IA
+    ═══════════════════════════════════════════════════════ -->
+
+    <!-- Botón flotante IA -->
+    <button class="az-ai-fab" id="azAiFab" onclick="azAiToggle()" title="Asistente IA del CRM">
+        <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/><circle cx="9" cy="14" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="14" r="1.5" fill="white" stroke="none"/></svg>
+    </button>
+
+    <!-- Panel de chat IA -->
+    <div class="az-ai-panel" id="azAiPanel">
+        <div class="az-ai-panel-head">
+            <div class="az-ai-panel-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2z"/><circle cx="9" cy="14" r="1.5" fill="white" stroke="none"/><circle cx="15" cy="14" r="1.5" fill="white" stroke="none"/></svg>
+            </div>
+            <div>
+                <div class="az-ai-panel-title">Asistente IA · Azyvion</div>
+            </div>
+            <button class="az-ai-close" onclick="azAiToggle()">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <div class="az-ai-key-banner" id="azAiKeyBanner">
+            ⚠️ Configura tu <a onclick="azAiOpenKeySetup()">API Key de Claude</a> para activar el asistente. Se guarda solo en tu navegador.
+        </div>
+        <div class="az-ai-msgs" id="azAiMsgs">
+            <div class="az-ai-msg bot">👋 Hola, soy el asistente de Azyvion CRM. Puedo analizar tus datos de clientes, prospectos, cotizaciones e inventario. ¿En qué te ayudo?</div>
+        </div>
+        <div class="az-ai-suggestions" id="azAiSuggs">
+            <button class="az-ai-sugg" onclick="azAiSend('¿Cuántos clientes activos tengo?')">Clientes activos</button>
+            <button class="az-ai-sugg" onclick="azAiSend('¿Cuál es el valor total del pipeline?')">Valor pipeline</button>
+            <button class="az-ai-sugg" onclick="azAiSend('¿Qué productos tienen stock crítico?')">Stock crítico</button>
+            <button class="az-ai-sugg" onclick="azAiSend('¿Cuál es la tasa de conversión de cotizaciones?')">Conversión</button>
+        </div>
+        <div class="az-ai-input-row">
+            <textarea class="az-ai-input" id="azAiInput" placeholder="Pregunta sobre tus datos del CRM…" rows="1"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();azAiSend()}"></textarea>
+            <button class="az-ai-send" id="azAiSendBtn" onclick="azAiSend()">
+                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+    /* ════════════════════════════════════════════════════════════
+       DASHBOARD v2 — Saludo dinámico
+    ════════════════════════════════════════════════════════════ */
+    window._ovGreeting = function _ovGreeting() {
+        var h = new Date().getHours();
+        var saludo = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+        var emoji  = h < 12 ? '🌤️' : h < 19 ? '☀️' : '🌙';
+        var nombre = (window._usuario || '').split(' ')[0] || 'Usuario';
+        var grEl   = document.getElementById('ovGreeting');
+        var subEl  = document.getElementById('ovGreetingSub');
+        if (grEl) grEl.textContent = saludo + ', ' + nombre + ' ' + emoji;
+        if (subEl) {
+            var now = new Date();
+            var dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+            var meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+            subEl.textContent = dias[now.getDay()] + ', ' + now.getDate() + ' de ' + meses[now.getMonth()] + ' de ' + now.getFullYear();
+        }
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       GRÁFICAS
+    ════════════════════════════════════════════════════════════ */
+    var _charts = {};
+
+    function _chartDestroy(id) {
+        if (_charts[id]) { try { _charts[id].destroy(); } catch(e){} delete _charts[id]; }
+    }
+
+    function _isDark() {
+        return document.body.classList.contains('theme-dark');
+    }
+
+    function _chartColors() {
+        return {
+            text: _isDark() ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.45)',
+            grid: _isDark() ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+        };
+    }
+
+    /* Sparkline mini (línea simple) */
+    function _sparkline(canvasId, data, color) {
+        var el = document.getElementById(canvasId);
+        if (!el) return;
+        _chartDestroy(canvasId);
+        if (!data || data.length < 2) return;
+        _charts[canvasId] = new Chart(el, {
+            type: 'line',
+            data: {
+                labels: data.map(function(_,i){ return i; }),
+                datasets: [{ data: data, borderColor: color, borderWidth: 2, tension: 0.4,
+                    fill: true,
+                    backgroundColor: color.replace('rgb','rgba').replace(')',',0.12)'),
+                    pointRadius: 0 }]
+            },
+            options: { responsive: false, animation: false, plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: { x: { display: false }, y: { display: false } } }
+        });
+    }
+
+    /* Pipeline horizontal bars */
+    function renderChartPipeline(prospectos) {
+        var el = document.getElementById('chartPipeline');
+        if (!el) return;
+        _chartDestroy('chartPipeline');
+        var etapas = ['Nuevo','Contactado','Calificado','Propuesta','Negociación'];
+        var counts = etapas.map(function(e){ return prospectos.filter(function(p){ return p.etapa===e; }).length; });
+        var valores = etapas.map(function(e){ return prospectos.filter(function(p){ return p.etapa===e; }).reduce(function(s,p){ return s+Number(p.valorEstimado||0); }, 0); });
+        var cc = _chartColors();
+        _charts['chartPipeline'] = new Chart(el, {
+            type: 'bar',
+            data: {
+                labels: etapas,
+                datasets: [{
+                    label: 'Prospectos',
+                    data: counts,
+                    backgroundColor: ['#8E8E93','#0A84FF','#14B8A6','#BF5AF2','#FF9F0A'],
+                    borderRadius: 6, borderSkipped: false
+                }]
+            },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(ctx) {
+                                return 'Q ' + (valores[ctx.dataIndex]||0).toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { ticks: { color: cc.text, font: {size:11} }, grid: { color: cc.grid }, beginAtZero: true },
+                    y: { ticks: { color: cc.text, font: {size:12} }, grid: { display: false } }
+                }
+            }
+        });
+        var total = prospectos.filter(function(p){ return p.etapa!=='Perdido'; }).length;
+        var sub = document.getElementById('ov-pipeline-sub');
+        if (sub) sub.textContent = total + ' oportunidades abiertas';
+    }
+
+    /* Cotizaciones donut */
+    function renderChartCotizaciones(cotizaciones) {
+        var el = document.getElementById('chartCotizaciones');
+        if (!el) return;
+        _chartDestroy('chartCotizaciones');
+        var estados = ['Borrador','Enviada','Aprobada','Rechazada'];
+        var colores = ['#8E8E93','#0A84FF','#22C55E','#EF4444'];
+        var counts  = estados.map(function(e){ return cotizaciones.filter(function(c){ return c.estado===e; }).length; });
+        var sub = document.getElementById('ov-cot-sub');
+        if (sub) {
+            var ap = cotizaciones.filter(function(c){ return c.estado==='Aprobada'; });
+            var env = cotizaciones.filter(function(c){ return ['Enviada','Aprobada','Rechazada'].includes(c.estado); });
+            var tasa = env.length ? Math.round(ap.length/env.length*100) : 0;
+            sub.textContent = tasa + '% conversión · ' + cotizaciones.length + ' total';
+        }
+        _charts['chartCotizaciones'] = new Chart(el, {
+            type: 'doughnut',
+            data: { labels: estados, datasets: [{ data: counts, backgroundColor: colores, borderWidth: 2,
+                borderColor: _isDark() ? '#1F2024' : '#fff' }] },
+            options: { responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font:{size:11}, color: _chartColors().text, padding:8, boxWidth:12 } } }
+            }
+        });
+    }
+
+    /* Segmentos donut */
+    function renderChartSegmentos(clientes) {
+        var el = document.getElementById('chartSegmentos');
+        if (!el) return;
+        _chartDestroy('chartSegmentos');
+        var segs = ['Estándar','Premium','Corporativo'];
+        var cols = ['#3B6EF5','#F59E0B','#8B5CF6'];
+        var counts = segs.map(function(s){ return clientes.filter(function(c){ return c.segmento===s; }).length; });
+        var sub = document.getElementById('ov-seg-sub');
+        if (sub) {
+            var max = segs[counts.indexOf(Math.max.apply(null,counts))];
+            sub.textContent = 'Mayor: ' + max + ' (' + Math.max.apply(null,counts) + ')';
+        }
+        _charts['chartSegmentos'] = new Chart(el, {
+            type: 'doughnut',
+            data: { labels: segs, datasets: [{ data: counts, backgroundColor: cols, borderWidth: 2,
+                borderColor: _isDark() ? '#1F2024' : '#fff' }] },
+            options: { responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { font:{size:11}, color: _chartColors().text, padding:8, boxWidth:12 } } }
+            }
+        });
+    }
+
+    /* Top clientes por valor */
+    function renderOvTopClientes() {
+        var el = document.getElementById('ovTopClientes');
+        if (!el) return;
+        var sorted = (_clientes||[]).slice().sort(function(a,b){ return Number(b.valorTotal||0)-Number(a.valorTotal||0); }).slice(0,5);
+        var maxV = sorted.length ? Number(sorted[0].valorTotal||0) : 1;
+        if (!sorted.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:13px;text-align:center;padding:20px">Sin clientes</div>'; return; }
+        el.innerHTML = sorted.map(function(c,i){
+            var pct = Math.round(Number(c.valorTotal||0)/Math.max(maxV,1)*100);
+            return '<div class="ov-top-client">' +
+                '<div class="ov-top-rank">' + (i+1) + '</div>' +
+                '<div class="mini-avatar" style="background:'+c.color+';width:28px;height:28px;font-size:11px">' + ((c.nombre||'?').substring(0,2).toUpperCase()) + '</div>' +
+                '<div class="ov-top-bar-wrap">' +
+                  '<div class="ov-top-name">' + escHtml(c.nombre) + '</div>' +
+                  '<div class="ov-top-bar-track"><div class="ov-top-bar-fill" style="width:'+pct+'%"></div></div>' +
+                '</div>' +
+                '<div class="ov-top-val">Q ' + Number(c.valorTotal||0).toLocaleString() + '</div>' +
+                '</div>';
+        }).join('');
+    }
+
+    /* Alertas */
+    function renderOvAlertas() {
+        var el = document.getElementById('ovAlertas');
+        if (!el) return;
+        var alertas = [];
+        var inv = (_inventario||[]);
+        var criticos = inv.filter(function(i){ return i.estado==='Crítico'; });
+        if (criticos.length) {
+            alertas.push({ color:'#EF4444', bg:'var(--danger-bg)', txt: criticos.length + ' producto(s) con stock crítico', btn: 'Ver inventario', action: "showPage('inventario',document.getElementById('nav-inventario'))" });
+        }
+        var bajos = inv.filter(function(i){ return i.estado==='Bajo'; });
+        if (bajos.length) {
+            alertas.push({ color:'#F59E0B', bg:'var(--warning-bg)', txt: bajos.length + ' producto(s) con stock bajo', btn: 'Revisar', action: "showPage('inventario',document.getElementById('nav-inventario'))" });
+        }
+        var pros = (_prospectos||[]).filter(function(p){ return p.etapa==='Propuesta'||p.etapa==='Negociación'; });
+        if (pros.length) {
+            alertas.push({ color:'#3B6EF5', bg:'var(--accent-bg)', txt: pros.length + ' prospecto(s) en etapa avanzada (Propuesta/Negociación)', btn: 'Ver', action: "showPage('prospectos',document.getElementById('nav-prospectos'))" });
+        }
+        var cots = (_cotizaciones||[]).filter(function(c){ return c.estado==='Enviada'; });
+        if (cots.length) {
+            alertas.push({ color:'#14B8A6', bg:'rgba(20,184,166,.1)', txt: cots.length + ' cotización(es) enviadas esperando respuesta', btn: 'Ver', action: "showPage('cotizaciones',document.getElementById('nav-cotizaciones'))" });
+        }
+        var pend = (_clientes||[]).filter(function(c){ return c.estado==='Pendiente'; });
+        if (pend.length) {
+            alertas.push({ color:'#8E8E93', bg:'var(--bg)', txt: pend.length + ' cliente(s) pendiente(s) de activar', btn: 'Activar', action: "showPage('clientes',document.getElementById('nav-clientes'))" });
+        }
+        if (!alertas.length) {
+            el.innerHTML = '<div class="ov-alert" style="background:var(--success-bg)"><div class="ov-alert-dot" style="background:#22C55E"></div><div class="ov-alert-txt" style="color:#1a8a3a">✅ Todo en orden, sin alertas activas.</div></div>';
+            return;
+        }
+        el.innerHTML = alertas.slice(0,4).map(function(a){
+            return '<div class="ov-alert" style="background:'+a.bg+'">' +
+                '<div class="ov-alert-dot" style="background:'+a.color+'"></div>' +
+                '<div class="ov-alert-txt">'+a.txt+'</div>' +
+                '<button class="ov-alert-btn" onclick="'+a.action+'">'+a.btn+'</button>' +
+                '</div>';
+        }).join('');
+    }
+
+    /* Actualiza los KPIs del overview con los datos ya cargados */
+    function renderOvKpis() {
+        var cli = _clientes || [];
+        var pro = _prospectos || [];
+        var cot = _cotizaciones || [];
+        var inv = _inventario || [];
+
+        var activos = cli.filter(function(c){ return c.estado==='Activo'; }).length;
+        document.getElementById('ov-cli').textContent = activos;
+        var ovCliD = document.getElementById('ov-cli-d');
+        if (ovCliD) ovCliD.textContent = cli.length + ' total registrados';
+
+        var proAct = pro.filter(function(p){ return p.etapa!=='Perdido'; });
+        document.getElementById('ov-pro').textContent = proAct.length;
+        var pond = proAct.reduce(function(s,p){ return s+Number(p.valorEstimado||0)*(Number(p.probabilidad||0)/100); }, 0);
+        var ovProD = document.getElementById('ov-pro-d');
+        if (ovProD) ovProD.textContent = 'Pipeline Q ' + Math.round(pond).toLocaleString();
+
+        var aprobadas = cot.filter(function(c){ return c.estado==='Aprobada'; });
+        var enviadas  = cot.filter(function(c){ return ['Enviada','Aprobada','Rechazada'].includes(c.estado); });
+        var tasa = enviadas.length ? Math.round(aprobadas.length/enviadas.length*100) : 0;
+        document.getElementById('ov-cot-ap').textContent = aprobadas.length;
+        var ovCotD = document.getElementById('ov-cot-ap-d');
+        if (ovCotD) ovCotD.textContent = tasa + '% de conversión';
+
+        var valorPond = proAct.reduce(function(s,p){ return s+Number(p.valorEstimado||0)*(Number(p.probabilidad||0)/100); }, 0);
+        document.getElementById('ov-pond').textContent = 'Q ' + Math.round(valorPond).toLocaleString();
+        var valorPot  = proAct.reduce(function(s,p){ return s+Number(p.valorEstimado||0); }, 0);
+        var ovPondD = document.getElementById('ov-pond-d');
+        if (ovPondD) ovPondD.textContent = 'Q ' + Math.round(valorPot).toLocaleString() + ' potencial';
+
+        var crit = inv.filter(function(i){ return i.estado==='Crítico'; }).length;
+        var bajo = inv.filter(function(i){ return i.estado==='Bajo'; }).length;
+        document.getElementById('ov-crit').textContent = crit;
+        var ovCritD = document.getElementById('ov-crit-d');
+        if (ovCritD) ovCritD.textContent = bajo + ' con stock bajo';
+
+        // encuestas
+        var enc = _encuestas || [];
+        var totalEnv = enc.reduce(function(s,e){ return s+Number(e.totalEnviadas||0); }, 0);
+        var totalResp = enc.reduce(function(s,e){ return s+Number(e.respuestas||0); }, 0);
+        var tasaEnc = totalEnv ? Math.round(totalResp/totalEnv*100) : 0;
+        document.getElementById('ov-tasa').textContent = tasaEnc + '%';
+        var ovTasaD = document.getElementById('ov-tasa-d');
+        if (ovTasaD) ovTasaD.textContent = totalResp + ' respuestas de ' + totalEnv;
+    }
+
+    /* Render completo del overview — llamado tras cargar datos */
+    function renderOverview() {
+        _ovGreeting();
+        renderOvKpis();
+        renderOvTopClientes();
+        renderOvAlertas();
+        if (typeof _prospectos !== 'undefined') renderChartPipeline(_prospectos);
+        if (typeof _cotizaciones !== 'undefined') renderChartCotizaciones(_cotizaciones);
+        if (typeof _clientes !== 'undefined') renderChartSegmentos(_clientes);
+    }
+
+    /* Hook en loadAll/loadResumen para refrescar overview */
+    (function() {
+        var _origLoadClientes = window.loadClientes;
+        var _origLoadProspectos = window.loadProspectos;
+        var _origLoadInventario = window.loadInventario;
+        var _origLoadCotizaciones = window.loadCotizaciones;
+        var _origLoadEncuestas = window.loadEncuestas;
+
+        function _refreshOverviewIfNeeded() {
+            if (document.getElementById('page-overview') &&
+                document.getElementById('page-overview').classList.contains('active')) {
+                renderOverview();
+            }
+        }
+
+        if (_origLoadClientes) window.loadClientes = function() {
+            var r = _origLoadClientes.apply(this, arguments);
+            setTimeout(_refreshOverviewIfNeeded, 800);
+            return r;
+        };
+        if (_origLoadProspectos) window.loadProspectos = function() {
+            var r = _origLoadProspectos.apply(this, arguments);
+            setTimeout(_refreshOverviewIfNeeded, 800);
+            return r;
+        };
+        if (_origLoadInventario) window.loadInventario = function() {
+            var r = _origLoadInventario.apply(this, arguments);
+            setTimeout(_refreshOverviewIfNeeded, 800);
+            return r;
+        };
+        if (_origLoadCotizaciones) window.loadCotizaciones = function() {
+            var r = _origLoadCotizaciones.apply(this, arguments);
+            setTimeout(_refreshOverviewIfNeeded, 800);
+            return r;
+        };
+        if (_origLoadEncuestas) window.loadEncuestas = function() {
+            var r = _origLoadEncuestas.apply(this, arguments);
+            setTimeout(_refreshOverviewIfNeeded, 800);
+            return r;
+        };
+
+        // Render inicial cuando la página overview es visible
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                window._ovGreeting();
+                // Actualizar el saludo cada minuto
+                setInterval(window._ovGreeting, 60000);
+            }, 100);
+        });
+
+        // Hook en showPage para re-renderizar gráficas al volver al overview
+        var _origShowPage2 = window.showPage;
+        if (_origShowPage2) {
+            window.showPage = function(id, navEl) {
+                _origShowPage2(id, navEl);
+                if (id === 'overview') {
+                    setTimeout(renderOverview, 150);
+                }
+            };
+        }
+    })();
+
+
+    /* ════════════════════════════════════════════════════════════
+       ASISTENTE IA — Chat con Claude (API key en localStorage)
+    ════════════════════════════════════════════════════════════ */
+    var _azAiOpen = false;
+    var _azAiBusy = false;
+    var _AZ_AI_KEY_LS = 'azyvion_claude_api_key';
+
+    function azAiToggle() {
+        _azAiOpen = !_azAiOpen;
+        var panel = document.getElementById('azAiPanel');
+        if (panel) panel.classList.toggle('open', _azAiOpen);
+        if (_azAiOpen) {
+            _azAiCheckKey();
+            setTimeout(function(){
+                var inp = document.getElementById('azAiInput');
+                if (inp) inp.focus();
+            }, 250);
+        }
+    }
+
+    function _azAiCheckKey() {
+        var key = localStorage.getItem(_AZ_AI_KEY_LS) || '';
+        var banner = document.getElementById('azAiKeyBanner');
+        if (banner) banner.style.display = key ? 'none' : 'block';
+    }
+
+    function azAiOpenKeySetup() {
+        var current = localStorage.getItem(_AZ_AI_KEY_LS) || '';
+        var key = prompt('Ingresa tu API Key de Anthropic (Claude):\nhttps://console.anthropic.com/\n\nSe guarda solo en tu navegador, nunca en el servidor.', current);
+        if (key !== null) {
+            key = key.trim();
+            if (key) { localStorage.setItem(_AZ_AI_KEY_LS, key); showToast('API Key guardada', '#30D158'); }
+            else { localStorage.removeItem(_AZ_AI_KEY_LS); showToast('API Key eliminada', '#FF9F0A'); }
+            _azAiCheckKey();
+        }
+    }
+
+    function _azAiBuildContext() {
+        var cli  = (_clientes||[]).length;
+        var cliA = (_clientes||[]).filter(function(c){ return c.estado==='Activo'; }).length;
+        var cliP = (_clientes||[]).filter(function(c){ return c.estado==='Pendiente'; }).length;
+        var cliTop = (_clientes||[]).slice().sort(function(a,b){ return Number(b.valorTotal||0)-Number(a.valorTotal||0); }).slice(0,3).map(function(c){ return c.nombre + ' (Q'+Number(c.valorTotal||0).toLocaleString()+')'; }).join(', ');
+        var cliVal = (_clientes||[]).reduce(function(s,c){ return s+Number(c.valorTotal||0); }, 0);
+
+        var proA = (_prospectos||[]).filter(function(p){ return p.etapa!=='Perdido'; }).length;
+        var proVal = (_prospectos||[]).filter(function(p){ return p.etapa!=='Perdido'; }).reduce(function(s,p){ return s+Number(p.valorEstimado||0); }, 0);
+        var proPond = (_prospectos||[]).filter(function(p){ return p.etapa!=='Perdido'; }).reduce(function(s,p){ return s+Number(p.valorEstimado||0)*(Number(p.probabilidad||0)/100); }, 0);
+        var etapas = ['Nuevo','Contactado','Calificado','Propuesta','Negociación','Perdido'];
+        var etStr = etapas.map(function(e){ return e+':'+(_prospectos||[]).filter(function(p){ return p.etapa===e; }).length; }).join(', ');
+
+        var cotAp = (_cotizaciones||[]).filter(function(c){ return c.estado==='Aprobada'; });
+        var cotEn = (_cotizaciones||[]).filter(function(c){ return ['Enviada','Aprobada','Rechazada'].includes(c.estado); });
+        var cotMonto = cotAp.reduce(function(s,c){ return s+Number(c.total||0); }, 0);
+        var cotTasa = cotEn.length ? Math.round(cotAp.length/cotEn.length*100) : 0;
+
+        var invCrit = (_inventario||[]).filter(function(i){ return i.estado==='Crítico'; });
+        var invBajo = (_inventario||[]).filter(function(i){ return i.estado==='Bajo'; });
+        var invVal  = (_inventario||[]).reduce(function(s,i){ return s+Number(i.unidades||0)*Number(i.precioUnit||0); }, 0);
+
+        var enc = _encuestas || [];
+        var encEnv = enc.reduce(function(s,e){ return s+Number(e.totalEnviadas||0); }, 0);
+        var encResp = enc.reduce(function(s,e){ return s+Number(e.respuestas||0); }, 0);
+        var encTasa = encEnv ? Math.round(encResp/encEnv*100) : 0;
+
+        return 'Eres el asistente inteligente del CRM Azyvion. Responde de forma concisa y útil en español.\n\n' +
+            '=== DATOS ACTUALES DEL CRM ===\n' +
+            'CLIENTES: ' + cli + ' total | ' + cliA + ' activos | ' + cliP + ' pendientes\n' +
+            'Valor total de clientes: Q ' + cliVal.toLocaleString() + '\n' +
+            'Top clientes: ' + (cliTop || 'sin datos') + '\n\n' +
+            'PROSPECTOS: ' + proA + ' activos | Pipeline Q ' + Math.round(proVal).toLocaleString() + ' | Ponderado Q ' + Math.round(proPond).toLocaleString() + '\n' +
+            'Por etapa: ' + etStr + '\n\n' +
+            'COTIZACIONES: ' + (_cotizaciones||[]).length + ' total | ' + cotAp.length + ' aprobadas | Tasa conversión ' + cotTasa + '%\n' +
+            'Monto aprobado: Q ' + Math.round(cotMonto).toLocaleString() + '\n\n' +
+            'INVENTARIO: ' + (_inventario||[]).length + ' ítems | ' + invCrit.length + ' críticos | ' + invBajo.length + ' bajo\n' +
+            'Valor inventario: Q ' + Math.round(invVal).toLocaleString() + '\n' +
+            (invCrit.length ? 'Críticos: ' + invCrit.slice(0,5).map(function(i){ return i.producto; }).join(', ') + '\n' : '') + '\n' +
+            'ENCUESTAS: ' + enc.length + ' | Tasa respuesta ' + encTasa + '% (' + encResp + '/' + encEnv + ')\n\n' +
+            'Responde siempre en español. Si el usuario pregunta sobre datos que no tienes, dilo claramente.';
+    }
+
+    var _azAiHistory = [];
+
+    function _azAiAddMsg(text, role) {
+        var msgs = document.getElementById('azAiMsgs');
+        if (!msgs) return;
+        var div = document.createElement('div');
+        div.className = 'az-ai-msg ' + (role === 'user' ? 'user' : 'bot');
+        div.textContent = text;
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+        return div;
+    }
+
+    function azAiSend(presetText) {
+        if (_azAiBusy) return;
+        var inp = document.getElementById('azAiInput');
+        var text = (presetText || (inp ? inp.value.trim() : '')).trim();
+        if (!text) return;
+
+        var apiKey = localStorage.getItem(_AZ_AI_KEY_LS) || '';
+        if (!apiKey) { azAiOpenKeySetup(); return; }
+
+        _azAiAddMsg(text, 'user');
+        _azAiHistory.push({ role: 'user', content: text });
+        if (inp) inp.value = '';
+        if (inp) inp.style.height = 'auto';
+
+        var suggs = document.getElementById('azAiSuggs');
+        if (suggs) suggs.style.display = 'none';
+
+        _azAiBusy = true;
+        var sendBtn = document.getElementById('azAiSendBtn');
+        if (sendBtn) sendBtn.disabled = true;
+
+        var typingEl = _azAiAddMsg('Pensando…', 'bot typing');
+
+        var systemPrompt = _azAiBuildContext();
+        var messages = _azAiHistory.slice(-10); // últimas 10 turns
+
+        fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': apiKey,
+                'anthropic-version': '2023-06-01',
+                'anthropic-dangerous-direct-browser-access': 'true'
+            },
+            body: JSON.stringify({
+                model: 'claude-haiku-4-5-20251001',
+                max_tokens: 600,
+                system: systemPrompt,
+                messages: messages
+            })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (typingEl && typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
+            if (data.error) {
+                _azAiAddMsg('Error: ' + (data.error.message || JSON.stringify(data.error)), 'bot');
+                _azAiHistory.pop();
+            } else {
+                var reply = data.content && data.content[0] && data.content[0].text || 'Sin respuesta';
+                _azAiAddMsg(reply, 'bot');
+                _azAiHistory.push({ role: 'assistant', content: reply });
+            }
+        })
+        .catch(function(err) {
+            if (typingEl && typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
+            _azAiAddMsg('Error de conexión: ' + (err.message || String(err)) + '. Verifica tu API key y conexión.', 'bot');
+            _azAiHistory.pop();
+        })
+        .finally(function() {
+            _azAiBusy = false;
+            if (sendBtn) sendBtn.disabled = false;
+        });
+    }
+
+    /* Auto-resize textarea */
+    document.addEventListener('DOMContentLoaded', function() {
+        var inp = document.getElementById('azAiInput');
+        if (inp) {
+            inp.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 90) + 'px';
+            });
+        }
+        // Configurar API key en ajustes de perfil (añadir enlace)
+        setTimeout(function() {
+            var perfilBody = document.getElementById('perfilBody');
+            if (perfilBody && !document.getElementById('azAiKeySection')) {
+                // Se añade la sección cuando se renderiza el perfil (hook)
+            }
+        }, 2000);
+    });
+
+    </script>
+
 </body>
 
 </html>
