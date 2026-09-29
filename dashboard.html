@@ -1101,7 +1101,7 @@
         <div class="page" id="page-suscripciones">
             <!-- Sub-tabs -->
             <div class="sub-tabs" id="subTabsSus">
-                <button class="sub-tab active" onclick="_subTab('dashboard')">Dashboard</button>
+                <button class="sub-tab active" onclick="_subTab('reporte')">Reporte</button>
                 <button class="sub-tab" onclick="_subTab('empresas')">Empresas</button>
                 <button class="sub-tab" onclick="_subTab('subs')">Suscripciones</button>
                 <button class="sub-tab" onclick="_subTab('planes')">Planes</button>
@@ -1109,8 +1109,8 @@
                 <button class="sub-tab" onclick="_subTab('auditoria')">Auditoría</button>
             </div>
 
-            <!-- ── Dashboard de suscripciones ── -->
-            <div id="sub-view-dashboard">
+            <!-- ── Reporte de suscripciones ── -->
+            <div id="sub-view-reporte">
                 <div class="kpi-grid" style="margin-bottom:18px">
                     <div class="kpi-card">
                         <div class="kpi-label">Empresas activas</div>
@@ -6797,7 +6797,7 @@ window.addEventListener('resize', function() {
     'use strict';
 
     /* ── Estado interno ── */
-    var _tabActual = 'dashboard';
+    var _tabActual = 'reporte';
     var _empresas  = [];
     var _planes    = [];
     var _subs      = [];
@@ -7002,21 +7002,21 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
     window._subTab = function(tab) {
         _tabActual = tab;
         // Ocultar todos los views
-        ['dashboard','empresas','subs','planes','pagos','auditoria'].forEach(function(v) {
+        ['reporte','empresas','subs','planes','pagos','auditoria'].forEach(function(v) {
             var el = document.getElementById('sub-view-' + v);
             if (el) el.style.display = 'none';
         });
         var target = document.getElementById('sub-view-' + tab);
-        if (target) target.style.display = '';
+        if (target) target.style.display = 'block';
 
         // Tab activo
-        document.querySelectorAll('.sub-tab').forEach(function(b) { b.classList.remove('active'); });
-        var tabs = document.querySelectorAll('.sub-tab');
-        var idx = ['dashboard','empresas','subs','planes','pagos','auditoria'].indexOf(tab);
+        document.querySelectorAll('#subTabsSus .sub-tab').forEach(function(b) { b.classList.remove('active'); });
+        var tabs = document.querySelectorAll('#subTabsSus .sub-tab');
+        var idx = ['reporte','empresas','subs','planes','pagos','auditoria'].indexOf(tab);
         if (tabs[idx]) tabs[idx].classList.add('active');
 
         if (!_tablesExist) { _renderSetupBanner(tab); return; }
-        if (tab === 'dashboard') _renderDashboard();
+        if (tab === 'reporte') _renderReporte();
         else if (tab === 'empresas') _renderEmpresas();
         else if (tab === 'subs') _renderSubs();
         else if (tab === 'planes') _renderPlanes();
@@ -7049,9 +7049,9 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         }
     };
 
-    /* ── Dashboard ── */
-    function _renderDashboard() {
-        if (!_tablesExist) { _renderSetupBanner('dashboard'); return; }
+    /* ── Reporte ── */
+    function _renderReporte() {
+        if (!_tablesExist) { _renderSetupBanner('reporte'); return; }
 
         var hoy = new Date(); hoy.setHours(0,0,0,0);
         var activas     = _empresas.filter(function(e){ return e.estado === 'ACTIVE'; }).length;
@@ -7156,7 +7156,8 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
                 var toggleLabel = estaActiva ? 'Suspender' : (e.estado === 'SUSPENDED' || e.estado === 'PAST_DUE' ? 'Activar' : null);
                 var toggleAccion = estaActiva ? 'suspender' : 'activar';
                 return '<tr>' +
-                    '<td><div class="cell-main">' + escHtml(e.nombre) + '</div>' +
+                    '<td style="cursor:pointer" onclick="_subVerEmpresa(\'' + e.id + '\')">' +
+                    '<div class="cell-main" style="color:var(--accent)">' + escHtml(e.nombre) + '</div>' +
                     (e.correo ? '<div class="cell-sub">' + escHtml(e.correo) + '</div>' : '') + '</td>' +
                     '<td>' + escHtml(planNombre) + '</td>' +
                     '<td>' + _estadoBadge(e.estado) + '</td>' +
@@ -7414,7 +7415,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
             await _audit(accionLabel, e, detalle, {estado: e.estado, fecha_fin: e.fecha_fin}, up);
             showToast(accionLabel + ' registrada correctamente', '#22C55E');
             await _loadEmpresas();
-            _renderDashboard();
+            _renderReporte();
             _renderEmpresas();
         }
 
@@ -7503,7 +7504,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         _subCerrarFormEmp();
         await _loadEmpresas();
         _renderEmpresas();
-        if (_tabActual === 'dashboard') _renderDashboard();
+        if (_tabActual === 'reporte') _renderReporte();
     };
 
     /* ── Suscripciones ── */
@@ -7749,7 +7750,7 @@ CREATE TABLE IF NOT EXISTS sub_auditoria (
         await _loadPagos();
         await _loadEmpresas();
         _renderPagos();
-        _renderDashboard();
+        _renderReporte();
     };
 
     /* ── Auditoría ── */
