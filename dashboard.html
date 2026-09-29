@@ -561,72 +561,157 @@
                 </div>
                 <!-- /mobContactosWrap -->
 
-                <div class="kpi-grid">
-                    <div class="kpi-card">
+                <!-- ── KPIs: 4 originales + 4 nuevos (8 total en desktop) ── -->
+                <div class="kpi-grid" style="grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); margin-bottom:16px">
+
+                    <!-- KPI 1: Total clientes -->
+                    <div class="kpi-card" style="border-top:2px solid var(--accent)">
                         <div class="kpi-label">Total clientes</div>
                         <div class="kpi-value" id="cli-total">—</div>
-                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg><span id="cli-total-d">…</span></div>
+                        <div class="kpi-delta up">
+                            <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                            <span id="cli-total-d">…</span>
+                        </div>
                     </div>
-                    <div class="kpi-card">
+
+                    <!-- KPI 2: Activos -->
+                    <div class="kpi-card" style="border-top:2px solid var(--success)">
                         <div class="kpi-label">Activos</div>
                         <div class="kpi-value" id="cli-activos">—</div>
-                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg><span id="cli-activos-d">…</span></div>
+                        <div class="kpi-delta up">
+                            <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                            <span id="cli-activos-d">…</span>
+                        </div>
                     </div>
-                    <div class="kpi-card">
+
+                    <!-- KPI 3: Pendientes -->
+                    <div class="kpi-card" style="border-top:2px solid var(--warning)">
                         <div class="kpi-label">Pendientes</div>
                         <div class="kpi-value" id="cli-pend">—</div>
-                        <div class="kpi-delta down"><svg viewBox="0 0 24 24">
-                                <polyline points="6 9 12 15 18 9" />
-                            </svg><span id="cli-pend-d">…</span></div>
+                        <div class="kpi-delta down">
+                            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                            <span id="cli-pend-d">En revisión</span>
+                        </div>
                     </div>
-                    <div class="kpi-card">
+
+                    <!-- KPI 4: Valor promedio -->
+                    <div class="kpi-card" style="border-top:2px solid var(--purple)">
                         <div class="kpi-label">Valor promedio</div>
                         <div class="kpi-value" id="cli-valor">—</div>
-                        <div class="kpi-delta up"><svg viewBox="0 0 24 24">
-                                <polyline points="18 15 12 9 6 15" />
-                            </svg>Promedio por cliente</div>
+                        <div class="kpi-delta neu">
+                            <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                            Promedio por cliente
+                        </div>
                     </div>
+
+                    <!-- KPI 5: Inactivos -->
+                    <div class="kpi-card" style="border-top:2px solid var(--danger)">
+                        <div class="kpi-label">Inactivos</div>
+                        <div class="kpi-value" id="cli-inactivos">—</div>
+                        <div class="kpi-delta down">
+                            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                            Sin actividad comercial
+                        </div>
+                    </div>
+
+                    <!-- KPI 6: En riesgo -->
+                    <div class="kpi-card" style="border-top:2px solid var(--danger)">
+                        <div class="kpi-label">En riesgo</div>
+                        <div class="kpi-value" id="cli-en-riesgo">—</div>
+                        <div class="kpi-delta down">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            +60d sin actividad
+                        </div>
+                    </div>
+
+                    <!-- KPI 7: Valor ganado total -->
+                    <div class="kpi-card" style="border-top:2px solid var(--success)">
+                        <div class="kpi-label">Valor ganado</div>
+                        <div class="kpi-value" id="cli-valor-total">—</div>
+                        <div class="kpi-delta up">
+                            <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+                            Cotizaciones aprobadas
+                        </div>
+                    </div>
+
+                    <!-- KPI 8: Ticket promedio -->
+                    <div class="kpi-card" style="border-top:2px solid var(--accent)">
+                        <div class="kpi-label">Ticket promedio</div>
+                        <div class="kpi-value" id="cli-ticket">—</div>
+                        <div class="kpi-delta neu">
+                            <svg viewBox="0 0 24 24">
+                                <line x1="12" y1="1" x2="12" y2="23"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                            Por cliente activo
+                        </div>
+                    </div>
+
                 </div>
+                <!-- /kpi-grid -->
+
+                <!-- ── Tabla principal ── -->
                 <div class="table-card">
                     <div class="table-toolbar">
+                        <!-- Filtros por estado -->
                         <div class="filter-tabs">
-                            <button class="filter-tab active" onclick="filtrarClientes('Todos',this)">Todos</button>
-                            <button class="filter-tab" onclick="filtrarClientes('Activo',this)">Activos</button>
-                            <button class="filter-tab" onclick="filtrarClientes('Pendiente',this)">Pendientes</button>
-                            <button class="filter-tab" onclick="filtrarClientes('Inactivo',this)">Inactivos</button>
+                            <button class="filter-tab active"   onclick="filtrarClientes('Todos',this)">Todos</button>
+                            <button class="filter-tab"           onclick="filtrarClientes('Activo',this)">Activos</button>
+                            <button class="filter-tab"           onclick="filtrarClientes('Pendiente',this)">Pendientes</button>
+                            <button class="filter-tab"           onclick="filtrarClientes('Inactivo',this)">Inactivos</button>
+                            <button class="filter-tab"           onclick="filtrarClientes('Archivado',this)">Archivados</button>
                         </div>
+
+                        <!-- Controles derechos -->
                         <div class="toolbar-right">
-                            <select class="mini-select" id="cliFiltroSeg" onchange="renderClientes(_filtroCliActual)">
+                            <!-- Filtro por fuente (llenado por JS desde CRM_CONFIG.fuentes) -->
+                            <select class="mini-select" id="cliFiltroFuente"
+                                    onchange="renderClientes(_filtroCliActual)">
+                                <option value="">Todos los orígenes</option>
+                            </select>
+
+                            <!-- Filtro por segmento -->
+                            <select class="mini-select" id="cliFiltroSeg"
+                                    onchange="renderClientes(_filtroCliActual)">
                                 <option value="">Todos los segmentos</option>
-                                <option>Estándar</option>
-                                <option>Premium</option>
-                                <option>Corporativo</option>
                             </select>
-                            <select class="mini-select" id="cliOrden" onchange="renderClientes(_filtroCliActual)">
+
+                            <!-- Ordenamiento -->
+                            <select class="mini-select" id="cliOrden"
+                                    onchange="renderClientes(_filtroCliActual)">
                                 <option value="nombre">Ordenar: nombre</option>
-                                <option value="valor">Ordenar: valor</option>
+                                <option value="valor">Ordenar: valor ganado</option>
                                 <option value="reciente">Ordenar: más reciente</option>
+                                <option value="riesgo">Ordenar: en riesgo primero</option>
                             </select>
+
+                            <!-- Exportar -->
                             <button class="btn-ghost" onclick="exportarClientes()">
-                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
                                 Exportar
                             </button>
                         </div>
                     </div>
+
+                    <!-- Tabla: columnas v6 (nombre comercial, contacto/ubicación, ejecutivo, segmento, estado, valor ganado, acciones) -->
                     <div class="table-scroll">
                         <table>
                             <thead>
                                 <tr>
                                     <th>Cliente</th>
-                                    <th>Contacto</th>
-                                    <th>Dirección</th>
+                                    <th>Contacto / Ubicación</th>
+                                    <th>Ejecutivo</th>
                                     <th>Segmento</th>
                                     <th>Estado</th>
-                                    <th class="cell-num">Valor total</th>
+                                    <th class="cell-num">Valor ganado</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -637,9 +722,15 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pie: conteo + toggle archivados -->
                     <div class="table-foot" id="cliFoot"></div>
+
+                    <!-- Paginación -->
                     <div class="pagination-wrap" id="cliPagination"></div>
                 </div>
+                <!-- /table-card -->
+
             </div>
 
             <!-- ── PROSPECTOS ── -->
