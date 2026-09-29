@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#1a1a2e" />
+    <title>Azyvion CRM</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+    <div class="bg-orb"></div>
+    <div class="bg-orb"></div>
+    <div class="bg-orb"></div>
+
+    <div class="toast" id="toast">
+        <svg viewBox="0 0 24 24" style="stroke:#30d158">
+            <polyline points="20 6 9 17 4 12" />
+        </svg>
+        Sesión iniciada correctamente
+    </div>
+
+    <div class="card">
+        <div class="brand">
+            <div class="brand-icon">
+                <img src="logo-crm.png" alt="Azyvion CRM Logo" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\'0 0 24 24\' style=\'width:24px;height:24px;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none\'><path d=\'M12 2L2 7l10 5 10-5-10-5z\'/><path d=\'M2 17l10 5 10-5\'/><path d=\'M2 12l10 5 10-5\'/></svg>'">
+            </div>
+            <div class="brand-name">Azyvion CRM</div>
+            <div class="brand-sub">Technology Beyond Limits</div>
+        </div>
+
+        <div class="field-group">
+            <div class="field">
+                <svg class="field-icon" viewBox="0 0 24 24">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                </svg>
+                <input type="text" id="usuario" placeholder="Usuario" autocomplete="username" />
+            </div>
+            <div class="field">
+                <svg class="field-icon" viewBox="0 0 24 24">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                <input type="password" id="password" placeholder="Contraseña" autocomplete="current-password" />
+                <button class="field-action" onclick="togglePwd()" aria-label="Mostrar contraseña">
+                    <svg id="eyeIcon" viewBox="0 0 24 24">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="error-msg" id="errMsg">Usuario o contraseña incorrectos.</div>
+
+        <div class="row-aux">
+            <label class="checkbox-label">
+                <input type="checkbox" id="remember" />
+                <span class="custom-check">
+                    <svg viewBox="0 0 12 12">
+                        <polyline points="2 6 5 9 10 3" />
+                    </svg>
+                </span>
+                Recordarme
+            </label>
+            <button class="link" onclick="handleForgot()">¿Olvidaste tu contraseña?</button>
+        </div>
+
+        <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
+            <span class="btn-text">Iniciar sesión</span>
+            <div class="spinner"></div>
+        </button>
+
+        <p class="footer-text">
+            Al ingresar aceptas los <a class="link" href="#">Términos de uso</a> de Azyvion.
+        </p>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════════
+         AZYVION CRM — LOGIN via Edge Function login-crm
+    ═════════════════════════════════════════════════════════════ -->
+    <script>
+    (function () {
+        var SESSION_KEY  = 'azyvion_session';
+        var REMEMBER_KEY = 'azyvion_remember_user';
+        var LOGIN_URL    = 'https://dwtykzporgjjvdustjfq.supabase.co/functions/v1/login-crm';
+
+        /* ── Verificación rápida de sesión existente ─────────────────────────────
+           El dashboard requiere azyvion_session con { token, expira }.
+           Si ya existe una sesión válida (token presente y no expirada),
+           redirigir directamente sin llamar al backend.
+           Si llegamos aquí con ?logout=1 o ?expired=1 en la URL, no redirigir
+           (el dashboard nos mandó de vuelta porque la sesión falló).             */
+        (function checkExisting() {
+            try {
+                // Si el dashboard nos redirigió de vuelta, no volver a redirigir
+                if (window.location.search.indexOf('logout') !== -1 ||
+                    window.location.search.indexOf('expired') !== -1) {
+                    localStorage.removeItem(SESSION_KEY);
+                    return;
+                }
+                var raw = localStorage.getItem(SESSION_KEY);
+                if (!raw) return;
+                var sess = JSON.parse(raw);
+                if (!sess || !sess.token) return;
+                if (sess.expira && new Date(sess.expira) <= new Date()) {
+                    localStorage.removeItem(SESSION_KEY);
+                    return;
+                }
+                // Sesión todavía válida: ir directo al dashboard
+                window.location.href = 'dashboard.html';
+            } catch (e) {}
+        })();
+
+        /* ── Pre-rellenar usuario si Recordarme estaba activo ───────────────── */
+        (function prefillUser() {
+            try {
+                var saved = localStorage.getItem(REMEMBER_KEY);
+                if (saved) {
+                    document.getElementById('usuario').value = saved;
+                    document.getElementById('remember').checked = true;
+                }
+            } catch (e) {}
+        })();
+
+        /* ── handleLogin ─────────────────────────────────────────────────────── */
+        window.handleLogin = function () {
+            var usuario  = document.getElementById('usuario').value.trim();
+            var pwd      = document.getElementById('password').value;
+            var remember = document.getElementById('remember').checked;
+            var btn      = document.getElementById('loginBtn');
+            var err      = document.getElementById('errMsg');
+
+            err.classList.remove('visible');
+
+            if (!usuario || !pwd) {
+                err.textContent = 'Ingresa tu usuario y contraseña.';
+                err.classList.add('visible');
+                return;
+            }
+
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            fetch(LOGIN_URL, {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ usuario: usuario, contrasena: pwd })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+
+                if (!res.ok) {
+                    err.textContent = res.error || 'Error al iniciar sesión.';
+                    err.classList.add('visible');
+                    return;
+                }
+
+                /* ── Recordarme: solo el nombre de usuario, nunca la contraseña */
+                try {
+                    if (remember) {
+                        localStorage.setItem(REMEMBER_KEY, usuario);
+                    } else {
+                        localStorage.removeItem(REMEMBER_KEY);
+                    }
+                } catch (e) {}
+
+                /* ── Construir objeto de sesión compatible con dashboard.html ───
+                   El dashboard verifica:
+                     sess.token   → debe existir (usamos access_token de Supabase Auth)
+                     sess.expira  → ISO string; si <= now() la sesión es inválida
+                     sess.rol     → string 'Admin' | 'Gerente' | 'Agente'
+                     sess.nombre  → string con el nombre visible
+                     sess.usuario → string con el username
+                   Campos adicionales que el dashboard consume si están presentes:
+                     sess.fotoUrl, sess.preferencias                              */
+                var expiresAt = res.session.expires_at;
+                // expires_at de Supabase Auth es unix timestamp (segundos)
+                var expira = new Date(expiresAt * 1000).toISOString();
+
+                var sesion = {
+                    token:        res.session.access_token,
+                    refresh_token: res.session.refresh_token,
+                    nombre:       res.nombre,
+                    usuario:      res.usuario,
+                    rol:          res.rol,
+                    expira:       expira,
+                    fotoUrl:      res.fotoUrl  || '',
+                    preferencias: res.preferencias || {}
+                };
+
+                try {
+                    localStorage.setItem(SESSION_KEY, JSON.stringify(sesion));
+                } catch (e) {
+                    err.textContent = 'No se pudo guardar la sesión. Revisa los permisos del navegador.';
+                    err.classList.add('visible');
+                    return;
+                }
+
+                showToast('Sesión iniciada — bienvenido, ' + res.nombre, '#30d158');
+                setTimeout(function () {
+                    window.location.href = 'dashboard.html';
+                }, 1300);
+            })
+            .catch(function (e) {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                err.textContent = 'Error de conexión: ' + (e.message || 'intenta de nuevo.');
+                err.classList.add('visible');
+            });
+        };
+
+        /* ── Helpers UI ──────────────────────────────────────────────────────── */
+        window.handleForgot = function () {
+            showToast('Contacta al administrador para restablecer tu contraseña', '#0A84FF');
+        };
+
+        function showToast(msg, color) {
+            color = color || '#30d158';
+            var t = document.getElementById('toast');
+            t.innerHTML = '<svg viewBox="0 0 24 24" style="stroke:' + color + ';width:18px;height:18px;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none"><polyline points="20 6 9 17 4 12"/></svg> ' + msg;
+            t.classList.add('show');
+            setTimeout(function () { t.classList.remove('show'); }, 3000);
+        }
+
+        var pwdVisible = false;
+        window.togglePwd = function () {
+            pwdVisible = !pwdVisible;
+            document.getElementById('password').type = pwdVisible ? 'text' : 'password';
+        };
+
+        /* ── Enter en cualquier campo dispara el login ───────────────────────── */
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') window.handleLogin();
+        });
+
+    })();
+    </script>
+</body>
+
+</html>
