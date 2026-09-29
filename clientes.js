@@ -787,16 +787,23 @@ window._renderCliPagedData = function() {
     /* ── 2. Filtro por Fuente en la toolbar ───────────────────── */
     const toolbar = document.querySelector('#page-clientes .toolbar-right');
     if (toolbar) {
-        /* Insertar select de fuente antes del select de segmento */
+        /* Insertar select de fuente antes del select de segmento (solo si no existe ya en el HTML) */
         const segSel = toolbar.querySelector('#cliFiltroSeg');
         if (segSel) {
-            const fuenSel = document.createElement('select');
-            fuenSel.className = 'mini-select';
-            fuenSel.id = 'cliFiltroFuente';
-            fuenSel.setAttribute('onchange', 'renderClientes(_filtroCliActual)');
-            fuenSel.innerHTML = `<option value="">Todos los orígenes</option>` +
-                CRM_CONFIG.fuentes.map(f => `<option value="${escHtml(f)}">${escHtml(f)}</option>`).join('');
-            toolbar.insertBefore(fuenSel, segSel);
+            const fuenSelExisting = document.getElementById('cliFiltroFuente');
+            if (fuenSelExisting) {
+                /* Ya está en el HTML — solo poblar las opciones dinámicas */
+                fuenSelExisting.innerHTML = `<option value="">Todos los orígenes</option>` +
+                    CRM_CONFIG.fuentes.map(f => `<option value="${escHtml(f)}">${escHtml(f)}</option>`).join('');
+            } else {
+                const fuenSel = document.createElement('select');
+                fuenSel.className = 'mini-select';
+                fuenSel.id = 'cliFiltroFuente';
+                fuenSel.setAttribute('onchange', 'renderClientes(_filtroCliActual)');
+                fuenSel.innerHTML = `<option value="">Todos los orígenes</option>` +
+                    CRM_CONFIG.fuentes.map(f => `<option value="${escHtml(f)}">${escHtml(f)}</option>`).join('');
+                toolbar.insertBefore(fuenSel, segSel);
+            }
         }
 
         /* Reemplazar opciones del select de segmento con las de CRM_CONFIG */
@@ -848,10 +855,10 @@ window._renderCliPagedData = function() {
             '<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>'
         );
 
-        kpiGrid.appendChild(cardInact);
-        kpiGrid.appendChild(cardRiesgo);
-        kpiGrid.appendChild(cardValor);
-        kpiGrid.appendChild(cardTicket);
+        if (!document.getElementById('cli-inactivos'))  kpiGrid.appendChild(cardInact);
+        if (!document.getElementById('cli-en-riesgo'))  kpiGrid.appendChild(cardRiesgo);
+        if (!document.getElementById('cli-valor-total')) kpiGrid.appendChild(cardValor);
+        if (!document.getElementById('cli-ticket'))      kpiGrid.appendChild(cardTicket);
     }
 
     /* ── 4. Añadir tab "Archivados" a los filtros de estado ────── */
