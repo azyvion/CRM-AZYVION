@@ -2679,7 +2679,8 @@ body.theme-dark #cropZoom { background: #3A3A3E; }
     border-radius: var(--radius);
     padding: 18px 20px;
     box-shadow: var(--shadow-sm);
-    min-width: 0;
+    min-width: 260px;
+    flex-basis: 260px;
 }
 
 /* Top clientes */
@@ -3067,9 +3068,11 @@ textarea.form-input { height: auto; min-height: 74px; padding: 9px 11px; line-he
 body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
 .ficha-tabs { overflow-x: visible; }
 /* ── Overview v2 desktop overrides ── */
-.ov-kpi-grid { grid-template-columns: repeat(6, 1fr) !important; }
-.ov-charts-row { flex-wrap: nowrap !important; }
-.ov-bottom-row { flex-wrap: nowrap !important; }
+.ov-kpi-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)) !important; }
+.ov-charts-row { flex-wrap: wrap !important; }
+.ov-bottom-row { flex-wrap: wrap !important; }
+.ov-chart-card { min-width: 260px; }
+.ov-card { min-width: 260px; }
 .ov-kpi-value { font-size: 22px; }
 
 /* ── SUSCRIPCIONES — Módulo SaaS ─────────────────────────── */
