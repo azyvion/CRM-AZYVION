@@ -3253,3 +3253,25 @@ body.theme-dark .sub-estado-INTERNAL { background: rgba(94,53,177,.25); color: #
     line-height: 1.6;
     margin-bottom: 12px;
 }
+
+/* ── Nav subgrupo (Inventario > Ver / Categorías) ── */
+.nav-subgroup { background: transparent; }
+.nav-subitem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px 7px 36px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 1px 8px;
+    transition: background .15s, color .15s;
+}
+.nav-subitem:hover { background: var(--hover); color: var(--text); }
+.nav-subitem.active { background: var(--accent-muted, rgba(10,132,255,.12)); color: var(--accent); font-weight: 600; }
+.nav-subitem svg { stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+@media (max-width: 900px) {
+    .nav-subitem { padding: 7px 10px 7px 30px; font-size: 12px; }
+}
