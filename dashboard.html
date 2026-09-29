@@ -6068,6 +6068,8 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
 
 /* ── NUEVA loadAll: una sola petición en lugar de 9 ─────── */
 loadAll = function() {
+    // Suscripciones: verificar SUPER_ADMIN contra Supabase (muestra el menu y la etiqueta solo si aplica)
+    if (typeof window._subInit === 'function') setTimeout(function () { window._subInit(); }, 0);
     _mostrarSkeletons();
     _setSplashStatus('Cargando datos…');
 
