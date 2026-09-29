@@ -3125,6 +3125,8 @@ body.ficha-max .ficha-shell { height: calc(100vh - 84px); }
 .sub-estado-PAST_DUE { background: var(--warning-bg); color: var(--warning); }
 .sub-estado-SUSPENDED{ background: var(--danger-bg);  color: var(--danger); }
 .sub-estado-CANCELLED{ background: var(--border);     color: var(--text-muted); }
+.sub-estado-INTERNAL { background: #e8e0ff;            color: #5e35b1; }
+body.theme-dark .sub-estado-INTERNAL { background: rgba(94,53,177,.25); color: #b39ddb; }
 .sub-pago-badge {
     display: inline-flex;
     align-items: center;
