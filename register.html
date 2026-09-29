@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <title>Crear cuenta — Azyvion CRM</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #1a1a2e;
+      --card: rgba(255,255,255,0.9);
+      --card-border: rgba(255,255,255,0.5);
+      --text-primary: #1C1C1E;
+      --text-secondary: #8E8E93;
+      --field-bg: rgba(118,118,128,0.12);
+      --field-focus: rgba(10,132,255,0.12);
+      --accent: #0A84FF;
+      --accent-dark: #0060DF;
+      --danger: #FF453A;
+      --green: #30d158;
+      --divider: rgba(60,60,67,0.13);
+      --border: rgba(60,60,67,0.2);
+    }
+
+    html { height: 100%; }
+    body {
+      min-height: 100dvh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      position: relative;
+      padding: env(safe-area-inset-top,20px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,20px) env(safe-area-inset-left,0px);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── BG ORBS ── */
+    .bg-orb { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.5; animation: drift linear infinite; pointer-events: none; }
+    .bg-orb:nth-child(1) { width:520px;height:520px;background:radial-gradient(circle,#0A84FF,#005cc5);top:-100px;left:-80px;animation-duration:18s; }
+    .bg-orb:nth-child(2) { width:400px;height:400px;background:radial-gradient(circle,#5e5ce6,#1c1c8a);bottom:-100px;right:-60px;animation-duration:22s;animation-direction:reverse; }
+    .bg-orb:nth-child(3) { width:280px;height:280px;background:radial-gradient(circle,#30d158,#1a7a35);bottom:100px;left:60px;animation-duration:28s;opacity:0.25; }
+    @keyframes drift { 0%{transform:translate(0,0)scale(1)} 33%{transform:translate(40px,30px)scale(1.06)} 66%{transform:translate(-20px,50px)scale(0.95)} 100%{transform:translate(0,0)scale(1)} }
+
+    /* ── MAIN CARD ── */
+    .card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 560px;
+      margin: 20px 16px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 36px 32px 32px;
+      backdrop-filter: blur(32px) saturate(180%);
+      -webkit-backdrop-filter: blur(32px) saturate(180%);
+      box-shadow: 0 2px 0 rgba(255,255,255,0.6) inset, 0 32px 80px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.2);
+      animation: cardIn .5s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes cardIn { from{opacity:0;transform:translateY(28px)scale(0.96)} to{opacity:1;transform:translateY(0)scale(1)} }
+
+    /* ── BRAND ── */
+    .brand { text-align:center; margin-bottom:28px; }
+    .brand-icon {
+      width:56px;height:56px;
+      background:linear-gradient(145deg,#0A84FF,#005cc5);
+      border-radius:16px;
+      display:inline-flex;align-items:center;justify-content:center;
+      margin-bottom:12px;
+      box-shadow:0 6px 20px rgba(10,132,255,0.35);
+    }
+    .brand-icon svg { width:28px;height:28px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+    .brand-name { font-size:20px;font-weight:800;color:var(--text-primary);letter-spacing:-0.4px; }
+    .brand-sub { font-size:13px;color:var(--text-secondary);margin-top:2px; }
+
+    /* ── STEPS INDICATOR ── */
+    .steps-bar {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 28px;
+    }
+    .step-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex;align-items:center;justify-content:center;
+      font-size: 13px;font-weight: 700;
+      border: 2px solid var(--border);
+      color: var(--text-secondary);
+      background: transparent;
+      transition: all .3s;
+      flex-shrink: 0;
+    }
+    .step-dot.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .step-dot.done { background: var(--green); border-color: var(--green); color: #fff; }
+    .step-dot.done::before { content: ''; display: block; width: 12px; height: 12px; background: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='20 6 9 17 4 12' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; }
+    .step-dot.done span { display: none; }
+    .step-line { flex: 1; height: 2px; background: var(--border); transition: background .3s; }
+    .step-line.done { background: var(--green); }
+    .steps-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      margin-bottom: 24px;
+    }
+    .step-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-align: center;
+      flex: 1;
+      transition: color .3s;
+    }
+    .step-label.active { color: var(--accent); }
+    .step-label.done { color: var(--green); }
+
+    /* ── SECTION TITLE ── */
+    .step-title { font-size:19px;font-weight:800;color:var(--text-primary);letter-spacing:-0.4px;margin-bottom:4px; }
+    .step-sub { font-size:13.5px;color:var(--text-secondary);margin-bottom:22px;line-height:1.5; }
+
+    /* ── FORM FIELDS ── */
+    .field-group { background:var(--field-bg);border-radius:14px;overflow:hidden;margin-bottom:14px; }
+    .field-group-2 { display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px; }
+    @media(max-width:480px){ .field-group-2{grid-template-columns:1fr;} }
+    .field-group-2 .field-group { margin-bottom:0; }
+
+    .field { display:flex;align-items:center;padding:0 16px;height:56px;position:relative;transition:background .18s; }
+    .field:not(:last-child) { border-bottom:1px solid var(--divider); }
+    .field:focus-within { background:var(--field-focus); }
+    .field-icon { width:18px;height:18px;flex-shrink:0;stroke:var(--text-secondary);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none;margin-right:11px;transition:stroke .18s; }
+    .field:focus-within .field-icon { stroke:var(--accent); }
+    .field input, .field select {
+      flex:1;border:none;background:transparent;outline:none;
+      font-size:16px;font-family:inherit;color:var(--text-primary);
+      caret-color:var(--accent);-webkit-user-select:text;
+    }
+    .field input::placeholder { color:var(--text-secondary); }
+    .field select { appearance:none;cursor:pointer;color:var(--text-primary); }
+    .field select option { background:#fff;color:#1C1C1E; }
+
+    /* ── ERROR ── */
+    .error-msg { color:var(--danger);font-size:13px;font-weight:500;min-height:18px;margin-bottom:10px;opacity:0;transform:translateY(-4px);transition:all .22s; }
+    .error-msg.visible { opacity:1;transform:translateY(0); }
+
+    /* ── PLAN CARDS ── */
+    .plan-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px; }
+    @media(max-width:400px){ .plan-grid{grid-template-columns:1fr;} }
+    .plan-radio { display:none; }
+    .plan-card {
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 14px;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+    }
+    .plan-card:hover { border-color: rgba(10,132,255,0.4); }
+    .plan-radio:checked + .plan-card {
+      border-color: var(--accent);
+      background: rgba(10,132,255,0.06);
+    }
+    .plan-radio:checked + .plan-card .plan-check { opacity:1;transform:scale(1); }
+    .plan-check {
+      position: absolute;top:10px;right:10px;
+      width:20px;height:20px;border-radius:50%;
+      background:var(--accent);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;transform:scale(0.5);
+      transition:all .2s;
+    }
+    .plan-check svg { width:11px;height:11px;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none; }
+    .plan-name { font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:3px; }
+    .plan-price { font-size:22px;font-weight:800;color:var(--accent);line-height:1; }
+    .plan-price span { font-size:12px;font-weight:500;color:var(--text-secondary); }
+    .plan-detail { font-size:11.5px;color:var(--text-secondary);margin-top:6px;line-height:1.4; }
+    .plan-badge {
+      display:inline-block;
+      font-size:10px;font-weight:700;
+      background:var(--accent);color:#fff;
+      padding:2px 8px;border-radius:20px;
+      margin-top:6px;
+    }
+    .plan-free-note { font-size:11px;color:var(--text-secondary);text-align:center;margin-top:4px;margin-bottom:4px; }
+
+    /* ── PAYMENT METHOD TABS ── */
+    .pay-tabs { display:flex;gap:8px;margin-bottom:18px; }
+    .pay-tab {
+      flex:1;padding:12px 8px;border-radius:12px;border:2px solid var(--border);
+      background:transparent;font-family:inherit;font-size:13px;font-weight:600;
+      color:var(--text-secondary);cursor:pointer;text-align:center;
+      transition:all .18s;
+      display:flex;flex-direction:column;align-items:center;gap:5px;
+    }
+    .pay-tab svg { width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round; }
+    .pay-tab.active { border-color:var(--accent);color:var(--accent);background:rgba(10,132,255,0.06); }
+
+    /* ── CARD INPUT GRID ── */
+    .card-number-wrap { position:relative; }
+    .card-brands { position:absolute;right:14px;top:50%;transform:translateY(-50%);display:flex;gap:5px; }
+    .card-brand { width:32px;height:20px;border-radius:4px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#555; }
+    .card-brand.visa { background:#1A1F71;color:#fff; }
+    .card-brand.mc { background:#EB001B;color:#fff; }
+
+    /* ── TRANSFER INFO ── */
+    .transfer-info { background:var(--field-bg);border-radius:14px;padding:18px;margin-bottom:14px; }
+    .transfer-row { display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--divider); }
+    .transfer-row:last-child { border-bottom:none; }
+    .transfer-label { font-size:12px;color:var(--text-secondary);font-weight:500; }
+    .transfer-value { font-size:13.5px;font-weight:700;color:var(--text-primary); }
+    .transfer-note { font-size:12px;color:var(--text-secondary);margin-top:10px;line-height:1.5; }
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      width:100%;height:56px;background:var(--accent);color:#fff;
+      border:none;border-radius:14px;font-size:17px;font-weight:700;
+      font-family:inherit;cursor:pointer;position:relative;overflow:hidden;
+      transition:background .2s;margin-bottom:16px;
+      -webkit-tap-highlight-color:transparent;
+    }
+    .btn-primary:hover:not(:disabled){ background:var(--accent-dark); }
+    .btn-primary:active:not(:disabled){ transform:scale(0.98); }
+    .btn-primary:disabled { opacity:.6;cursor:not-allowed; }
+    .btn-text { transition:opacity .2s; }
+    .spinner { position:absolute;inset:0;display:none;align-items:center;justify-content:center; }
+    .spinner::after { content:'';width:22px;height:22px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .75s linear infinite; }
+    @keyframes spin{ to{transform:rotate(360deg)} }
+    .btn-primary.loading .btn-text { opacity:0; }
+    .btn-primary.loading .spinner { display:flex; }
+
+    .btn-back {
+      width:100%;height:48px;background:transparent;color:var(--text-secondary);
+      border:1.5px solid var(--border);border-radius:14px;font-size:15px;font-weight:600;
+      font-family:inherit;cursor:pointer;transition:all .18s;margin-bottom:12px;
+    }
+    .btn-back:hover { border-color:var(--text-secondary);color:var(--text-primary); }
+
+    /* ── SUCCESS ── */
+    .success-screen { text-align:center;padding:20px 0; }
+    .success-icon {
+      width:72px;height:72px;border-radius:50%;
+      background:linear-gradient(145deg,#30d158,#1a7a35);
+      display:inline-flex;align-items:center;justify-content:center;
+      margin-bottom:20px;
+      box-shadow:0 8px 28px rgba(48,209,88,0.35);
+      animation:popIn .5s cubic-bezier(0.34,1.56,0.64,1) both .1s;
+    }
+    @keyframes popIn{ from{opacity:0;transform:scale(0.4)} to{opacity:1;transform:scale(1)} }
+    .success-icon svg { width:36px;height:36px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round; }
+    .success-title { font-size:24px;font-weight:800;color:var(--text-primary);letter-spacing:-0.5px;margin-bottom:10px; }
+    .success-msg { font-size:14.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:28px; }
+    .success-detail {
+      background:var(--field-bg);border-radius:14px;padding:16px;margin-bottom:24px;text-align:left;
+    }
+    .success-row { display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--divider); }
+    .success-row:last-child{border-bottom:none;}
+    .success-key { font-size:12.5px;color:var(--text-secondary);font-weight:500; }
+    .success-val { font-size:13px;font-weight:700;color:var(--text-primary); }
+
+    /* ── FOOTER TEXT ── */
+    .footer-text { text-align:center;font-size:12.5px;color:var(--text-secondary); }
+    .link { background:none;border:none;padding:0;font-family:inherit;font-size:inherit;color:var(--accent);cursor:pointer;font-weight:600;text-decoration:none; }
+
+    /* ── TOAST ── */
+    .toast {
+      position:fixed;bottom:calc(28px + env(safe-area-inset-bottom,0px));left:50%;
+      transform:translateX(-50%) translateY(120px);
+      background:rgba(30,30,30,0.92);color:#fff;
+      padding:13px 22px;border-radius:20px;font-size:14px;font-weight:500;
+      backdrop-filter:blur(16px);display:flex;align-items:center;gap:8px;
+      z-index:100;transition:transform .38s cubic-bezier(0.34,1.42,0.64,1);
+      white-space:nowrap;max-width:calc(100vw - 32px);
+    }
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    /* ── PASSWORD STRENGTH ── */
+    .pwd-strength { display:flex;gap:5px;margin-top:8px;margin-bottom:4px; }
+    .pwd-bar { flex:1;height:3px;border-radius:2px;background:var(--border);transition:background .3s; }
+    .pwd-bar.weak { background:#FF453A; }
+    .pwd-bar.medium { background:#FF9F0A; }
+    .pwd-bar.strong { background:#30d158; }
+    .pwd-label { font-size:11.5px;color:var(--text-secondary);margin-bottom:14px; }
+
+    @media(prefers-reduced-motion:reduce){ .bg-orb,.card{animation:none;} }
+    @media(prefers-color-scheme:dark){
+      :root:not([data-theme="light"]){
+        --card:rgba(38,38,48,0.94);
+        --card-border:rgba(255,255,255,0.1);
+        --text-primary:#F2F2F7;
+        --text-secondary:#A5A5AA;
+        --field-bg:rgba(118,118,128,0.2);
+        --field-focus:rgba(10,132,255,0.16);
+        --divider:rgba(255,255,255,0.07);
+        --border:rgba(255,255,255,0.12);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+  <div class="bg-orb"></div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="card">
+    <!-- BRAND -->
+    <div class="brand">
+      <div class="brand-icon">
+        <img src="logo-crm.png" alt="Logo" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;"
+             onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\'0 0 24 24\' style=\'width:24px;height:24px;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none\'><path d=\'M12 2L2 7l10 5 10-5-10-5z\'/><path d=\'M2 17l10 5 10-5\'/><path d=\'M2 12l10 5 10-5\'/></svg>'">
+      </div>
+      <div class="brand-name">Azyvion CRM</div>
+      <div class="brand-sub">Crea tu cuenta — Technology Beyond Limits</div>
+    </div>
+
+    <!-- STEPS BAR -->
+    <div class="steps-bar" id="stepsBar">
+      <div class="step-dot active" id="dot1"><span>1</span></div>
+      <div class="step-line" id="line12"></div>
+      <div class="step-dot" id="dot2"><span>2</span></div>
+      <div class="step-line" id="line23"></div>
+      <div class="step-dot" id="dot3"><span>3</span></div>
+      <div class="step-line" id="line34"></div>
+      <div class="step-dot" id="dot4"><span>4</span></div>
+    </div>
+    <div class="steps-labels" id="stepsLabels">
+      <div class="step-label active" id="lbl1">Empresa</div>
+      <div class="step-label" id="lbl2">Administrador</div>
+      <div class="step-label" id="lbl3">Plan</div>
+      <div class="step-label" id="lbl4">Pago</div>
+    </div>
+
+    <!-- ═══════════ STEP 1: COMPANY INFO ═══════════ -->
+    <div id="step1">
+      <div class="step-title">Tu empresa</div>
+      <div class="step-sub">Cuéntanos sobre tu organización para configurar tu espacio de trabajo.</div>
+
+      <div class="field-group">
+        <div class="field">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <input type="text" id="f_empresa" placeholder="Nombre de la empresa *" autocomplete="organization" />
+        </div>
+        <div class="field">
+          <svg class="field-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <select id="f_pais">
+            <option value="">País *</option>
+            <option value="Guatemala">🇬🇹 Guatemala</option>
+            <option value="Mexico">🇲🇽 México</option>
+            <option value="Colombia">🇨🇴 Colombia</option>
+            <option value="El Salvador">🇸🇻 El Salvador</option>
+            <option value="Honduras">🇭🇳 Honduras</option>
+            <option value="Costa Rica">🇨🇷 Costa Rica</option>
+            <option value="Panama">🇵🇦 Panamá</option>
+            <option value="Peru">🇵🇪 Perú</option>
+            <option value="Chile">🇨🇱 Chile</option>
+            <option value="Argentina">🇦🇷 Argentina</option>
+            <option value="Ecuador">🇪🇨 Ecuador</option>
+            <option value="Bolivia">🇧🇴 Bolivia</option>
+            <option value="Venezuela">🇻🇪 Venezuela</option>
+            <option value="Paraguay">🇵🇾 Paraguay</option>
+            <option value="Uruguay">🇺🇾 Uruguay</option>
+            <option value="Republica Dominicana">🇩🇴 Rep. Dominicana</option>
+            <option value="Otro">🌎 Otro</option>
+          </select>
+        </div>
+        <div class="field">
+          <svg class="field-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <select id="f_sector">
+            <option value="">Industria / Sector *</option>
+            <option>Comercio y Retail</option>
+            <option>Tecnología y Software</option>
+            <option>Servicios Profesionales</option>
+            <option>Construcción y Bienes Raíces</option>
+            <option>Manufactura e Industria</option>
+            <option>Logística y Transporte</option>
+            <option>Salud y Medicina</option>
+            <option>Educación</option>
+            <option>Alimentos y Bebidas</option>
+            <option>Financiero y Seguros</option>
+            <option>Turismo y Hospitalidad</option>
+            <option>Agropecuario</option>
+            <option>Marketing y Publicidad</option>
+            <option>Otro</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group-2">
+        <div class="field-group">
+          <div class="field">
+            <svg class="field-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input type="email" id="f_correo_emp" placeholder="Correo empresa *" autocomplete="email" />
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field">
+            <svg class="field-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13 19.79 19.79 0 0 1 1.57 4.36 2 2 0 0 1 3.54 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <input type="tel" id="f_telefono_emp" placeholder="Teléfono empresa" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field">
+          <svg class="field-icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <select id="f_tamano">
+            <option value="">Tamaño de la empresa</option>
+            <option>1–5 empleados</option>
+            <option>6–20 empleados</option>
+            <option>21–50 empleados</option>
+            <option>51–200 empleados</option>
+            <option>Más de 200 empleados</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="error-msg" id="err1"></div>
+      <button class="btn-primary" onclick="nextStep(2)"><span class="btn-text">Continuar →</span><div class="spinner"></div></button>
+      <p class="footer-text">¿Ya tienes cuenta? <a href="login.html" class="link">Iniciar sesión</a></p>
+    </div>
+
+    <!-- ═══════════ STEP 2: ADMIN USER ═══════════ -->
+    <div id="step2" style="display:none">
+      <div class="step-title">Tu perfil de administrador</div>
+      <div class="step-sub">Esta será la cuenta principal con acceso completo al CRM.</div>
+
+      <div class="field-group">
+        <div class="field">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="f_nombre" placeholder="Nombre completo *" autocomplete="name" />
+        </div>
+        <div class="field">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><path d="M17 11l2 2 4-4"/><circle cx="10" cy="7" r="4"/></svg>
+          <input type="text" id="f_cargo" placeholder="Cargo / Puesto" autocomplete="organization-title" />
+        </div>
+      </div>
+
+      <div class="field-group-2">
+        <div class="field-group">
+          <div class="field">
+            <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="f_usuario" placeholder="Nombre de usuario *" autocomplete="username" />
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field">
+            <svg class="field-icon" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13 19.79 19.79 0 0 1 1.57 4.36 2 2 0 0 1 3.54 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <input type="tel" id="f_telefono_usr" placeholder="Teléfono personal" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field">
+          <svg class="field-icon" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <input type="email" id="f_correo_usr" placeholder="Correo personal *" autocomplete="email" />
+        </div>
+        <div class="field">
+          <svg class="field-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="password" id="f_pwd" placeholder="Contraseña *" autocomplete="new-password" oninput="checkPwd(this.value)" />
+          <button class="field-action" onclick="toggleField('f_pwd')" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text-secondary);">
+            <svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="pwd-strength">
+        <div class="pwd-bar" id="ps1"></div>
+        <div class="pwd-bar" id="ps2"></div>
+        <div class="pwd-bar" id="ps3"></div>
+        <div class="pwd-bar" id="ps4"></div>
+      </div>
+      <div class="pwd-label" id="pwdLabel">Mínimo 8 caracteres</div>
+
+      <div class="error-msg" id="err2"></div>
+      <button class="btn-primary" onclick="nextStep(3)"><span class="btn-text">Continuar →</span><div class="spinner"></div></button>
+      <button class="btn-back" onclick="goBack(1)">← Anterior</button>
+    </div>
+
+    <!-- ═══════════ STEP 3: PLAN ═══════════ -->
+    <div id="step3" style="display:none">
+      <div class="step-title">Elige tu plan</div>
+      <div class="step-sub">Comienza gratis y escala cuando lo necesites. Sin compromisos.</div>
+
+      <div class="plan-grid">
+        <label>
+          <input type="radio" name="plan" value="free" class="plan-radio" id="planFree" checked />
+          <div class="plan-card">
+            <div class="plan-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="plan-name">Gratis</div>
+            <div class="plan-price">$0<span>/mes</span></div>
+            <div class="plan-detail">1 usuario · 500 contactos · 1 pipeline · 5GB</div>
+          </div>
+        </label>
+        <label>
+          <input type="radio" name="plan" value="starter" class="plan-radio" id="planStarter" />
+          <div class="plan-card">
+            <div class="plan-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="plan-name">Starter</div>
+            <div class="plan-price">$29<span>/mes</span></div>
+            <div class="plan-detail">5 usuarios · 2,000 contactos · 3 pipelines · IA básica</div>
+            <div class="plan-badge">14 días gratis</div>
+          </div>
+        </label>
+        <label style="position:relative">
+          <input type="radio" name="plan" value="pro" class="plan-radio" id="planPro" />
+          <div class="plan-card" style="border-color:rgba(10,132,255,0.35);">
+            <div class="plan-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="plan-name">Pro ⭐</div>
+            <div class="plan-price">$79<span>/mes</span></div>
+            <div class="plan-detail">15 usuarios · Ilimitado · IA completa · 50GB</div>
+            <div class="plan-badge">14 días gratis</div>
+          </div>
+        </label>
+        <label>
+          <input type="radio" name="plan" value="enterprise" class="plan-radio" id="planEnt" />
+          <div class="plan-card">
+            <div class="plan-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="plan-name">Enterprise</div>
+            <div class="plan-price" style="font-size:16px;padding-top:4px;">A medida</div>
+            <div class="plan-detail">Ilimitado todo · SSO · SLA · Gerente dedicado</div>
+          </div>
+        </label>
+      </div>
+      <p class="plan-free-note">💡 El plan gratuito incluye la marca Azyvion en tus cotizaciones y exports</p>
+
+      <div class="error-msg" id="err3"></div>
+      <button class="btn-primary" onclick="nextStep(4)"><span class="btn-text">Continuar →</span><div class="spinner"></div></button>
+      <button class="btn-back" onclick="goBack(2)">← Anterior</button>
+    </div>
+
+    <!-- ═══════════ STEP 4: PAYMENT ═══════════ -->
+    <div id="step4" style="display:none">
+      <div class="step-title" id="payTitle">Método de pago</div>
+      <div class="step-sub" id="paySubtitle">Ingresa tus datos de pago. Puedes cancelar cuando quieras.</div>
+
+      <!-- FREE PLAN SHORTCUT -->
+      <div id="freeConfirm" style="display:none;text-align:center;padding:16px 0;">
+        <div style="font-size:48px;margin-bottom:14px;">🎉</div>
+        <div style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">¡Plan gratuito seleccionado!</div>
+        <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:20px;">No necesitas ingresar datos de pago. Podrás actualizar tu plan en cualquier momento desde el panel.</p>
+      </div>
+
+      <!-- ENTERPRISE SHORTCUT -->
+      <div id="entConfirm" style="display:none;text-align:center;padding:16px 0;">
+        <div style="font-size:48px;margin-bottom:14px;">🤝</div>
+        <div style="font-size:17px;font-weight:700;color:var(--text-primary);margin-bottom:8px;">¡Excelente elección!</div>
+        <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:20px;">Un ejecutivo de Azyvion se comunicará contigo en las próximas 24 horas para diseñar el plan perfecto para tu empresa.</p>
+      </div>
+
+      <!-- PAID PLAN PAYMENT -->
+      <div id="paidPayment">
+        <div class="pay-tabs">
+          <button class="pay-tab active" id="tabCard" onclick="setPayTab('card')">
+            <svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Tarjeta
+          </button>
+          <button class="pay-tab" id="tabTransfer" onclick="setPayTab('transfer')">
+            <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            Transferencia
+          </button>
+          <button class="pay-tab" id="tabPaypal" onclick="setPayTab('paypal')">
+            <svg viewBox="0 0 24 24"><path d="M7 11.5c0 .3.2.5.5.5H9a5 5 0 0 0 4.9-4c0-1.1-.9-2-2-2H7.5c-.3 0-.5.2-.5.5l-.5 5z"/><path d="M4 20l1-8h2.5a7 7 0 0 0 6.5-4.5"/></svg>
+            PayPal
+          </button>
+        </div>
+
+        <!-- CARD TAB -->
+        <div id="cardForm">
+          <div class="field-group card-number-wrap">
+            <div class="field">
+              <svg class="field-icon" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              <input type="text" id="f_card" placeholder="Número de tarjeta" maxlength="19" oninput="formatCard(this)" />
+              <div class="card-brands">
+                <div class="card-brand visa">VISA</div>
+                <div class="card-brand mc">MC</div>
+              </div>
+            </div>
+          </div>
+          <div class="field-group-2">
+            <div class="field-group">
+              <div class="field">
+                <svg class="field-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <input type="text" id="f_expiry" placeholder="MM/AA" maxlength="5" oninput="formatExpiry(this)" />
+              </div>
+            </div>
+            <div class="field-group">
+              <div class="field">
+                <svg class="field-icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input type="text" id="f_cvv" placeholder="CVV" maxlength="4" />
+              </div>
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <svg class="field-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input type="text" id="f_cardholder" placeholder="Nombre en la tarjeta" />
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:12px;color:var(--text-secondary);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Pago seguro · SSL 256-bit · Tus datos están protegidos
+          </div>
+        </div>
+
+        <!-- TRANSFER TAB -->
+        <div id="transferForm" style="display:none">
+          <div class="transfer-info">
+            <div class="transfer-row"><span class="transfer-label">Banco</span><span class="transfer-value">Banco Industrial</span></div>
+            <div class="transfer-row"><span class="transfer-label">Cuenta</span><span class="transfer-value">302-123456-7</span></div>
+            <div class="transfer-row"><span class="transfer-label">A nombre de</span><span class="transfer-value">Azyvion S.A.</span></div>
+            <div class="transfer-row"><span class="transfer-label">Moneda</span><span class="transfer-value">USD / GTQ</span></div>
+          </div>
+          <div class="field-group">
+            <div class="field">
+              <svg class="field-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <input type="text" id="f_referencia" placeholder="No. de referencia / Voucher *" />
+            </div>
+          </div>
+          <p class="transfer-note">⚠️ Tu cuenta será activada en máximo 24 horas hábiles después de confirmar tu transferencia. Guarda el comprobante.</p>
+        </div>
+
+        <!-- PAYPAL TAB -->
+        <div id="paypalForm" style="display:none;text-align:center;padding:16px 0;">
+          <p style="font-size:14px;color:var(--text-secondary);margin-bottom:20px;">Serás redirigido a PayPal para completar el pago de forma segura.</p>
+          <div style="background:var(--field-bg);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;color:var(--text-secondary);">
+            Monto a pagar: <strong id="ppAmount" style="color:var(--text-primary);font-size:18px;"></strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-msg" id="err4"></div>
+      <button class="btn-primary" id="finalBtn" onclick="handleRegister()"><span class="btn-text" id="finalBtnText">Crear mi cuenta</span><div class="spinner"></div></button>
+      <button class="btn-back" onclick="goBack(3)">← Anterior</button>
+    </div>
+
+    <!-- ═══════════ SUCCESS ═══════════ -->
+    <div id="stepSuccess" style="display:none">
+      <div class="success-screen">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="success-title">¡Cuenta creada! 🎉</div>
+        <div class="success-msg" id="successMsg">Tu espacio de trabajo en Azyvion CRM está listo. Revisa tu correo para confirmar tu cuenta.</div>
+        <div class="success-detail" id="successDetail"></div>
+        <button class="btn-primary" onclick="window.location.href='login.html'">Ir al inicio de sesión →</button>
+        <p class="footer-text">¿Preguntas? <a href="mailto:soporte@azyvion.com" class="link">soporte@azyvion.com</a></p>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+
+  <script>
+  (function(){
+    var REGISTER_URL = 'https://dwtykzporgjjvdustjfq.supabase.co/functions/v1/register-crm';
+    var currentStep = 1;
+    var selectedPlan = 'free';
+    var payMethod = 'card';
+
+    /* ── Read plan from URL params ─────────────────── */
+    (function(){
+      try {
+        var p = new URLSearchParams(window.location.search).get('plan');
+        if(p) {
+          var el = document.getElementById('plan' + p.charAt(0).toUpperCase() + p.slice(1));
+          if(el) { el.checked = true; selectedPlan = p; }
+        }
+      } catch(e){}
+    })();
+
+    /* ── Step navigation ───────────────────────────── */
+    window.nextStep = function(to) {
+      if(!validate(currentStep)) return;
+      markDone(currentStep);
+      showStep(to);
+      if(to === 4) setupPayStep();
+    };
+
+    window.goBack = function(to) {
+      setDotState(currentStep, '');
+      showStep(to);
+    };
+
+    function showStep(n) {
+      for(var i=1;i<=4;i++){
+        var el=document.getElementById('step'+i);
+        if(el) el.style.display = (i===n)?'':'none';
+      }
+      document.getElementById('stepSuccess').style.display = 'none';
+      currentStep = n;
+      setActive(n);
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    function markDone(n) {
+      var dot = document.getElementById('dot'+n);
+      var lbl = document.getElementById('lbl'+n);
+      if(dot){ dot.className='step-dot done'; dot.innerHTML=''; }
+      if(lbl){ lbl.className='step-label done'; }
+      if(n < 4){
+        var line = document.getElementById('line'+ n + (n+1));
+        if(line) line.className='step-line done';
+      }
+    }
+
+    function setActive(n) {
+      var dot = document.getElementById('dot'+n);
+      var lbl = document.getElementById('lbl'+n);
+      if(dot && !dot.classList.contains('done')){ dot.className='step-dot active'; dot.innerHTML='<span>'+n+'</span>'; }
+      if(lbl && !lbl.classList.contains('done')){ lbl.className='step-label active'; }
+    }
+
+    function setDotState(n,state) {
+      var dot=document.getElementById('dot'+n);
+      var lbl=document.getElementById('lbl'+n);
+      if(state===''){
+        if(dot){ dot.className='step-dot'; dot.innerHTML='<span>'+n+'</span>'; }
+        if(lbl){ lbl.className='step-label'; }
+        var line=document.getElementById('line'+ n + (n+1));
+        if(line) line.className='step-line';
+      }
+    }
+
+    /* ── Validation ────────────────────────────────── */
+    function validate(step) {
+      var err = document.getElementById('err'+step);
+      err.classList.remove('visible');
+
+      if(step===1){
+        if(!v('f_empresa')){ return showErr(1,'Ingresa el nombre de la empresa.'); }
+        if(!v('f_pais')){ return showErr(1,'Selecciona el país.'); }
+        if(!v('f_sector')){ return showErr(1,'Selecciona la industria.'); }
+        if(!v('f_correo_emp')||!isEmail(g('f_correo_emp'))){ return showErr(1,'Ingresa un correo empresarial válido.'); }
+      }
+      if(step===2){
+        if(!v('f_nombre')){ return showErr(2,'Ingresa tu nombre completo.'); }
+        if(!v('f_usuario')){ return showErr(2,'Elige un nombre de usuario.'); }
+        if(g('f_usuario').length<4){ return showErr(2,'El usuario debe tener al menos 4 caracteres.'); }
+        if(!v('f_correo_usr')||!isEmail(g('f_correo_usr'))){ return showErr(2,'Ingresa un correo personal válido.'); }
+        if(!v('f_pwd')){ return showErr(2,'Ingresa una contraseña.'); }
+        if(g('f_pwd').length<8){ return showErr(2,'La contraseña debe tener al menos 8 caracteres.'); }
+      }
+      if(step===3){
+        selectedPlan = document.querySelector('input[name="plan"]:checked').value;
+      }
+      return true;
+    }
+
+    function showErr(step, msg){
+      var err=document.getElementById('err'+step);
+      err.textContent=msg;
+      err.classList.add('visible');
+      return false;
+    }
+
+    function v(id){ return (g(id)||'').trim().length>0; }
+    function g(id){ var el=document.getElementById(id); return el?(el.value||''):''; }
+    function isEmail(s){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s); }
+
+    /* ── Password strength ─────────────────────────── */
+    window.checkPwd = function(pwd) {
+      var bars=['ps1','ps2','ps3','ps4'];
+      bars.forEach(function(id){ document.getElementById(id).className='pwd-bar'; });
+      var lbl=document.getElementById('pwdLabel');
+      if(!pwd){ lbl.textContent='Mínimo 8 caracteres'; return; }
+      var score=0;
+      if(pwd.length>=8)score++;
+      if(/[A-Z]/.test(pwd))score++;
+      if(/[0-9]/.test(pwd))score++;
+      if(/[^A-Za-z0-9]/.test(pwd))score++;
+      var cls=score<=1?'weak':score<=2?'medium':'strong';
+      var labels=['','Débil','Regular','Fuerte','Muy fuerte'];
+      for(var i=0;i<score;i++) document.getElementById(bars[i]).className='pwd-bar '+cls;
+      lbl.textContent=labels[score]||'Mínimo 8 caracteres';
+    };
+
+    /* ── Toggle password visibility ─────────────────── */
+    window.toggleField = function(id){
+      var el=document.getElementById(id);
+      if(el) el.type=el.type==='password'?'text':'password';
+    };
+
+    /* ── Card formatters ───────────────────────────── */
+    window.formatCard = function(el){
+      var v=el.value.replace(/\D/g,'').substring(0,16);
+      el.value=v.replace(/(.{4})/g,'$1 ').trim();
+    };
+    window.formatExpiry = function(el){
+      var v=el.value.replace(/\D/g,'');
+      if(v.length>=2) v=v.substring(0,2)+'/'+v.substring(2,4);
+      el.value=v;
+    };
+
+    /* ── Payment step setup ─────────────────────────── */
+    function setupPayStep(){
+      selectedPlan = document.querySelector('input[name="plan"]:checked').value;
+      var prices={free:'$0',starter:'$29',pro:'$79',enterprise:'A medida'};
+      var names={free:'Gratis',starter:'Starter',pro:'Pro',enterprise:'Enterprise'};
+
+      document.getElementById('freeConfirm').style.display = selectedPlan==='free'?'':'none';
+      document.getElementById('entConfirm').style.display = selectedPlan==='enterprise'?'':'none';
+      document.getElementById('paidPayment').style.display = (selectedPlan==='starter'||selectedPlan==='pro')?'':'none';
+
+      if(selectedPlan==='free'){
+        document.getElementById('payTitle').textContent='Confirma tu cuenta';
+        document.getElementById('paySubtitle').textContent='Plan gratuito seleccionado. Sin tarjeta de crédito.';
+        document.getElementById('finalBtnText').textContent='Crear mi cuenta gratis →';
+      } else if(selectedPlan==='enterprise'){
+        document.getElementById('payTitle').textContent='¡Casi listo!';
+        document.getElementById('paySubtitle').textContent='Un ejecutivo te contactará para cerrar los detalles.';
+        document.getElementById('finalBtnText').textContent='Solicitar Enterprise →';
+      } else {
+        document.getElementById('payTitle').textContent='Pago — Plan '+names[selectedPlan];
+        document.getElementById('paySubtitle').textContent='14 días gratis, luego '+prices[selectedPlan]+'/mes. Cancela cuando quieras.';
+        document.getElementById('finalBtnText').textContent='Activar prueba gratuita →';
+        document.getElementById('ppAmount').textContent=prices[selectedPlan]+'/mes';
+      }
+    }
+
+    /* ── Pay tabs ──────────────────────────────────── */
+    window.setPayTab = function(tab){
+      payMethod=tab;
+      ['card','transfer','paypal'].forEach(function(t){
+        document.getElementById('tab'+t.charAt(0).toUpperCase()+t.slice(1)).classList.toggle('active',t===tab);
+        document.getElementById(t+'Form').style.display=t===tab?'':'none';
+      });
+    };
+
+    /* ── Main registration ─────────────────────────── */
+    window.handleRegister = function(){
+      var err4=document.getElementById('err4');
+      err4.classList.remove('visible');
+
+      // Extra validation for paid plans with card
+      if((selectedPlan==='starter'||selectedPlan==='pro') && payMethod==='card'){
+        if(!v('f_card')){ err4.textContent='Ingresa el número de tarjeta.'; err4.classList.add('visible'); return; }
+        if(!v('f_expiry')){ err4.textContent='Ingresa la fecha de vencimiento.'; err4.classList.add('visible'); return; }
+        if(!v('f_cvv')){ err4.textContent='Ingresa el CVV.'; err4.classList.add('visible'); return; }
+      }
+      if((selectedPlan==='starter'||selectedPlan==='pro') && payMethod==='transfer'){
+        if(!v('f_referencia')){ err4.textContent='Ingresa el número de referencia de la transferencia.'; err4.classList.add('visible'); return; }
+      }
+
+      var btn=document.getElementById('finalBtn');
+      btn.classList.add('loading');
+      btn.disabled=true;
+
+      var payload = {
+        empresa: {
+          nombre:    g('f_empresa'),
+          correo:    g('f_correo_emp'),
+          telefono:  g('f_telefono_emp'),
+          pais:      g('f_pais'),
+          sector:    g('f_sector'),
+          tamano:    g('f_tamano')
+        },
+        usuario: {
+          nombre:    g('f_nombre'),
+          cargo:     g('f_cargo'),
+          usuario:   g('f_usuario'),
+          correo:    g('f_correo_usr'),
+          telefono:  g('f_telefono_usr'),
+          contrasena: g('f_pwd')
+        },
+        plan: selectedPlan,
+        pago: {
+          metodo:    payMethod,
+          referencia: g('f_referencia') || '',
+          // NOTE: In production, tokenize card via Stripe.js/Conekta instead of sending raw card data
+          // cardLast4: g('f_card').replace(/\s/g,'').slice(-4)
+        }
+      };
+
+      fetch(REGISTER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        btn.classList.remove('loading');
+        btn.disabled=false;
+
+        if(!res.ok){
+          err4.textContent = res.error || 'Error al crear la cuenta. Intenta de nuevo.';
+          err4.classList.add('visible');
+          return;
+        }
+
+        showSuccess(res);
+      })
+      .catch(function(e){
+        btn.classList.remove('loading');
+        btn.disabled=false;
+        // If the edge function doesn't exist yet, show a friendly message
+        err4.textContent = 'Error de conexión: ' + (e.message||'intenta de nuevo.');
+        err4.classList.add('visible');
+      });
+    };
+
+    function showSuccess(res){
+      var planNames={free:'Gratis',starter:'Starter',pro:'Pro',enterprise:'Enterprise'};
+      document.getElementById('stepsBar').style.display='none';
+      document.getElementById('stepsLabels').style.display='none';
+      for(var i=1;i<=4;i++){
+        var el=document.getElementById('step'+i);
+        if(el) el.style.display='none';
+      }
+      document.getElementById('stepSuccess').style.display='';
+
+      var detail='';
+      detail+='<div class="success-row"><span class="success-key">Empresa</span><span class="success-val">'+g('f_empresa')+'</span></div>';
+      detail+='<div class="success-row"><span class="success-key">Administrador</span><span class="success-val">'+g('f_nombre')+'</span></div>';
+      detail+='<div class="success-row"><span class="success-key">Usuario</span><span class="success-val">@'+g('f_usuario')+'</span></div>';
+      detail+='<div class="success-row"><span class="success-key">Correo</span><span class="success-val">'+g('f_correo_usr')+'</span></div>';
+      detail+='<div class="success-row"><span class="success-key">Plan</span><span class="success-val">'+planNames[selectedPlan]+'</span></div>';
+      document.getElementById('successDetail').innerHTML=detail;
+
+      if(selectedPlan==='free'){
+        document.getElementById('successMsg').textContent='Tu cuenta gratuita está lista. Revisa tu correo y entra al panel.';
+      } else if(selectedPlan==='enterprise'){
+        document.getElementById('successMsg').textContent='Recibimos tu solicitud. Un ejecutivo te contactará en menos de 24 horas.';
+      } else {
+        document.getElementById('successMsg').textContent='Tu prueba gratuita de 14 días ha comenzado. Revisa tu correo para confirmar y acceder.';
+      }
+    }
+
+    /* ── Toast ─────────────────────────────────────── */
+    function showToast(msg){
+      var t=document.getElementById('toast');
+      t.innerHTML='<svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#30d158;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;fill:none"><polyline points="20 6 9 17 4 12"/></svg> '+msg;
+      t.classList.add('show');
+      setTimeout(function(){ t.classList.remove('show'); },3000);
+    }
+
+    /* ── Enter key ─────────────────────────────────── */
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Enter'&&currentStep<4) nextStep(currentStep+1);
+      if(e.key==='Enter'&&currentStep===4) handleRegister();
+    });
+
+  })();
+  </script>
+</body>
+</html>
