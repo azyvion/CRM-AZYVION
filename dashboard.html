@@ -1821,50 +1821,9 @@
     //     publicKey:  'XXXXXXXXXXXXXXXXXXXX' // tu Public Key de EmailJS
     // };
     </script>
+    <script src="auth.js"></script>
     <script>
     (function () {
-        const SUPABASE_URL      = 'https://dwtykzporgjjvdustjfq.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable__sKrMJxAHySP1qqHZ5v6mQ_6BTligkc';
-        const { createClient } = supabase;
-        const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            auth: {
-                autoRefreshToken:  true,
-                persistSession:    false,   // Azyvion gestiona la sesión en azyvion_session
-                detectSessionInUrl: false
-            }
-        });
-        window._supabase = _sb;
-        window._sb = _sb;
-        window.AZ_API_URL = '';
-        const SESSION_KEY = 'azyvion_session';
-        window.SESSION_KEY = SESSION_KEY;
-
-        function readSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e){ return null; } }
-
-        function _estadoItem(tipo, unidades, stockMax) {
-            if (tipo === 'Servicio') return 'Servicio';
-            const u = Number(unidades)||0, m = Number(stockMax)||1;
-            return u <= m*0.1 ? 'Crítico' : u <= m*0.3 ? 'Bajo' : 'Normal';
-        }
-
-        function _prefsUsuario(u) {
-            u=u||{};
-            return {
-                tema: u.tema==='oscuro'?'oscuro':'claro',
-                paginaInicio: ['overview','clientes','prospectos','inventario','cotizaciones','encuestas','contabilidad','usuarios'].includes(u.paginaInicio)?u.paginaInicio:'overview',
-                densidadTabla: u.densidadTabla==='compacta'?'compacta':'comoda',
-                copiarmeCotizaciones: u.copiarmeCotizaciones===true||String(u.copiarmeCotizaciones).toLowerCase()==='true',
-                alertaStockCritico: u.alertaStockCritico===true||String(u.alertaStockCritico).toLowerCase()==='true'
-            };
-        }
-
-        // ── _logout: cierra sesión en Supabase Auth y limpia localStorage ────────
-        async function _logout() {
-            try { await _sb.auth.signOut(); } catch(e) {}
-            localStorage.removeItem(SESSION_KEY);
-            localStorage.removeItem('azyvion_perfil_cache');
-            return {ok:true};
-        }
 
         async function _getResumen() {
             const [cR,iR,eR]=await Promise.all([_sb.from('Clientes').select('*'),_sb.from('Inventario').select('*'),_sb.from('Encuestas').select('*')]);
@@ -2284,151 +2243,9 @@
             'Propuesta': '#BF5AF2', 'Negociación': '#FF9F0A', 'Perdido': '#FF453A'
         };
 
-        function esAdmin() {return String(_rol).trim().toLowerCase() === 'admin';}
-
-        /* ═══════════════════════════════════════════════════════
-           INICIALIZACIÓN
-        ═══════════════════════════════════════════════════════ */
+        /* INICIALIZACIÓN + esAdmin + loadAll + refreshCurrent → auth.js */
         document.addEventListener('DOMContentLoaded', function () {
-            // ── 0. Aplicar tema/densidad cacheados de inmediato (evita parpadeo) ──
-            try {
-                var prefsCache = JSON.parse(localStorage.getItem('azyvion_perfil_cache') || 'null');
-                if (prefsCache && prefsCache.preferencias) aplicarPreferencias(prefsCache.preferencias);
-            } catch (e) {}
-
-            // ── 1. Leer sesión de localStorage de forma inmediata ──
-            var sessLocal = null;
-            try { sessLocal = JSON.parse(localStorage.getItem('azyvion_session') || 'null'); } catch (e) {}
-
-            // Sin token → login de inmediato
-            if (!sessLocal || !sessLocal.token) {
-                window.location.href = 'index.html?expired=1';
-                return;
-            }
-
-            // Token expirado localmente → login de inmediato
-            if (sessLocal.expira && new Date(sessLocal.expira) <= new Date()) {
-                localStorage.removeItem('azyvion_session');
-                window.location.href = 'index.html?expired=1';
-                return;
-            }
-
-            // ── 2. Inicializar UI con datos locales SIN esperar al backend ──
-            _rol     = sessLocal.rol    || '';
-            _usuario = sessLocal.nombre || '';
-            // Fase 4B: derivar _currentUserRole desde el rol legacy
-            _currentUserRole = {
-                'Admin':   'ADMIN',
-                'Gerente': 'GERENTE',
-                'Agente':  'AGENTE'
-            }[_rol] || 'AGENTE';
-
-            var elName   = document.getElementById('userName');
-            var elRole   = document.getElementById('userRole');
-            var elAvatar = document.getElementById('userAvatar');
-            var elNav    = document.getElementById('nav-usuarios');
-
-            if (elName)   elName.textContent   = sessLocal.nombre || '';
-            if (elRole)   elRole.textContent   = sessLocal.rol    || '';
-            if (elAvatar) elAvatar.textContent = (sessLocal.nombre || '??').substring(0, 2).toUpperCase();
-            if (elNav)    elNav.style.display  = esAdmin() ? 'flex' : 'none';
-            var elNavSub = document.getElementById('nav-suscripciones');
-            var elNavSubSec = document.getElementById('nav-section-suscripciones');
-            if (elNavSub) elNavSub.style.display = 'none';   // solo se muestra si _subInit confirma SUPER_ADMIN
-            if (elNavSubSec) elNavSubSec.style.display = 'none';
             _aplicarAvatarSidebar();
-
-            // ── 3. Restaurar sesión en Supabase Auth ANTES de cargar datos ──
-            //    Si el access_token sigue vigente → setSession lo activa en el cliente.
-            //    Si expiró pero existe refresh_token → Supabase Auth lo renueva
-            //    automáticamente y devuelve nuevos tokens que actualizamos en localStorage.
-            //    Si la sesión no puede restaurarse → redirigir al login.
-            //    loadAll() SOLO se ejecuta después de que setSession() haya terminado con éxito.
-            _setSplashStatus('Verificando acceso…');
-            (function restaurarSesionSupabase() {
-                var s = (function(){ try { return JSON.parse(localStorage.getItem('azyvion_session')); } catch(e){ return null; } })();
-                if (!s || !s.token) { localStorage.removeItem('azyvion_session'); window.location.href = 'index.html'; return; }
-                window._sb.auth.setSession({ access_token: s.token, refresh_token: s.refresh_token || '' })
-                    .then(function(res) {
-                        if (res.error || !res.data || !res.data.session) {
-                            // No se pudo restaurar: limpiar y redirigir. NO ejecutar loadAll().
-                            localStorage.removeItem('azyvion_session');
-                            window.location.href = 'index.html?expired=1';
-                            return;
-                        }
-                        var newSess = res.data.session;
-                        // Si Supabase renovó los tokens, actualizar azyvion_session
-                        if (newSess.access_token !== s.token) {
-                            s.token         = newSess.access_token;
-                            s.refresh_token = newSess.refresh_token;
-                            s.expira        = new Date(newSess.expires_at * 1000).toISOString();
-                            try { localStorage.setItem('azyvion_session', JSON.stringify(s)); } catch(e) {}
-                        }
-
-                        // ── 4. Cargar org_id del usuario y luego cargar datos ──
-                        window._sb.from('user_roles')
-                            .select('organization_id')
-                            .eq('user_id', res.data.session.user.id)
-                            .not('organization_id', 'is', null)
-                            .limit(1)
-                            .then(function(ur) {
-                                if (ur.data && ur.data.length > 0) {
-                                    _currentOrgId = ur.data[0].organization_id;
-                                }
-                                loadAll();
-                            })
-                            .catch(function() { loadAll(); });
-
-                        // Página de inicio preferida (una sola vez, si hay preferencia cacheada distinta a Inicio)
-                        try {
-                            var prefsCacheLanding = JSON.parse(localStorage.getItem('azyvion_perfil_cache') || 'null');
-                            var landing = prefsCacheLanding && prefsCacheLanding.preferencias && prefsCacheLanding.preferencias.paginaInicio;
-                            if (landing && landing !== 'overview' && document.getElementById('page-' + landing)) {
-                                showPage(landing, document.getElementById('nav-' + landing));
-                            }
-                        } catch (e) {}
-                    })
-                    .catch(function(err) {
-                        console.warn('[Azyvion] setSession error de red:', err);
-                        // Error de red o fallo al contactar Supabase Auth.
-                        // No eliminamos la sesión local (puede ser un error temporal de red).
-                        // Pero SÍ debemos ocultar el splash para que el usuario no quede
-                        // atrapado en carga infinita. Redirigimos al login para que vuelva
-                        // a intentarlo cuando haya conectividad.
-                        _hideSplash();
-                        localStorage.removeItem('azyvion_session');
-                        window.location.href = 'index.html?expired=1';
-                    });
-            })();
-        });
-
-        function loadAll() {
-            loadResumen();
-            loadActividad();
-            loadClientes();
-            loadProspectos();
-            loadInventario();
-            loadCategorias();
-            loadEncuestas();
-            loadCotizaciones();
-            if (esAdmin()) loadUsuarios();
-            _subInit();
-            _initContabilidad();
-        }
-
-        function refreshCurrent() {
-            if (_currentPage === 'overview')   {loadResumen(); loadActividad(); loadClientes(); loadInventario();}
-            if (_currentPage === 'clientes')   {loadClientes(); loadResumen();}
-            if (_currentPage === 'prospectos') {loadProspectos(); loadResumen();}
-            if (_currentPage === 'inventario') {loadInventario(); loadResumen();}
-            if (_currentPage === 'categorias') {loadCategorias();}
-            if (_currentPage === 'cotizaciones') {loadCotizaciones(); loadInventario(); loadClientes();}
-            if (_currentPage === 'ficha') {recargarFicha();}
-            if (_currentPage === 'encuestas')  {loadEncuestas(); loadResumen();}
-            if (_currentPage === 'usuarios')   {loadUsuarios();}
-            if (_currentPage === 'contabilidad') { loadCuentasBancarias(); loadPlanCuentas(); loadTransacciones(); loadResumenContable(); }
-            showToast('Datos actualizados', '#30D158');
-        }
 
         /* ═══════════════════════════════════════════════════════
            CARGA DE DATOS
@@ -6755,38 +6572,7 @@ function _handleActividad(r) {
     }).join('');
 }
 
-/* ══════════════════════════════════════════════════════════
-   SPLASH SCREEN — control
-══════════════════════════════════════════════════════════ */
-var _splashShownAt  = Date.now();
-var _splashHidden   = false;
-var _SPLASH_MIN_MS  = 1200;   // mínimo en pantalla (ms) para que no parpadee
-
-function _setSplashStatus(txt) {
-    var el = document.getElementById('az-splash-status');
-    if (!el || _splashHidden) return;
-    el.classList.add('az-fade');
-    setTimeout(function () {
-        el.textContent = txt;
-        el.classList.remove('az-fade');
-    }, 240);
-}
-
-function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._ovGreeting(); }, 100);
-    if (_splashHidden) return;
-    var splash  = document.getElementById('az-splash');
-    var elapsed = Date.now() - _splashShownAt;
-    var delay   = Math.max(0, _SPLASH_MIN_MS - elapsed);
-
-    _setSplashStatus('¡Listo!');
-    setTimeout(function () {
-        _splashHidden = true;
-        if (splash) {
-            splash.classList.add('az-splash-out');
-            setTimeout(function () { splash.style.display = 'none'; }, 520);
-        }
-    }, delay);
-}
+/* _setSplashStatus, _hideSplash → auth.js */
 
 /* ── NUEVA loadAll: una sola petición en lugar de 9 ─────── */
 loadAll = function() {
