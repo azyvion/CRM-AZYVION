@@ -323,6 +323,7 @@ function exportarClientes() {
         Pais:            c.pais       || '',
         SitioWeb:        c.sitioWeb   || '',
         Ejecutivo:       c.ejecutivo  || '',
+        CreadoPor:       c.creadoPor  || '',
         Estado:          c.estado,
         ValorGanado:     _getValorGanado(c),
         UltimaActividad: c.ultimaActividad || '',
@@ -460,6 +461,15 @@ function newCliente() {
 function editCliente(id) {
     const c = _clientes.find(x => String(x.id) === String(id));
     if (!c) return;
+    // VENDEDOR: solo puede editar sus propios clientes
+    if (typeof esVendedor === 'function' && esVendedor()) {
+        const sess = (function(){ try { return JSON.parse(localStorage.getItem('azyvion_session')||'null'); } catch(e){ return null; } })();
+        const me = sess ? (sess.usuario || sess.nombre || '') : '';
+        if (c.creadoPor && c.creadoPor !== me) {
+            showToast('Solo puedes editar los clientes que tú creaste', '#FF9F0A');
+            return;
+        }
+    }
     _modalMode = {type: 'cliente', action: 'edit', id};
     openModal('Editar cliente — ' + escHtml(c.nombre), _htmlFormCliente(c));
 }
@@ -695,18 +705,29 @@ function _cliRowHtml(c) {
         <div class="cell-main cell-clip">${escHtml(contacto || '—')}</div>
         ${c.ciudad || c.pais ? `<div class="cell-sub">${escHtml([c.ciudad, c.pais].filter(Boolean).join(', '))}</div>` : ''}
       </td>
-      <td>${escHtml(c.ejecutivo || '—')}</td>
+      <td>${escHtml((typeof esVendedor === 'function' && esVendedor()) ? (c.creadoPor || '—') : (c.ejecutivo || '—'))}</td>
       <td>${tagSegmento(c.segmento)}</td>
       <td>${tagEstado(c.estado)}</td>
       <td class="cell-num" style="font-weight:600">Q ${valorGanado.toLocaleString()}</td>
       <td>
         <div class="row-actions" onclick="event.stopPropagation()">
           <button class="section-action" onclick="abrirFicha('Cliente','${escAttr(c.id)}')">Ver</button>
-          <button class="section-action" onclick="editCliente('${escAttr(c.id)}')">Editar</button>
-          ${esAdmin()
-            ? `<button class="btn-danger-sm" onclick="confirmDeleteCliente('${escAttr(c.id)}','${escAttr(c.nombre)}')">Eliminar</button>`
-            : `<button class="section-action" onclick="archivarCliente('${escAttr(c.id)}','${escAttr(c.nombre)}')">Archivar</button>`
-          }
+          ${(function() {
+              // VENDEDOR: solo puede editar clientes que él mismo creó
+              const _isVend = typeof esVendedor === 'function' && esVendedor();
+              const _sess = (function(){ try { return JSON.parse(localStorage.getItem('azyvion_session')||'null'); } catch(e){ return null; } })();
+              const _me = _sess ? (_sess.usuario || _sess.nombre || '') : '';
+              const _esMio = !_isVend || (c.creadoPor === _me);
+              if (!_isVend) {
+                  return esAdmin()
+                    ? `<button class="section-action" onclick="editCliente('${escAttr(c.id)}')">Editar</button><button class="btn-danger-sm" onclick="confirmDeleteCliente('${escAttr(c.id)}','${escAttr(c.nombre)}')">Eliminar</button>`
+                    : `<button class="section-action" onclick="editCliente('${escAttr(c.id)}')">Editar</button><button class="section-action" onclick="archivarCliente('${escAttr(c.id)}','${escAttr(c.nombre)}')">Archivar</button>`;
+              }
+              // Es Vendedor
+              return _esMio
+                ? `<button class="section-action" onclick="editCliente('${escAttr(c.id)}')">Editar</button>`
+                : `<span style="font-size:11px;color:var(--text-muted)">Sin acceso</span>`;
+          })()}
         </div>
       </td>
     </tr>`;
@@ -773,11 +794,12 @@ window._renderCliPagedData = function() {
     /* ── 1. Cabecera de tabla: añadir columna Ejecutivo ───────── */
     const thead = document.querySelector('#page-clientes table thead tr');
     if (thead) {
-        /* Reemplaza <th>Contacto</th> con 3 columnas más descriptivas */
+        /* Reemplaza columnas con estructura enriquecida; Vendedor ve "Creado por" */
+        const esVend = typeof esVendedor === 'function' && esVendedor();
         thead.innerHTML = `
           <th>Cliente</th>
           <th>Contacto / Ubicación</th>
-          <th>Ejecutivo</th>
+          <th>${esVend ? 'Creado por' : 'Ejecutivo'}</th>
           <th>Segmento</th>
           <th>Estado</th>
           <th class="cell-num">Valor ganado</th>
