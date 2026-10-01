@@ -849,7 +849,7 @@ textarea:focus{
         </div>
         <div class="qnav">
           <button class="btn-prev" onclick="gotoStep(4)">← Anterior</button>
-          <button class="btn-send" id="btnSend" onclick="goReview()" disabled>Revisar y enviar →</button>
+          <button class="btn-send" id="btnSend" onclick="submitFromStep()">Enviar →</button>
         </div>
       </div>
     </div>
@@ -884,8 +884,8 @@ textarea:focus{
    Reemplaza los dos valores con los de tu proyecto en:
    Supabase Dashboard → Project Settings → API
 ══════════════════════════════════════════════════════════════════ */
-const SUPABASE_URL      = 'https://TU_PROYECTO.supabase.co';   // ← cambia esto
-const SUPABASE_ANON_KEY = 'TU_ANON_PUBLIC_KEY';                // ← cambia esto
+const SUPABASE_URL      = 'https://dwtykzporgjjvdustjfq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dHlrenBvcmdqanZkdXN0amZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MjM2MjIsImV4cCI6MjEwNTQ5OTYyMn0.0SXLE5HhIjHbHz2k0cgyat9bvCper_sjAiiCrkOSmF8';
 
 const _sbFree = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -959,6 +959,46 @@ function onType(n){
   sync();
 }
 
+async function submitFromStep(){
+  const btn = document.getElementById('btnSend');
+  if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
+
+  const answers = {};
+  for(let i=1;i<=5;i++) answers[i] = (document.getElementById(`a${i}`)?.value||'').trim();
+
+  if (_encuestaId) {
+    try {
+      const { data: envio, error: envErr } = await _sbFree
+        .from('encuesta_envios')
+        .insert({
+          encuesta_id:  _encuestaId,
+          puesto:       ENCUESTA_NOMBRE,
+          submitted_at: new Date().toISOString()
+        })
+        .select('id')
+        .single();
+      if (envErr) throw envErr;
+
+      const filas = TITLES.map((titulo, idx) => ({
+        envio_id:        envio.id,
+        encuesta_id:     _encuestaId,
+        pregunta_orden:  idx + 1,
+        pregunta_titulo: titulo,
+        respuesta:       answers[idx + 1] || ''
+      }));
+      const { error: respErr } = await _sbFree.from('encuesta_respuestas').insert(filas);
+      if (respErr) throw respErr;
+    } catch(err){
+      console.error('[Freelancer] submitFromStep:', err);
+    }
+  }
+
+  for(let i=1;i<=5;i++) document.getElementById(`card${i}`).classList.remove('visible');
+  document.getElementById('reviewCard').classList.remove('visible');
+  document.getElementById('successCard').classList.add('visible');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 function sync(){
   const pct=(done.size/5)*100;
   document.getElementById('topFill').style.width=pct+'%';
@@ -971,7 +1011,7 @@ function sync(){
   }
   document.getElementById('hStepVal').textContent=`${cur} / 5`;
   const btn=document.getElementById('btnSend');
-  if(btn) btn.disabled=done.size<5;
+  if(btn) btn.disabled=false;
 }
 
 function gotoStep(n){
