@@ -2293,6 +2293,8 @@
                 const si = document.getElementById('nav-categorias');
                 if (si) si.classList.add('active');
                 loadCategorias();
+            } else if (id === 'encuestas') {
+                if (typeof loadEncuestas === 'function') loadEncuestas();
             } else if (window.CATALOGO_POR_PAGE && CATALOGO_POR_PAGE[id]) {
                 _openNavGroup('invGroup');
                 const si = document.getElementById('nav-' + id);
@@ -3372,11 +3374,8 @@ function _aplicarDashboardInit(r) {
         cotLlenarSelectItems();
     }
 
-    /* 6 · Encuestas ───────────────────────────────────────── */
-    if (r.encuestas && r.encuestas.ok) {
-        _encuestas = r.encuestas.data || [];
-        renderEncuestas();
-    }
+    /* 6 · Encuestas — cargadas desde Supabase (encuestas.js) */
+    if (typeof loadEncuestas === 'function') loadEncuestas();
 
     /* 7 · Cotizaciones ────────────────────────────────────── */
     if (r.cotizaciones && r.cotizaciones.ok) {
