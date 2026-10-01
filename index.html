@@ -28,7 +28,7 @@
       --purple:      #7c3aed;
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 
     body {
       font-family: 'Inter', -apple-system, sans-serif;
@@ -37,14 +37,17 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    img { max-width: 100%; display: block; }
+
     /* ─── NAV ─────────────────────────────────────── */
     nav {
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 200;
       height: 64px;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.95);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
@@ -92,6 +95,9 @@
 
     .nav-links a:hover { color: var(--text); background: var(--bg-alt); }
 
+    /* Duplicate "Precios" fix: hide the second one */
+    .nav-links li:last-child { display: none; }
+
     .nav-cta {
       display: flex;
       align-items: center;
@@ -126,10 +132,107 @@
       cursor: pointer;
       text-decoration: none;
       transition: background .15s, transform .1s;
+      white-space: nowrap;
     }
 
     .btn-primary-sm:hover { background: var(--blue-dark); }
     .btn-primary-sm:active { transform: scale(0.98); }
+
+    /* ─── HAMBURGER ────────────────────────────────── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      width: 40px; height: 40px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 8px;
+      margin-left: auto;
+      padding: 8px;
+      flex-shrink: 0;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px; height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform .25s, opacity .2s;
+      transform-origin: center;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile drawer */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 64px; left: 0; right: 0;
+      background: rgba(255,255,255,0.98);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      z-index: 199;
+      padding: 16px 20px 24px;
+      flex-direction: column;
+      gap: 4px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-2);
+      text-decoration: none;
+      transition: background .15s, color .15s;
+    }
+
+    .mobile-menu a:hover { background: var(--bg-alt); color: var(--text); }
+
+    .mobile-menu-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 0;
+    }
+
+    .mobile-menu .mobile-cta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .mobile-menu .mobile-btn-ghost {
+      padding: 13px 20px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      background: transparent;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .mobile-menu .mobile-btn-primary {
+      padding: 13px 20px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--blue);
+      text-decoration: none;
+      text-align: center;
+    }
 
     /* ─── HERO ────────────────────────────────────── */
     .hero {
@@ -237,521 +340,28 @@
 
     .trust-stars { color: #f59e0b; font-size: 14px; letter-spacing: 1px; }
 
-
-    /* ─── PRODUCT PREVIEW ────────────────────────── */
-    .product-preview-section {
-      padding: 96px 40px;
-      background: var(--bg);
-    }
-    .product-preview-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .preview-tabs {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 20px;
-      background: var(--bg-alt);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 4px;
-      width: fit-content;
-    }
-    .preview-tab {
-      padding: 7px 20px;
-      border-radius: 9px;
-      border: none;
-      background: transparent;
-      font-family: inherit;
-      font-size: 13.5px;
-      font-weight: 600;
-      color: var(--text-2);
-      cursor: pointer;
-      transition: all .18s;
-    }
-    .preview-tab.active { background: var(--blue); color: #fff; }
-    .preview-frame-wrap {
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1.5px solid var(--border);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.13);
-    }
-    .preview-browser-bar {
-      background: #1a2035;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-    }
-    .preview-screen { display: none; }
-    .preview-screen.active { display: block; }
-
-    /* Preview screen tokens */
-    .preview-screen {
-      --pbg: #F2F2F7;
-      --pbg-card: #fff;
-      --pborder: #e4e7ed;
-      --ptext: #0f1117;
-      --ptext-m: #8a92a3;
-      --paccent: #0A84FF;
-      --psidebar: #16171B;
-      --psidebar-text: rgba(255,255,255,0.55);
-      --psidebar-active: #0A84FF;
-      background: var(--pbg);
-    }
-
-    .pscreen-layout {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      height: 420px;
-    }
-
-    .pscreen-sidebar {
-      background: var(--psidebar);
-      padding: 12px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .pscreen-logo {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 0 8px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      margin-bottom: 8px;
-    }
-    .pscreen-nav-section {
-      font-size: 8.5px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.25);
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-      padding: 8px 10px 4px;
-    }
-    .pscreen-nav-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: 7px;
-      font-size: 11.5px;
-      font-weight: 500;
-      color: var(--psidebar-text);
-      cursor: pointer;
-      transition: background .15s, color .15s;
-    }
-    .pscreen-nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
-    .pscreen-nav-item.active { background: rgba(10,132,255,0.2); color: var(--paccent); }
-    .pscreen-nav-item svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
-
-    .pscreen-main {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 14px 16px;
-      overflow: hidden;
-    }
-    .pscreen-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .pscreen-kpi-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
-    .pscreen-kpi {
-      background: var(--pbg-card);
-      border: 1px solid var(--pborder);
-      border-radius: 10px;
-      padding: 10px 12px;
-    }
-    .pscreen-kpi-label { font-size: 9.5px; color: var(--ptext-m); margin-bottom: 4px; }
-    .pscreen-kpi-val { font-size: 18px; font-weight: 800; color: var(--ptext); line-height: 1; letter-spacing: -0.5px; }
-    .pscreen-kpi-delta { font-size: 9px; margin-top: 4px; color: var(--ptext-m); }
-    .pscreen-kpi-delta.up { color: #22c55e; }
-
-    .pscreen-bottom {
-      display: flex;
-      gap: 10px;
-      flex: 1;
-      overflow: hidden;
-    }
-    .pscreen-card {
-      background: var(--pbg-card);
-      border: 1px solid var(--pborder);
-      border-radius: 10px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .pscreen-card-title { font-size: 10px; font-weight: 600; color: var(--ptext-m); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-
-    /* Chart */
-    .pscreen-chart { flex: 1; display: flex; align-items: flex-end; }
-    .pchart-bars { display: flex; gap: 6px; align-items: flex-end; height: 100%; width: 100%; }
-    .pchart-bar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; flex: 1; }
-    .pchart-bar-inner { width: 100%; border-radius: 4px 4px 0 0; flex: 1; }
-    .pchart-bar span { font-size: 8px; color: var(--ptext-m); white-space: nowrap; }
-
-    /* Lead list */
-    .pscreen-lead-list { display: flex; flex-direction: column; gap: 6px; }
-    .pscreen-lead-row { display: flex; align-items: center; gap: 7px; padding: 5px 0; border-bottom: 1px solid var(--pborder); }
-    .pscreen-lead-row:last-child { border-bottom: none; }
-    .pscreen-lead-av { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0; }
-    .pscreen-lead-info { flex: 1; }
-    .pscreen-lead-name { font-size: 10.5px; font-weight: 600; color: var(--ptext); }
-    .pscreen-lead-sub { font-size: 9px; color: var(--ptext-m); }
-    .pscreen-lead-badge { font-size: 10px; }
-    .pscreen-lead-badge.hot { color: #ef4444; }
-    .pscreen-lead-badge.warm { color: #f97316; }
-    .pscreen-lead-badge.new { color: #22c55e; }
-
-    /* Pipeline board */
-    .pkboard-col { display: flex; flex-direction: column; gap: 6px; }
-    .pkboard-head { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 6px; border-bottom: 2px solid; display: flex; align-items: center; justify-content: space-between; }
-    .pkboard-head span { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 1px 6px; }
-    .pkboard-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 7px; padding: 8px; }
-    .pkbc-co { font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,0.85); }
-    .pkbc-val { font-size: 8.5px; color: rgba(255,255,255,0.45); margin-top: 2px; }
-    .pkbc-bar { height: 2px; border-radius: 2px; margin-top: 5px; }
-
-    /* Contacts table */
-    .pscreen-table-head { display: grid; grid-template-columns: 1.5fr 1.2fr 0.8fr 0.7fr 0.7fr; gap: 8px; padding: 0 8px 8px; border-bottom: 1px solid var(--pborder); font-size: 9px; font-weight: 700; color: var(--ptext-m); text-transform: uppercase; letter-spacing: 0.5px; }
-    .pscreen-table-row { display: grid; grid-template-columns: 1.5fr 1.2fr 0.8fr 0.7fr 0.7fr; gap: 8px; padding: 8px; border-bottom: 1px solid var(--pborder); font-size: 10.5px; color: var(--ptext); align-items: center; }
-    .pscreen-table-row:hover { background: var(--bg-alt); }
-
-    @media(max-width:900px){ .product-preview-section { padding: 64px 24px; } .pscreen-layout { grid-template-columns: 1fr; } .pscreen-sidebar { display: none; } .pscreen-kpi-row { grid-template-columns: repeat(2,1fr); } }
-
-    /* ─── PRICING ─────────────────────────────────── */
-    .pricing-section {
-      padding: 96px 40px;
-      background: var(--bg-alt);
-    }
-    .pricing-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .billing-toggle {
-      display: inline-flex;
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 12px;
-      padding: 4px;
-      gap: 4px;
-      margin: 32px 0 48px;
-    }
-    .billing-btn {
-      padding: 8px 22px;
-      border-radius: 9px;
-      border: none;
-      background: transparent;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-2);
-      cursor: pointer;
-      transition: all .18s;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-    .billing-btn.active {
-      background: var(--blue);
-      color: #fff;
-    }
-    .save-badge {
-      background: var(--green);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 20px;
-    }
-    .billing-btn.active .save-badge {
-      background: rgba(255,255,255,0.25);
-    }
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      align-items: start;
-    }
-    @media(max-width:1024px){.pricing-grid{grid-template-columns:repeat(2,1fr);}}
-    @media(max-width:600px){.pricing-grid{grid-template-columns:1fr;}}
-
-    .price-skeleton {
-      background: linear-gradient(90deg, var(--border) 25%, var(--bg-alt) 50%, var(--border) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-      border-radius: 22px;
-      height: 420px;
-    }
-    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    .price-card {
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 22px;
-      padding: 28px 24px;
-      position: relative;
-      transition: box-shadow .2s, transform .2s;
-    }
-    .price-card:hover {
-      box-shadow: 0 8px 36px rgba(0,0,0,0.09);
-      transform: translateY(-3px);
-    }
-    .price-card.featured {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 4px rgba(10,132,255,0.09), 0 12px 40px rgba(10,132,255,0.16);
-    }
-    .price-badge {
-      position: absolute;
-      top: -13px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--blue);
-      color: #fff;
-      font-size: 11.5px;
-      font-weight: 700;
-      padding: 4px 14px;
-      border-radius: 20px;
-      white-space: nowrap;
-    }
-    .price-plan {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text-2);
-      margin-bottom: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .price-amount {
-      display: flex;
-      align-items: baseline;
-      gap: 3px;
-      margin-bottom: 14px;
-    }
-    .price-currency { font-size: 22px; font-weight: 700; color: var(--text); margin-top: 8px; }
-    .price-num { font-size: 52px; font-weight: 900; color: var(--text); line-height: 1; letter-spacing: -2px; }
-    .price-cycle { font-size: 14px; color: var(--text-3); font-weight: 500; }
-    .price-desc { font-size: 13.5px; color: var(--text-2); line-height: 1.55; margin-bottom: 22px; min-height: 52px; }
-    .price-btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      border-radius: 11px;
-      font-size: 14.5px;
-      font-weight: 700;
-      text-align: center;
-      text-decoration: none;
-      cursor: pointer;
-      transition: all .18s;
-      margin-bottom: 24px;
-      border: 1.5px solid transparent;
-    }
-    .price-btn.outline {
-      border-color: var(--border);
-      color: var(--text);
-      background: transparent;
-    }
-    .price-btn.outline:hover { border-color: var(--blue); color: var(--blue); }
-    .price-btn.primary {
-      background: var(--blue);
-      color: #fff;
-      border-color: var(--blue);
-    }
-    .price-btn.primary:hover { background: var(--blue-dark); }
-    .price-features {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      margin-bottom: 18px;
-    }
-    .price-features li {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      font-size: 13.5px;
-      color: var(--text);
-    }
-    .price-features li.feature-off { color: var(--text-3); }
-    .price-features li svg {
-      width: 16px; height: 16px;
-      fill: none;
-      stroke-width: 2.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      flex-shrink: 0;
-    }
-    .price-features li:not(.feature-off) svg { stroke: var(--green); }
-    .price-features li.feature-off svg { stroke: var(--text-3); }
-    .price-note {
-      font-size: 11.5px;
-      color: var(--text-3);
-      text-align: center;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-    }
-
-    /* ─── HERO VISUAL (dashboard mockup) ─────────── */
+    /* ─── HERO VISUAL ─────────────────────────────── */
     .hero-visual {
       position: relative;
     }
 
-    .dashboard-frame {
-      background: var(--navy);
+    /* Hero image replacing dashboard mockup */
+    .hero-img-wrap {
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.28), 0 4px 16px rgba(0,0,0,0.14);
-      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.22), 0 4px 16px rgba(0,0,0,0.1);
+      border: 1px solid var(--border);
+      position: relative;
     }
 
-    .dash-topbar {
-      background: var(--navy-mid);
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+    .hero-img-wrap img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+      object-position: center top;
     }
 
-    .dot-row { display: flex; gap: 6px; }
-    .dot-row span { width: 10px; height: 10px; border-radius: 50%; display: block; }
-    .dot-row span:nth-child(1) { background: #ff5f57; }
-    .dot-row span:nth-child(2) { background: #ffbd2e; }
-    .dot-row span:nth-child(3) { background: #28c840; }
-
-    .dash-url {
-      flex: 1;
-      background: rgba(255,255,255,0.07);
-      border-radius: 6px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      font-size: 11px;
-      color: rgba(255,255,255,0.4);
-      font-family: monospace;
-    }
-
-    .dash-body {
-      display: grid;
-      grid-template-columns: 56px 1fr;
-      height: 340px;
-    }
-
-    .dash-sidebar {
-      background: rgba(255,255,255,0.04);
-      border-right: 1px solid rgba(255,255,255,0.06);
-      padding: 14px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .sb-icon {
-      width: 36px; height: 36px;
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-    }
-
-    .sb-icon.active { background: var(--blue); }
-    .sb-icon svg { width: 16px; height: 16px; stroke: rgba(255,255,255,0.5); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
-    .sb-icon.active svg { stroke: #fff; }
-
-    .dash-content {
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      overflow: hidden;
-    }
-
-    .dash-stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .dash-stat {
-      background: rgba(255,255,255,0.06);
-      border-radius: 10px;
-      padding: 12px;
-      border: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .dash-stat-label { font-size: 9.5px; color: rgba(255,255,255,0.4); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .dash-stat-val { font-size: 18px; font-weight: 800; color: #fff; line-height: 1; }
-    .dash-stat-delta { font-size: 9px; color: var(--green); margin-top: 3px; }
-
-    .dash-pipeline {
-      background: rgba(255,255,255,0.04);
-      border-radius: 10px;
-      padding: 12px;
-      border: 1px solid rgba(255,255,255,0.07);
-      flex: 1;
-    }
-
-    .dash-pipeline-title { font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-
-    .pipeline-stages {
-      display: flex;
-      gap: 6px;
-      height: 80px;
-      align-items: flex-end;
-    }
-
-    .p-stage { flex: 1; border-radius: 6px 6px 0 0; position: relative; }
-    .p-stage-label { position: absolute; bottom: -16px; left: 0; right: 0; text-align: center; font-size: 7.5px; color: rgba(255,255,255,0.35); white-space: nowrap; overflow: hidden; }
-
-    .dash-leads {
-      background: rgba(255,255,255,0.04);
-      border-radius: 10px;
-      padding: 12px;
-      border: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .dash-leads-title { font-size: 10px; color: rgba(255,255,255,0.5); margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-
-    .lead-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
-
-    .lead-row:last-child { border-bottom: none; }
-
-    .lead-avatar {
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 9px; font-weight: 700; color: #fff;
-      flex-shrink: 0;
-    }
-
-    .lead-name { font-size: 10px; color: rgba(255,255,255,0.8); font-weight: 500; flex: 1; }
-    .lead-val { font-size: 10px; color: var(--blue); font-weight: 600; }
-
-    .lead-status {
-      font-size: 8.5px;
-      padding: 2px 6px;
-      border-radius: 20px;
-      font-weight: 600;
-    }
-
-    .lead-status.hot { background: rgba(239,68,68,0.2); color: #f87171; }
-    .lead-status.warm { background: rgba(249,115,22,0.2); color: #fb923c; }
-    .lead-status.new { background: rgba(34,197,94,0.2); color: #4ade80; }
-
-    /* floating notification pill */
+    /* Floating elements */
     .hero-notif {
       position: absolute;
       bottom: -16px;
@@ -787,6 +397,45 @@
 
     .badge-num { font-size: 22px; font-weight: 900; color: #fff; line-height: 1; }
     .badge-label { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+    /* ─── LOGOS BAND ──────────────────────────────── */
+    .logos-band {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 40px;
+      background: var(--bg-alt);
+    }
+
+    .logos-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .logos-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      white-space: nowrap;
+      margin-right: 12px;
+    }
+
+    .logo-pill {
+      padding: 8px 20px;
+      border-radius: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-3);
+      letter-spacing: -0.2px;
+    }
 
     /* ─── STATS BAND ──────────────────────────────── */
     .stats-band {
@@ -903,9 +552,70 @@
       line-height: 1.65;
     }
 
+    /* ─── IMAGE SECTION ───────────────────────────── */
+    .img-split-section {
+      background: var(--bg-alt);
+      padding: 96px 40px;
+    }
+
+    .img-split-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 72px;
+      align-items: center;
+    }
+
+    .img-split-inner.reverse {
+      grid-template-columns: 1fr 1.1fr;
+    }
+
+    .img-split-visual {
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.13);
+      border: 1.5px solid var(--border);
+    }
+
+    .img-split-visual img {
+      width: 100%;
+      height: 380px;
+      object-fit: cover;
+    }
+
+    .check-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .check-list li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      font-size: 15.5px;
+      color: var(--text-2);
+      line-height: 1.55;
+    }
+
+    .check-list li::before {
+      content: '';
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      margin-top: 1px;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230A84FF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+      background-size: 13px;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
     /* ─── PIPELINE SECTION ────────────────────────── */
     .pipeline-section {
-      background: var(--bg-alt);
+      background: var(--bg);
       padding: 96px 40px;
     }
 
@@ -986,41 +696,10 @@
     .kcol-3 .kc-bar { background: linear-gradient(90deg, var(--purple), transparent); }
     .kcol-4 .kc-bar { background: linear-gradient(90deg, var(--green), transparent); }
 
-    .pipeline-text {}
-
-    .check-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .check-list li {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      font-size: 15.5px;
-      color: var(--text-2);
-      line-height: 1.55;
-    }
-
-    .check-list li::before {
-      content: '';
-      flex-shrink: 0;
-      width: 22px; height: 22px;
-      margin-top: 1px;
-      border-radius: 50%;
-      background: var(--blue-soft);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230A84FF' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
-      background-size: 13px;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
     /* ─── AI SECTION ──────────────────────────────── */
     .ai-section {
       padding: 96px 40px;
-      background: var(--bg);
+      background: var(--bg-alt);
     }
 
     .ai-inner {
@@ -1048,7 +727,7 @@
     }
 
     .ai-card.light {
-      background: var(--bg-alt);
+      background: var(--bg);
       border: 1.5px solid var(--border);
     }
 
@@ -1089,9 +768,334 @@
       pointer-events: none;
     }
 
+    /* ─── PRODUCT PREVIEW ────────────────────────── */
+    .product-preview-section {
+      padding: 96px 40px;
+      background: var(--bg);
+    }
+    .product-preview-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .preview-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      background: var(--bg-alt);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      width: fit-content;
+      overflow-x: auto;
+    }
+    .preview-tab {
+      padding: 7px 20px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all .18s;
+      white-space: nowrap;
+    }
+    .preview-tab.active { background: var(--blue); color: #fff; }
+    .preview-frame-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.13);
+    }
+    .preview-browser-bar {
+      background: #1a2035;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .preview-screen { display: none; }
+    .preview-screen.active { display: block; }
+
+    .preview-screen {
+      --pbg: #F2F2F7;
+      --pbg-card: #fff;
+      --pborder: #e4e7ed;
+      --ptext: #0f1117;
+      --ptext-m: #8a92a3;
+      --paccent: #0A84FF;
+      --psidebar: #16171B;
+      --psidebar-text: rgba(255,255,255,0.55);
+      --psidebar-active: #0A84FF;
+      background: var(--pbg);
+    }
+
+    .pscreen-layout {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      height: 420px;
+    }
+
+    .pscreen-sidebar {
+      background: var(--psidebar);
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .pscreen-logo {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 8px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      margin-bottom: 8px;
+    }
+    .pscreen-nav-section {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.25);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      padding: 8px 10px 4px;
+    }
+    .pscreen-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--psidebar-text);
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+    .pscreen-nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+    .pscreen-nav-item.active { background: rgba(10,132,255,0.2); color: var(--paccent); }
+    .pscreen-nav-item svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+
+    .pscreen-main {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px 16px;
+      overflow: hidden;
+    }
+    .pscreen-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .pscreen-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .pscreen-kpi {
+      background: var(--pbg-card);
+      border: 1px solid var(--pborder);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .pscreen-kpi-label { font-size: 9.5px; color: var(--ptext-m); margin-bottom: 4px; }
+    .pscreen-kpi-val { font-size: 18px; font-weight: 800; color: var(--ptext); line-height: 1; letter-spacing: -0.5px; }
+    .pscreen-kpi-delta { font-size: 9px; margin-top: 4px; color: var(--ptext-m); }
+    .pscreen-kpi-delta.up { color: #22c55e; }
+
+    .pscreen-bottom {
+      display: flex;
+      gap: 10px;
+      flex: 1;
+      overflow: hidden;
+    }
+    .pscreen-card {
+      background: var(--pbg-card);
+      border: 1px solid var(--pborder);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .pscreen-card-title { font-size: 10px; font-weight: 600; color: var(--ptext-m); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+
+    .pscreen-chart { flex: 1; display: flex; align-items: flex-end; }
+    .pchart-bars { display: flex; gap: 6px; align-items: flex-end; height: 100%; width: 100%; }
+    .pchart-bar { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; flex: 1; }
+    .pchart-bar-inner { width: 100%; border-radius: 4px 4px 0 0; flex: 1; }
+    .pchart-bar span { font-size: 8px; color: var(--ptext-m); white-space: nowrap; }
+
+    .pscreen-lead-list { display: flex; flex-direction: column; gap: 6px; }
+    .pscreen-lead-row { display: flex; align-items: center; gap: 7px; padding: 5px 0; border-bottom: 1px solid var(--pborder); }
+    .pscreen-lead-row:last-child { border-bottom: none; }
+    .pscreen-lead-av { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .pscreen-lead-info { flex: 1; }
+    .pscreen-lead-name { font-size: 10.5px; font-weight: 600; color: var(--ptext); }
+    .pscreen-lead-sub { font-size: 9px; color: var(--ptext-m); }
+    .pscreen-lead-badge { font-size: 10px; }
+    .pscreen-lead-badge.hot { color: #ef4444; }
+    .pscreen-lead-badge.warm { color: #f97316; }
+    .pscreen-lead-badge.new { color: #22c55e; }
+
+    .pkboard-col { display: flex; flex-direction: column; gap: 6px; }
+    .pkboard-head { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding-bottom: 6px; border-bottom: 2px solid; display: flex; align-items: center; justify-content: space-between; }
+    .pkboard-head span { background: rgba(255,255,255,0.15); border-radius: 10px; padding: 1px 6px; }
+    .pkboard-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 7px; padding: 8px; }
+    .pkbc-co { font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,0.85); }
+    .pkbc-val { font-size: 8.5px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+    .pkbc-bar { height: 2px; border-radius: 2px; margin-top: 5px; }
+
+    .pscreen-table-head { display: grid; grid-template-columns: 1.5fr 1.2fr 0.8fr 0.7fr 0.7fr; gap: 8px; padding: 0 8px 8px; border-bottom: 1px solid var(--pborder); font-size: 9px; font-weight: 700; color: var(--ptext-m); text-transform: uppercase; letter-spacing: 0.5px; }
+    .pscreen-table-row { display: grid; grid-template-columns: 1.5fr 1.2fr 0.8fr 0.7fr 0.7fr; gap: 8px; padding: 8px; border-bottom: 1px solid var(--pborder); font-size: 10.5px; color: var(--ptext); align-items: center; }
+    .pscreen-table-row:hover { background: var(--bg-alt); }
+
+    .dot-row { display: flex; gap: 6px; }
+    .dot-row span { width: 10px; height: 10px; border-radius: 50%; display: block; }
+    .dot-row span:nth-child(1) { background: #ff5f57; }
+    .dot-row span:nth-child(2) { background: #ffbd2e; }
+    .dot-row span:nth-child(3) { background: #28c840; }
+
+    .dash-url {
+      flex: 1;
+      background: rgba(255,255,255,0.07);
+      border-radius: 6px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      font-family: monospace;
+    }
+
+    /* ─── PRICING ─────────────────────────────────── */
+    .pricing-section {
+      padding: 96px 40px;
+      background: var(--bg-alt);
+    }
+    .pricing-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .billing-toggle {
+      display: inline-flex;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+      margin: 32px 0 48px;
+    }
+    .billing-btn {
+      padding: 8px 22px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all .18s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .billing-btn.active { background: var(--blue); color: #fff; }
+    .save-badge {
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+    .billing-btn.active .save-badge { background: rgba(255,255,255,0.25); }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .price-skeleton {
+      background: linear-gradient(90deg, var(--border) 25%, var(--bg-alt) 50%, var(--border) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 22px;
+      height: 420px;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .price-card {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 22px;
+      padding: 28px 24px;
+      position: relative;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .price-card:hover { box-shadow: 0 8px 36px rgba(0,0,0,0.09); transform: translateY(-3px); }
+    .price-card.featured {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(10,132,255,0.09), 0 12px 40px rgba(10,132,255,0.16);
+    }
+    .price-badge {
+      position: absolute;
+      top: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--blue);
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .price-plan { font-size: 15px; font-weight: 700; color: var(--text-2); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .price-amount { display: flex; align-items: baseline; gap: 3px; margin-bottom: 14px; }
+    .price-currency { font-size: 22px; font-weight: 700; color: var(--text); margin-top: 8px; }
+    .price-num { font-size: 52px; font-weight: 900; color: var(--text); line-height: 1; letter-spacing: -2px; }
+    .price-cycle { font-size: 14px; color: var(--text-3); font-weight: 500; }
+    .price-desc { font-size: 13.5px; color: var(--text-2); line-height: 1.55; margin-bottom: 22px; min-height: 52px; }
+    .price-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border-radius: 11px;
+      font-size: 14.5px;
+      font-weight: 700;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all .18s;
+      margin-bottom: 24px;
+      border: 1.5px solid transparent;
+    }
+    .price-btn.outline { border-color: var(--border); color: var(--text); background: transparent; }
+    .price-btn.outline:hover { border-color: var(--blue); color: var(--blue); }
+    .price-btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .price-btn.primary:hover { background: var(--blue-dark); }
+    .price-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 18px;
+    }
+    .price-features li { display: flex; align-items: center; gap: 9px; font-size: 13.5px; color: var(--text); }
+    .price-features li.feature-off { color: var(--text-3); }
+    .price-features li svg { width: 16px; height: 16px; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .price-features li:not(.feature-off) svg { stroke: var(--green); }
+    .price-features li.feature-off svg { stroke: var(--text-3); }
+    .price-note { font-size: 11.5px; color: var(--text-3); text-align: center; padding-top: 14px; border-top: 1px solid var(--border); }
+
     /* ─── TESTIMONIALS ────────────────────────────── */
     .testimonials {
-      background: var(--bg-alt);
+      background: var(--bg);
       padding: 96px 40px;
     }
 
@@ -1108,7 +1112,7 @@
     }
 
     .testi-card {
-      background: var(--bg);
+      background: var(--bg-alt);
       border-radius: 20px;
       padding: 28px;
       border: 1.5px solid var(--border);
@@ -1133,23 +1137,27 @@
     }
 
     .testi-avatar {
-      width: 40px; height: 40px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .testi-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    .testi-avatar-initials {
+      width: 44px; height: 44px;
       border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-size: 15px; font-weight: 800; color: #fff;
       flex-shrink: 0;
     }
 
-    .testi-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .testi-role {
-      font-size: 12.5px;
-      color: var(--text-3);
-    }
+    .testi-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .testi-role { font-size: 12.5px; color: var(--text-3); }
 
     /* ─── CTA BAND ────────────────────────────────── */
     .cta-band {
@@ -1237,10 +1245,7 @@
       border-top: 1px solid rgba(255,255,255,0.07);
     }
 
-    .footer-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
 
     .footer-top {
       display: grid;
@@ -1266,20 +1271,8 @@
       margin-bottom: 16px;
     }
 
-    .footer-links {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .footer-links a {
-      font-size: 14px;
-      color: rgba(255,255,255,0.4);
-      text-decoration: none;
-      transition: color .15s;
-    }
-
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { font-size: 14px; color: rgba(255,255,255,0.4); text-decoration: none; transition: color .15s; }
     .footer-links a:hover { color: rgba(255,255,255,0.85); }
 
     .footer-bottom {
@@ -1294,36 +1287,56 @@
 
     .footer-copy { font-size: 13px; color: rgba(255,255,255,0.3); }
 
-    .footer-legal {
-      display: flex;
-      gap: 20px;
-    }
-
-    .footer-legal a {
-      font-size: 13px;
-      color: rgba(255,255,255,0.35);
-      text-decoration: none;
-    }
-
+    .footer-legal { display: flex; gap: 20px; }
+    .footer-legal a { font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; }
     .footer-legal a:hover { color: rgba(255,255,255,0.7); }
 
     /* ─── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 1024px) {
+      .pricing-grid { grid-template-columns: repeat(2,1fr); }
+    }
+
     @media (max-width: 900px) {
-      nav { padding: 0 20px; }
+      nav { padding: 0 20px; gap: 0; }
       .nav-links { display: none; }
+      .nav-cta { display: none; }
+      .hamburger { display: flex; }
+
       .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 40px; }
       .hero h1 { font-size: 36px; }
       .hero-visual { display: none; }
+
+      .logos-band { padding: 24px 20px; }
+
       .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
       .stat-item { border-right: none; }
+
       .section { padding: 64px 24px; }
       .features-grid { grid-template-columns: 1fr; }
+
+      .img-split-section { padding: 64px 24px; }
+      .img-split-inner { grid-template-columns: 1fr; gap: 40px; }
+      .img-split-inner.reverse { grid-template-columns: 1fr; }
+      .img-split-inner.reverse > *:first-child { order: 2; }
+
       .pipeline-section { padding: 64px 24px; }
       .pipeline-inner { grid-template-columns: 1fr; gap: 40px; }
+
+      .ai-section { padding: 64px 24px; }
       .ai-cards { grid-template-columns: 1fr; }
+
+      .product-preview-section { padding: 64px 24px; }
+      .pscreen-layout { grid-template-columns: 1fr; }
+      .pscreen-sidebar { display: none; }
+      .pscreen-kpi-row { grid-template-columns: repeat(2,1fr); }
+
+      .pricing-section { padding: 64px 24px; }
+
       .testimonials { padding: 64px 24px; }
       .testi-grid { grid-template-columns: 1fr; }
+
       .cta-band { padding: 64px 24px; }
+
       footer { padding: 48px 24px 28px; }
       .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
     }
@@ -1333,6 +1346,11 @@
       .footer-top { grid-template-columns: 1fr; }
       .hero-actions { flex-direction: column; align-items: flex-start; }
       .btn-hero { width: 100%; justify-content: center; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .billing-toggle { width: 100%; }
+      .billing-btn { flex: 1; justify-content: center; }
+      .cta-actions { flex-direction: column; }
+      .btn-cta-white, .btn-cta-outline { width: 100%; justify-content: center; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1356,13 +1374,30 @@
       <li><a href="#ia">IA</a></li>
       <li><a href="#precios">Precios</a></li>
       <li><a href="#clientes">Clientes</a></li>
-      <li><a href="#">Precios</a></li>
     </ul>
     <div class="nav-cta">
       <a href="login.html" class="btn-ghost">Iniciar sesión</a>
       <a href="register.html" class="btn-primary-sm">Crear cuenta gratis</a>
     </div>
+    <!-- Hamburger button (mobile only) -->
+    <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- Mobile menu drawer -->
+  <div class="mobile-menu" id="mobileMenu" role="navigation" aria-label="Menú principal">
+    <a href="#features" class="mobile-link">Funciones</a>
+    <a href="#pipeline" class="mobile-link">Pipeline</a>
+    <a href="#ia" class="mobile-link">Inteligencia Artificial</a>
+    <a href="#precios" class="mobile-link">Precios</a>
+    <a href="#clientes" class="mobile-link">Clientes</a>
+    <div class="mobile-menu-divider"></div>
+    <div class="mobile-cta">
+      <a href="login.html" class="mobile-btn-ghost">Iniciar sesión</a>
+      <a href="register.html" class="mobile-btn-primary">Crear cuenta gratis</a>
+    </div>
+  </div>
 
   <!-- ══════════════════════ HERO ══════════════════════ -->
   <section>
@@ -1388,95 +1423,13 @@
       </div>
 
       <div class="hero-visual">
-        <!-- Dashboard mockup -->
-        <div class="dashboard-frame">
-          <div class="dash-topbar">
-            <div class="dot-row">
-              <span></span><span></span><span></span>
-            </div>
-            <div class="dash-url">app.azyvion.com/dashboard</div>
-          </div>
-          <div class="dash-body">
-            <div class="dash-sidebar">
-              <div class="sb-icon active">
-                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-              </div>
-              <div class="sb-icon">
-                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              </div>
-              <div class="sb-icon">
-                <svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
-              </div>
-              <div class="sb-icon">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              </div>
-              <div class="sb-icon">
-                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.37 2 2 0 0 1 3.59 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 8.71a16 16 0 0 0 7.38 7.38l.91-.91a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-              </div>
-            </div>
-            <div class="dash-content">
-              <div class="dash-stats-row">
-                <div class="dash-stat">
-                  <div class="dash-stat-label">Ingresos</div>
-                  <div class="dash-stat-val">$84K</div>
-                  <div class="dash-stat-delta">↑ 18% este mes</div>
-                </div>
-                <div class="dash-stat">
-                  <div class="dash-stat-label">Leads activos</div>
-                  <div class="dash-stat-val">247</div>
-                  <div class="dash-stat-delta">↑ 32 nuevos</div>
-                </div>
-                <div class="dash-stat">
-                  <div class="dash-stat-label">Tasa cierre</div>
-                  <div class="dash-stat-val">68%</div>
-                  <div class="dash-stat-delta">↑ 5 pts</div>
-                </div>
-              </div>
-              <div class="dash-pipeline">
-                <div class="dash-pipeline-title">Pipeline · Q4 2026</div>
-                <div class="pipeline-stages">
-                  <div class="p-stage" style="height:40%;background:rgba(10,132,255,0.6);">
-                    <div class="p-stage-label">Prospecto</div>
-                  </div>
-                  <div class="p-stage" style="height:70%;background:rgba(249,115,22,0.6);">
-                    <div class="p-stage-label">Calificado</div>
-                  </div>
-                  <div class="p-stage" style="height:55%;background:rgba(124,58,237,0.6);">
-                    <div class="p-stage-label">Propuesta</div>
-                  </div>
-                  <div class="p-stage" style="height:35%;background:rgba(34,197,94,0.6);">
-                    <div class="p-stage-label">Negociación</div>
-                  </div>
-                  <div class="p-stage" style="height:20%;background:rgba(34,197,94,0.9);">
-                    <div class="p-stage-label">Cerrado</div>
-                  </div>
-                </div>
-              </div>
-              <div class="dash-leads">
-                <div class="dash-leads-title">Leads recientes</div>
-                <div class="lead-row">
-                  <div class="lead-avatar" style="background:#0A84FF">CM</div>
-                  <div class="lead-name">Constructora Mérida</div>
-                  <div class="lead-val">$12,400</div>
-                  <div class="lead-status hot">Caliente</div>
-                </div>
-                <div class="lead-row">
-                  <div class="lead-avatar" style="background:#7c3aed">TP</div>
-                  <div class="lead-name">TechParts S.A.</div>
-                  <div class="lead-val">$8,200</div>
-                  <div class="lead-status warm">Tibio</div>
-                </div>
-                <div class="lead-row">
-                  <div class="lead-avatar" style="background:#22c55e">AV</div>
-                  <div class="lead-name">Agrícola Vásquez</div>
-                  <div class="lead-val">$5,600</div>
-                  <div class="lead-status new">Nuevo</div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="hero-img-wrap">
+          <img
+            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=900&q=80&auto=format&fit=crop"
+            alt="Dashboard de ventas con gráficos y métricas de CRM"
+            loading="eager"
+          />
         </div>
-        <!-- Floating elements -->
         <div class="hero-notif">
           <div class="notif-icon">
             <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -1490,6 +1443,18 @@
       </div>
     </div>
   </section>
+
+  <!-- ══════════════════════ LOGOS ══════════════════════ -->
+  <div class="logos-band">
+    <div class="logos-inner">
+      <span class="logos-label">Confían en Azyvion</span>
+      <div class="logo-pill">Logística Norte</div>
+      <div class="logo-pill">TechParts S.A.</div>
+      <div class="logo-pill">Agrícola Vásquez</div>
+      <div class="logo-pill">Grupo Construye</div>
+      <div class="logo-pill">Industrias Beta</div>
+    </div>
+  </div>
 
   <!-- ══════════════════════ STATS ══════════════════════ -->
   <div class="stats-band">
@@ -1566,6 +1531,98 @@
     </div>
   </div>
 
+  <!-- ══════════════════════ IMAGE SPLIT — EQUIPO ══════════════════════ -->
+  <div class="img-split-section">
+    <div class="img-split-inner">
+      <div class="img-split-visual">
+        <img
+          src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&q=80&auto=format&fit=crop"
+          alt="Equipo de ventas colaborando en sala de reuniones"
+          loading="lazy"
+        />
+      </div>
+      <div>
+        <div class="section-tag">Para equipos reales</div>
+        <h2 class="section-title">Diseñado para que los vendedores vendan</h2>
+        <p class="section-desc" style="margin-bottom:32px;">Azyvion no añade burocracia: elimina la carga administrativa para que tu equipo dedique el tiempo donde importa.</p>
+        <ul class="check-list">
+          <li>Onboarding en menos de 30 minutos, sin capacitación técnica</li>
+          <li>Aplicación móvil para registrar visitas y llamadas en campo</li>
+          <li>Integración nativa con Gmail, Outlook y WhatsApp Business</li>
+          <li>Roles y permisos granulares por usuario o equipo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ PIPELINE ══════════════════════ -->
+  <div id="pipeline" class="pipeline-section">
+    <div class="pipeline-inner">
+      <div class="pipeline-visual">
+        <div class="pv-title">
+          Pipeline de ventas
+          <span>Q4 2026</span>
+        </div>
+        <div class="kanban-cols">
+          <div class="kcol-1">
+            <div class="kanban-col-head">Prospecto <span>4</span></div>
+            <div class="kanban-card"><div class="kc-company">Logística Norte</div><div class="kc-value">$3,200</div><div class="kc-bar" style="width:30%"></div></div>
+            <div class="kanban-card"><div class="kc-company">Ferretería López</div><div class="kc-value">$1,800</div><div class="kc-bar" style="width:20%"></div></div>
+          </div>
+          <div class="kcol-2">
+            <div class="kanban-col-head">Calificado <span>3</span></div>
+            <div class="kanban-card"><div class="kc-company">Grupo Construye</div><div class="kc-value">$14,000</div><div class="kc-bar" style="width:60%"></div></div>
+            <div class="kanban-card"><div class="kc-company">Industrias Beta</div><div class="kc-value">$7,500</div><div class="kc-bar" style="width:45%"></div></div>
+          </div>
+          <div class="kcol-3">
+            <div class="kanban-col-head">Propuesta <span>2</span></div>
+            <div class="kanban-card"><div class="kc-company">TechParts S.A.</div><div class="kc-value">$8,200</div><div class="kc-bar" style="width:75%"></div></div>
+          </div>
+          <div class="kcol-4">
+            <div class="kanban-col-head">Cerrado <span>5</span></div>
+            <div class="kanban-card"><div class="kc-company">Constructora Mérida</div><div class="kc-value">$12,400</div><div class="kc-bar" style="width:100%"></div></div>
+            <div class="kanban-card"><div class="kc-company">Agrícola Vásquez</div><div class="kc-value">$5,600</div><div class="kc-bar" style="width:100%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="pipeline-text">
+        <div class="section-tag">Pipeline</div>
+        <h2 class="section-title">Visualiza y controla cada negocio en curso</h2>
+        <p class="section-desc" style="margin-bottom:32px;">Con la vista Kanban de Azyvion ves exactamente en qué etapa está cada oportunidad, quién es el responsable y cuánto vale.</p>
+        <ul class="check-list">
+          <li>Pipelines ilimitados por equipo o línea de producto</li>
+          <li>Alertas cuando un negocio lleva demasiado tiempo sin avanzar</li>
+          <li>Pronóstico de ingresos basado en probabilidad de cierre</li>
+          <li>Vista lista, kanban o mapa de calor según tu flujo</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ IMAGE SPLIT — ANALYTICS ══════════════════════ -->
+  <div class="img-split-section" style="background:var(--bg);">
+    <div class="img-split-inner reverse">
+      <div>
+        <div class="section-tag">Analítica avanzada</div>
+        <h2 class="section-title">Decisiones basadas en datos, no en intuición</h2>
+        <p class="section-desc" style="margin-bottom:32px;">Reportes en tiempo real que te dicen exactamente dónde está el dinero y qué está frenando tus ventas.</p>
+        <ul class="check-list">
+          <li>Dashboards personalizables por rol o área</li>
+          <li>Exportación a Excel, PDF o Google Sheets con un clic</li>
+          <li>Comparativas históricas y proyecciones de cierre</li>
+          <li>Alertas automáticas por metas y umbrales</li>
+        </ul>
+      </div>
+      <div class="img-split-visual">
+        <img
+          src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80&auto=format&fit=crop"
+          alt="Pantalla con dashboard de analítica de ventas y gráficos"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </div>
+
   <!-- ══════════════════════ PRODUCT PREVIEW ══════════════════════ -->
   <div class="product-preview-section">
     <div class="product-preview-inner">
@@ -1580,7 +1637,6 @@
       </div>
 
       <div class="preview-frame-wrap">
-        <!-- Topbar del browser -->
         <div class="preview-browser-bar">
           <div class="dot-row"><span></span><span></span><span></span></div>
           <div class="dash-url" id="previewUrl">app.azyvion.com/dashboard</div>
@@ -1589,7 +1645,6 @@
         <!-- VISTA: OVERVIEW -->
         <div class="preview-screen active" id="preview-overview">
           <div class="pscreen-layout">
-            <!-- Sidebar -->
             <div class="pscreen-sidebar">
               <div class="pscreen-logo">
                 <div class="nav-logo-icon" style="width:28px;height:28px;border-radius:7px;">
@@ -1598,66 +1653,26 @@
                 <span style="font-size:11px;font-weight:700;color:#fff;">Azyvion</span>
               </div>
               <div class="pscreen-nav-section">General</div>
-              <div class="pscreen-nav-item active">
-                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-                Inicio
-              </div>
+              <div class="pscreen-nav-item active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Inicio</div>
               <div class="pscreen-nav-section">CRM</div>
-              <div class="pscreen-nav-item">
-                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                Clientes
-              </div>
-              <div class="pscreen-nav-item">
-                <svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
-                Pipeline
-              </div>
-              <div class="pscreen-nav-item">
-                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                Cotizaciones
-              </div>
-              <div class="pscreen-nav-item">
-                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                Inventario
-              </div>
+              <div class="pscreen-nav-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</div>
+              <div class="pscreen-nav-item"><svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>Pipeline</div>
+              <div class="pscreen-nav-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Cotizaciones</div>
             </div>
-
-            <!-- Main content -->
             <div class="pscreen-main">
               <div class="pscreen-header">
                 <div>
                   <div style="font-size:14px;font-weight:700;color:var(--ptext);">Buenos días, Carlos 👋</div>
                   <div style="font-size:10px;color:var(--ptext-m);">Resumen de hoy · Lunes 29 Sep 2026</div>
                 </div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0A84FF,#005cc5);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">CA</div>
-                </div>
+                <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0A84FF,#005cc5);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">CA</div>
               </div>
-
-              <!-- KPI row -->
               <div class="pscreen-kpi-row">
-                <div class="pscreen-kpi">
-                  <div class="pscreen-kpi-label">Ingresos del mes</div>
-                  <div class="pscreen-kpi-val">$84,200</div>
-                  <div class="pscreen-kpi-delta up">↑ 18% vs mes anterior</div>
-                </div>
-                <div class="pscreen-kpi">
-                  <div class="pscreen-kpi-label">Leads activos</div>
-                  <div class="pscreen-kpi-val">247</div>
-                  <div class="pscreen-kpi-delta up">↑ 32 nuevos esta semana</div>
-                </div>
-                <div class="pscreen-kpi">
-                  <div class="pscreen-kpi-label">Tasa de cierre</div>
-                  <div class="pscreen-kpi-val">68%</div>
-                  <div class="pscreen-kpi-delta up">↑ 5 pts</div>
-                </div>
-                <div class="pscreen-kpi">
-                  <div class="pscreen-kpi-label">Tareas pendientes</div>
-                  <div class="pscreen-kpi-val">12</div>
-                  <div class="pscreen-kpi-delta">3 para hoy</div>
-                </div>
+                <div class="pscreen-kpi"><div class="pscreen-kpi-label">Ingresos del mes</div><div class="pscreen-kpi-val">$84,200</div><div class="pscreen-kpi-delta up">↑ 18% vs mes anterior</div></div>
+                <div class="pscreen-kpi"><div class="pscreen-kpi-label">Leads activos</div><div class="pscreen-kpi-val">247</div><div class="pscreen-kpi-delta up">↑ 32 nuevos esta semana</div></div>
+                <div class="pscreen-kpi"><div class="pscreen-kpi-label">Tasa de cierre</div><div class="pscreen-kpi-val">68%</div><div class="pscreen-kpi-delta up">↑ 5 pts</div></div>
+                <div class="pscreen-kpi"><div class="pscreen-kpi-label">Tareas pendientes</div><div class="pscreen-kpi-val">12</div><div class="pscreen-kpi-delta">3 para hoy</div></div>
               </div>
-
-              <!-- Bottom row: chart + leads -->
               <div class="pscreen-bottom">
                 <div class="pscreen-card" style="flex:1.4">
                   <div class="pscreen-card-title">Ingresos · últimos 6 meses</div>
@@ -1675,21 +1690,9 @@
                 <div class="pscreen-card" style="flex:1">
                   <div class="pscreen-card-title">Leads recientes</div>
                   <div class="pscreen-lead-list">
-                    <div class="pscreen-lead-row">
-                      <div class="pscreen-lead-av" style="background:#0A84FF">CM</div>
-                      <div class="pscreen-lead-info"><div class="pscreen-lead-name">Constructora Mérida</div><div class="pscreen-lead-sub">$12,400 · Caliente</div></div>
-                      <div class="pscreen-lead-badge hot">●</div>
-                    </div>
-                    <div class="pscreen-lead-row">
-                      <div class="pscreen-lead-av" style="background:#7c3aed">TP</div>
-                      <div class="pscreen-lead-info"><div class="pscreen-lead-name">TechParts S.A.</div><div class="pscreen-lead-sub">$8,200 · Propuesta</div></div>
-                      <div class="pscreen-lead-badge warm">●</div>
-                    </div>
-                    <div class="pscreen-lead-row">
-                      <div class="pscreen-lead-av" style="background:#22c55e">AV</div>
-                      <div class="pscreen-lead-info"><div class="pscreen-lead-name">Agrícola Vásquez</div><div class="pscreen-lead-sub">$5,600 · Nuevo</div></div>
-                      <div class="pscreen-lead-badge new">●</div>
-                    </div>
+                    <div class="pscreen-lead-row"><div class="pscreen-lead-av" style="background:#0A84FF">CM</div><div class="pscreen-lead-info"><div class="pscreen-lead-name">Constructora Mérida</div><div class="pscreen-lead-sub">$12,400 · Caliente</div></div><div class="pscreen-lead-badge hot">●</div></div>
+                    <div class="pscreen-lead-row"><div class="pscreen-lead-av" style="background:#7c3aed">TP</div><div class="pscreen-lead-info"><div class="pscreen-lead-name">TechParts S.A.</div><div class="pscreen-lead-sub">$8,200 · Propuesta</div></div><div class="pscreen-lead-badge warm">●</div></div>
+                    <div class="pscreen-lead-row"><div class="pscreen-lead-av" style="background:#22c55e">AV</div><div class="pscreen-lead-info"><div class="pscreen-lead-name">Agrícola Vásquez</div><div class="pscreen-lead-sub">$5,600 · Nuevo</div></div><div class="pscreen-lead-badge new">●</div></div>
                   </div>
                 </div>
               </div>
@@ -1701,46 +1704,20 @@
         <div class="preview-screen" id="preview-pipeline">
           <div class="pscreen-layout">
             <div class="pscreen-sidebar">
-              <div class="pscreen-logo">
-                <div class="nav-logo-icon" style="width:28px;height:28px;border-radius:7px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
-                <span style="font-size:11px;font-weight:700;color:#fff;">Azyvion</span>
-              </div>
+              <div class="pscreen-logo"><div class="nav-logo-icon" style="width:28px;height:28px;border-radius:7px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><span style="font-size:11px;font-weight:700;color:#fff;">Azyvion</span></div>
               <div class="pscreen-nav-section">General</div>
               <div class="pscreen-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Inicio</div>
               <div class="pscreen-nav-section">CRM</div>
               <div class="pscreen-nav-item"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</div>
               <div class="pscreen-nav-item active"><svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>Pipeline</div>
-              <div class="pscreen-nav-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Cotizaciones</div>
             </div>
             <div class="pscreen-main">
-              <div class="pscreen-header">
-                <div style="font-size:14px;font-weight:700;color:var(--ptext);">Pipeline de ventas</div>
-                <div style="display:flex;gap:6px;">
-                  <div style="background:var(--paccent);color:#fff;font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;">+ Nuevo negocio</div>
-                </div>
-              </div>
-              <!-- Kanban board preview -->
+              <div class="pscreen-header"><div style="font-size:14px;font-weight:700;color:var(--ptext);">Pipeline de ventas</div><div style="background:var(--paccent);color:#fff;font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;">+ Nuevo negocio</div></div>
               <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1;overflow:hidden;">
-                <div class="pkboard-col">
-                  <div class="pkboard-head" style="border-color:#0A84FF;color:#0A84FF;">Prospecto <span>4</span></div>
-                  <div class="pkboard-card"><div class="pkbc-co">Logística Norte</div><div class="pkbc-val">$3,200</div><div class="pkbc-bar" style="width:30%;background:#0A84FF"></div></div>
-                  <div class="pkboard-card"><div class="pkbc-co">Ferretería López</div><div class="pkbc-val">$1,800</div><div class="pkbc-bar" style="width:20%;background:#0A84FF"></div></div>
-                  <div class="pkboard-card"><div class="pkbc-co">Distribuidora RC</div><div class="pkbc-val">$4,100</div><div class="pkbc-bar" style="width:15%;background:#0A84FF"></div></div>
-                </div>
-                <div class="pkboard-col">
-                  <div class="pkboard-head" style="border-color:#f97316;color:#f97316;">Calificado <span>3</span></div>
-                  <div class="pkboard-card"><div class="pkbc-co">Grupo Construye</div><div class="pkbc-val">$14,000</div><div class="pkbc-bar" style="width:60%;background:#f97316"></div></div>
-                  <div class="pkboard-card"><div class="pkbc-co">Industrias Beta</div><div class="pkbc-val">$7,500</div><div class="pkbc-bar" style="width:45%;background:#f97316"></div></div>
-                </div>
-                <div class="pkboard-col">
-                  <div class="pkboard-head" style="border-color:#7c3aed;color:#7c3aed;">Propuesta <span>2</span></div>
-                  <div class="pkboard-card"><div class="pkbc-co">TechParts S.A.</div><div class="pkbc-val">$8,200</div><div class="pkbc-bar" style="width:75%;background:#7c3aed"></div></div>
-                </div>
-                <div class="pkboard-col">
-                  <div class="pkboard-head" style="border-color:#22c55e;color:#22c55e;">Cerrado ✓ <span>5</span></div>
-                  <div class="pkboard-card"><div class="pkbc-co">Constructora Mérida</div><div class="pkbc-val">$12,400</div><div class="pkbc-bar" style="width:100%;background:#22c55e"></div></div>
-                  <div class="pkboard-card"><div class="pkbc-co">Agrícola Vásquez</div><div class="pkbc-val">$5,600</div><div class="pkbc-bar" style="width:100%;background:#22c55e"></div></div>
-                </div>
+                <div class="pkboard-col"><div class="pkboard-head" style="border-color:#0A84FF;color:#0A84FF;">Prospecto <span>4</span></div><div class="pkboard-card"><div class="pkbc-co">Logística Norte</div><div class="pkbc-val">$3,200</div><div class="pkbc-bar" style="width:30%;background:#0A84FF"></div></div><div class="pkboard-card"><div class="pkbc-co">Ferretería López</div><div class="pkbc-val">$1,800</div><div class="pkbc-bar" style="width:20%;background:#0A84FF"></div></div></div>
+                <div class="pkboard-col"><div class="pkboard-head" style="border-color:#f97316;color:#f97316;">Calificado <span>3</span></div><div class="pkboard-card"><div class="pkbc-co">Grupo Construye</div><div class="pkbc-val">$14,000</div><div class="pkbc-bar" style="width:60%;background:#f97316"></div></div></div>
+                <div class="pkboard-col"><div class="pkboard-head" style="border-color:#7c3aed;color:#7c3aed;">Propuesta <span>2</span></div><div class="pkboard-card"><div class="pkbc-co">TechParts S.A.</div><div class="pkbc-val">$8,200</div><div class="pkbc-bar" style="width:75%;background:#7c3aed"></div></div></div>
+                <div class="pkboard-col"><div class="pkboard-head" style="border-color:#22c55e;color:#22c55e;">Cerrado <span>5</span></div><div class="pkboard-card"><div class="pkbc-co">Constructora Mérida</div><div class="pkbc-val">$12,400</div><div class="pkbc-bar" style="width:100%;background:#22c55e"></div></div><div class="pkboard-card"><div class="pkbc-co">Agrícola Vásquez</div><div class="pkbc-val">$5,600</div><div class="pkbc-bar" style="width:100%;background:#22c55e"></div></div></div>
               </div>
             </div>
           </div>
@@ -1750,137 +1727,23 @@
         <div class="preview-screen" id="preview-contactos">
           <div class="pscreen-layout">
             <div class="pscreen-sidebar">
-              <div class="pscreen-logo">
-                <div class="nav-logo-icon" style="width:28px;height:28px;border-radius:7px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
-                <span style="font-size:11px;font-weight:700;color:#fff;">Azyvion</span>
-              </div>
+              <div class="pscreen-logo"><div class="nav-logo-icon" style="width:28px;height:28px;border-radius:7px;"><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div><span style="font-size:11px;font-weight:700;color:#fff;">Azyvion</span></div>
               <div class="pscreen-nav-section">General</div>
               <div class="pscreen-nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Inicio</div>
               <div class="pscreen-nav-section">CRM</div>
               <div class="pscreen-nav-item active"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Clientes</div>
               <div class="pscreen-nav-item"><svg viewBox="0 0 24 24"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>Pipeline</div>
-              <div class="pscreen-nav-item"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Cotizaciones</div>
             </div>
             <div class="pscreen-main">
-              <div class="pscreen-header">
-                <div style="font-size:14px;font-weight:700;color:var(--ptext);">Clientes</div>
-                <div style="display:flex;gap:6px;align-items:center;">
-                  <div style="background:var(--pbg-card);border:1px solid var(--pborder);border-radius:6px;padding:4px 10px;font-size:10px;color:var(--ptext-m);">🔍 Buscar...</div>
-                  <div style="background:var(--paccent);color:#fff;font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;">+ Nuevo</div>
-                </div>
-              </div>
-              <!-- Table -->
-              <div class="pscreen-card" style="flex:1;overflow:hidden;">
-                <div class="pscreen-table-head">
-                  <span>Nombre</span><span>Empresa</span><span>Estado</span><span>Valor</span><span>Agente</span>
-                </div>
-                <div class="pscreen-table-row">
-                  <div style="display:flex;align-items:center;gap:6px;"><div class="pscreen-lead-av" style="background:#0A84FF;width:22px;height:22px;font-size:8px;">MR</div>María Rodríguez</div>
-                  <span>Logística Norte</span>
-                  <span><div class="lead-status hot" style="font-size:9px;padding:2px 7px;">Caliente</div></span>
-                  <span style="color:var(--paccent);font-weight:600;">$3,200</span>
-                  <span style="color:var(--ptext-m);">Luis P.</span>
-                </div>
-                <div class="pscreen-table-row">
-                  <div style="display:flex;align-items:center;gap:6px;"><div class="pscreen-lead-av" style="background:#7c3aed;width:22px;height:22px;font-size:8px;">CP</div>Carlos Pérez</div>
-                  <span>TechParts S.A.</span>
-                  <span><div class="lead-status warm" style="font-size:9px;padding:2px 7px;">Propuesta</div></span>
-                  <span style="color:var(--paccent);font-weight:600;">$8,200</span>
-                  <span style="color:var(--ptext-m);">Ana V.</span>
-                </div>
-                <div class="pscreen-table-row">
-                  <div style="display:flex;align-items:center;gap:6px;"><div class="pscreen-lead-av" style="background:#22c55e;width:22px;height:22px;font-size:8px;">AV</div>Ana Vásquez</div>
-                  <span>Agrícola Vásquez</span>
-                  <span><div class="lead-status new" style="font-size:9px;padding:2px 7px;">Cliente</div></span>
-                  <span style="color:var(--paccent);font-weight:600;">$5,600</span>
-                  <span style="color:var(--ptext-m);">Carlos M.</span>
-                </div>
-                <div class="pscreen-table-row">
-                  <div style="display:flex;align-items:center;gap:6px;"><div class="pscreen-lead-av" style="background:#f97316;width:22px;height:22px;font-size:8px;">GC</div>Jorge Castillo</div>
-                  <span>Grupo Construye</span>
-                  <span><div class="lead-status hot" style="font-size:9px;padding:2px 7px;">Caliente</div></span>
-                  <span style="color:var(--paccent);font-weight:600;">$14,000</span>
-                  <span style="color:var(--ptext-m);">Luis P.</span>
-                </div>
-              </div>
+              <div class="pscreen-header"><div style="font-size:14px;font-weight:700;color:var(--ptext);">Contactos</div><div style="background:var(--paccent);color:#fff;font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;">+ Nuevo contacto</div></div>
+              <div class="pscreen-table-head"><span>Nombre</span><span>Empresa</span><span>Estado</span><span>Valor</span><span>Actualizado</span></div>
+              <div class="pscreen-table-row"><span style="font-weight:600">María Rodríguez</span><span>Logística Norte</span><span style="color:#22c55e;font-size:9.5px;font-weight:700;">ACTIVO</span><span style="color:#0A84FF;font-weight:600">$3,200</span><span style="color:var(--ptext-m)">Hoy</span></div>
+              <div class="pscreen-table-row"><span style="font-weight:600">Carlos Pérez</span><span>TechParts S.A.</span><span style="color:#f97316;font-size:9.5px;font-weight:700;">PROPUESTA</span><span style="color:#0A84FF;font-weight:600">$8,200</span><span style="color:var(--ptext-m)">Ayer</span></div>
+              <div class="pscreen-table-row"><span style="font-weight:600">Ana Vásquez</span><span>Agrícola Vásquez</span><span style="color:#22c55e;font-size:9.5px;font-weight:700;">CERRADO</span><span style="color:#0A84FF;font-weight:600">$5,600</span><span style="color:var(--ptext-m)">Lun</span></div>
+              <div class="pscreen-table-row"><span style="font-weight:600">Luis Hernández</span><span>Grupo Construye</span><span style="color:#0A84FF;font-size:9.5px;font-weight:700;">CALIFICADO</span><span style="color:#0A84FF;font-weight:600">$14,000</span><span style="color:var(--ptext-m)">Mar</span></div>
             </div>
           </div>
         </div>
-
-      </div><!-- /preview-frame-wrap -->
-    </div>
-  </div>
-
-  <!-- ══════════════════════ PIPELINE ══════════════════════ -->
-  <div id="pipeline" class="pipeline-section">
-    <div class="pipeline-inner">
-      <div class="pipeline-visual">
-        <div class="pv-title">
-          Pipeline de ventas
-          <span>En tiempo real</span>
-        </div>
-        <div class="kanban-cols">
-          <div class="kcol-1">
-            <div class="kanban-col-head">Prospecto <span>4</span></div>
-            <div class="kanban-card">
-              <div class="kc-company">Logística Norte</div>
-              <div class="kc-value">$3,200</div>
-              <div class="kc-bar" style="width:30%"></div>
-            </div>
-            <div class="kanban-card">
-              <div class="kc-company">Ferretería López</div>
-              <div class="kc-value">$1,800</div>
-              <div class="kc-bar" style="width:20%"></div>
-            </div>
-          </div>
-          <div class="kcol-2">
-            <div class="kanban-col-head">Calificado <span>3</span></div>
-            <div class="kanban-card">
-              <div class="kc-company">Grupo Construye</div>
-              <div class="kc-value">$14,000</div>
-              <div class="kc-bar" style="width:60%"></div>
-            </div>
-            <div class="kanban-card">
-              <div class="kc-company">Industrias Beta</div>
-              <div class="kc-value">$7,500</div>
-              <div class="kc-bar" style="width:45%"></div>
-            </div>
-          </div>
-          <div class="kcol-3">
-            <div class="kanban-col-head">Propuesta <span>2</span></div>
-            <div class="kanban-card">
-              <div class="kc-company">TechParts S.A.</div>
-              <div class="kc-value">$8,200</div>
-              <div class="kc-bar" style="width:75%"></div>
-            </div>
-          </div>
-          <div class="kcol-4">
-            <div class="kanban-col-head">Cerrado <span>5</span></div>
-            <div class="kanban-card">
-              <div class="kc-company">Constructora Mérida</div>
-              <div class="kc-value">$12,400</div>
-              <div class="kc-bar" style="width:100%"></div>
-            </div>
-            <div class="kanban-card">
-              <div class="kc-company">Agrícola Vásquez</div>
-              <div class="kc-value">$5,600</div>
-              <div class="kc-bar" style="width:100%"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="pipeline-text">
-        <div class="section-tag">Pipeline</div>
-        <h2 class="section-title">Visualiza y controla cada negocio en curso</h2>
-        <p class="section-desc" style="margin-bottom:32px;">Con la vista Kanban de Azyvion ves exactamente en qué etapa está cada oportunidad, quién es el responsable y cuánto vale. Arrastra, actualiza y enfoca el equipo donde importa.</p>
-        <ul class="check-list">
-          <li>Pipelines ilimitados por equipo o línea de producto</li>
-          <li>Alertas automáticas cuando un negocio lleva demasiado tiempo sin avanzar</li>
-          <li>Pronóstico de ingresos basado en probabilidad de cierre</li>
-          <li>Historial de cambios de etapa por negocio</li>
-          <li>Vista lista, kanban o mapa de calor según tu flujo de trabajo</li>
-        </ul>
       </div>
     </div>
   </div>
@@ -1926,7 +1789,6 @@
     </div>
   </div>
 
-
   <!-- ══════════════════════ PRECIOS ══════════════════════ -->
   <div id="precios" class="pricing-section">
     <div class="pricing-inner">
@@ -1940,113 +1802,17 @@
       </div>
 
       <div class="pricing-grid" id="pricingGrid">
-        <!-- Los planes se cargan dinámicamente desde Supabase -->
         <div class="price-skeleton"></div>
         <div class="price-skeleton"></div>
         <div class="price-skeleton"></div>
       </div>
       <p style="text-align:center;font-size:13px;color:var(--text-3);margin-top:24px;">
-        ¿Necesitas algo diferente? <a href="#" onclick="alert('Escríbenos a ventas@azyvion.com')" style="color:var(--blue);font-weight:600;">Habla con ventas</a>
+        ¿Necesitas algo diferente? <a href="mailto:ventas@azyvion.com" style="color:var(--blue);font-weight:600;">Habla con ventas</a>
       </p>
     </div>
   </div>
 
-  <script>
-  // Preview tabs
-  window.showPreview = function(name, btn) {
-    document.querySelectorAll('.preview-screen').forEach(function(s){ s.classList.remove('active'); });
-    document.querySelectorAll('.preview-tab').forEach(function(b){ b.classList.remove('active'); });
-    document.getElementById('preview-'+name).classList.add('active');
-    btn.classList.add('active');
-    var urls = { overview: 'app.azyvion.com/dashboard', pipeline: 'app.azyvion.com/pipeline', contactos: 'app.azyvion.com/clientes' };
-    document.getElementById('previewUrl').textContent = urls[name] || 'app.azyvion.com';
-  };
-  </script>
-
-  <script>
-  (function(){
-    var SUPABASE_URL = 'https://dwtykzporgjjvdustjfq.supabase.co';
-    var ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dHlrenBvcmdqanZkdXN0amZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MjM2MjIsImV4cCI6MjEwNTQ5OTYyMn0.0SXLE5HhIjHbHz2k0cgyat9bvCper_sjAiiCrkOSmF8';
-    var billingCycle = 'monthly';
-
-    var POPULAR_ID = 'plan_pro';
-
-    function renderPlans(plans) {
-      var grid = document.getElementById('pricingGrid');
-      if(!plans || !plans.length){ grid.innerHTML='<p style="color:#888;text-align:center">No hay planes disponibles.</p>'; return; }
-
-      var html = plans.map(function(p){
-        var price    = parseFloat(p.precio) || 0;
-        var priceAnn = Math.round(price * 0.8);
-        var isPopular = p.id === POPULAR_ID;
-        var displayPrice = price === 0 ? 'Gratis' : null;
-        var users = p.max_usuarios >= 999 ? 'Ilimitados' : p.max_usuarios + ' usuarios';
-        var storage = parseFloat(p.max_storage_gb) >= 100 ? parseFloat(p.max_storage_gb) + ' GB' : parseFloat(p.max_storage_gb) + ' GB';
-
-        // Build feature list from features JSONB
-        var featHtml = '';
-        if(Array.isArray(p.features)){
-          p.features.forEach(function(f){
-            var val = f.valor;
-            if(val === false){ featHtml += '<li class="feature-off"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'+f.label+'</li>'; }
-            else if(val === true){ featHtml += '<li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+f.label+'</li>'; }
-            else { featHtml += '<li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+f.label+': <strong>'+val+'</strong></li>'; }
-          });
-        }
-
-        // Always prepend users + storage
-        featHtml = '<li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+users+'</li>'
-                 + '<li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+storage+' almacenamiento</li>'
-                 + featHtml;
-
-        var priceDisplay = price === 0
-          ? '<div class="price-amount"><span class="price-num">Gratis</span></div>'
-          : '<div class="price-amount"><span class="price-currency">$</span><span class="price-num" data-monthly="'+price+'" data-annual="'+priceAnn+'">'+price+'</span><span class="price-cycle">/mes</span></div>';
-
-        var trialNote = price === 0
-          ? 'Sin tarjeta de crédito'
-          : '14 días de prueba gratuita · Sin tarjeta';
-
-        var btnClass = isPopular ? 'price-btn primary' : 'price-btn outline';
-        var btnText  = price === 0 ? 'Empezar gratis' : 'Empezar prueba gratis';
-
-        return '<div class="price-card'+(isPopular?' featured':'')+'">'+
-          (isPopular ? '<div class="price-badge">Más popular</div>' : '')+
-          '<div class="price-plan">'+p.nombre+'</div>'+
-          priceDisplay+
-          '<p class="price-desc">'+p.descripcion+'</p>'+
-          '<a href="register.html?plan='+p.id+'" class="'+btnClass+'">'+btnText+'</a>'+
-          '<ul class="price-features">'+featHtml+'</ul>'+
-          '<div class="price-note">'+trialNote+'</div>'+
-          '</div>';
-      }).join('');
-
-      grid.innerHTML = html;
-    }
-
-    window.setBilling = function(cycle){
-      billingCycle = cycle;
-      document.getElementById('billMonthly').classList.toggle('active', cycle==='monthly');
-      document.getElementById('billAnnual').classList.toggle('active', cycle==='annual');
-      document.querySelectorAll('.price-num[data-monthly]').forEach(function(el){
-        el.textContent = cycle==='annual' ? el.dataset.annual : el.dataset.monthly;
-      });
-    };
-
-    function loadPlans(){
-      fetch(SUPABASE_URL+'/rest/v1/sub_planes?select=*&activo=eq.true&order=precio.asc', {
-        headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer '+ANON_KEY }
-      })
-      .then(function(r){ return r.json(); })
-      .then(function(data){ renderPlans(data); })
-      .catch(function(){ document.getElementById('pricingGrid').innerHTML='<p style="color:#888;text-align:center;grid-column:1/-1">No se pudieron cargar los planes. Recarga la página.</p>'; });
-    }
-
-    loadPlans();
-  })();
-  </script>
-
-    <!-- ══════════════════════ TESTIMONIALS ══════════════════════ -->
+  <!-- ══════════════════════ TESTIMONIALS ══════════════════════ -->
   <div id="clientes" class="testimonials">
     <div class="testimonials-inner">
       <div class="section-tag">Clientes</div>
@@ -2056,7 +1822,9 @@
           <div class="testi-stars">★★★★★</div>
           <div class="testi-quote">Pasamos de llevar el pipeline en hojas de Excel a tenerlo todo centralizado. En 60 días aumentamos nuestra tasa de cierre en un 40%. No tiene precio.</div>
           <div class="testi-author">
-            <div class="testi-avatar" style="background:#0A84FF">MR</div>
+            <div class="testi-avatar">
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=88&q=80&auto=format&fit=crop&face=1" alt="María Rodríguez" />
+            </div>
             <div>
               <div class="testi-name">María Rodríguez</div>
               <div class="testi-role">Gerente de Ventas · Logística Norte</div>
@@ -2067,7 +1835,9 @@
           <div class="testi-stars">★★★★★</div>
           <div class="testi-quote">La automatización nos ahorra 3 horas diarias de trabajo manual. Los correos de seguimiento salen solos y nunca se nos olvida un lead importante.</div>
           <div class="testi-author">
-            <div class="testi-avatar" style="background:#7c3aed">CP</div>
+            <div class="testi-avatar">
+              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=88&q=80&auto=format&fit=crop&face=1" alt="Carlos Pérez" />
+            </div>
             <div>
               <div class="testi-name">Carlos Pérez</div>
               <div class="testi-role">Director Comercial · TechParts S.A.</div>
@@ -2078,7 +1848,9 @@
           <div class="testi-stars">★★★★★</div>
           <div class="testi-quote">El soporte en español y el precio competitivo fueron claves. Pero lo que realmente nos convenció fue ver los datos de nuestro pipeline en tiempo real.</div>
           <div class="testi-author">
-            <div class="testi-avatar" style="background:#22c55e">AV</div>
+            <div class="testi-avatar">
+              <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=88&q=80&auto=format&fit=crop&face=1" alt="Ana Vásquez" />
+            </div>
             <div>
               <div class="testi-name">Ana Vásquez</div>
               <div class="testi-role">CEO · Agrícola Vásquez</div>
@@ -2157,7 +1929,127 @@
     </div>
   </footer>
 
+  <script>
+  // ── Hamburger menu ──────────────────────────────
+  (function(){
+    var btn = document.getElementById('hamburgerBtn');
+    var menu = document.getElementById('mobileMenu');
+    var links = menu.querySelectorAll('a');
 
-  
+    function closeMenu() {
+      btn.classList.remove('open');
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    btn.addEventListener('click', function(){
+      var isOpen = menu.classList.contains('open');
+      if (isOpen) {
+        closeMenu();
+      } else {
+        btn.classList.add('open');
+        menu.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+
+    links.forEach(function(link){
+      link.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeMenu();
+    });
+  })();
+
+  // ── Preview tabs ─────────────────────────────────
+  window.showPreview = function(name, btn) {
+    document.querySelectorAll('.preview-screen').forEach(function(s){ s.classList.remove('active'); });
+    document.querySelectorAll('.preview-tab').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('preview-'+name).classList.add('active');
+    btn.classList.add('active');
+    var urls = { overview: 'app.azyvion.com/dashboard', pipeline: 'app.azyvion.com/pipeline', contactos: 'app.azyvion.com/clientes' };
+    document.getElementById('previewUrl').textContent = urls[name] || 'app.azyvion.com';
+  };
+  </script>
+
+  <script>
+  (function(){
+    var SUPABASE_URL = 'https://dwtykzporgjjvdustjfq.supabase.co';
+    var ANON_KEY     = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR3dHlrenBvcmdqanZkdXN0amZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5MjM2MjIsImV4cCI6MjEwNTQ5OTYyMn0.0SXLE5HhIjHbHz2k0cgyat9bvCper_sjAiiCrkOSmF8';
+    var billingCycle = 'monthly';
+    var POPULAR_ID = 'plan_pro';
+
+    function renderPlans(plans) {
+      var grid = document.getElementById('pricingGrid');
+      if(!plans || !plans.length){ grid.innerHTML='<p style="color:#888;text-align:center;grid-column:1/-1">No hay planes disponibles.</p>'; return; }
+
+      var html = plans.map(function(p){
+        var price    = parseFloat(p.precio) || 0;
+        var priceAnn = Math.round(price * 0.8);
+        var isPopular = p.id === POPULAR_ID;
+        var users = p.max_usuarios >= 999 ? 'Ilimitados' : p.max_usuarios + ' usuarios';
+        var storage = parseFloat(p.max_storage_gb) + ' GB';
+
+        var featHtml = '';
+        if(Array.isArray(p.features)){
+          p.features.forEach(function(f){
+            var val = f.valor;
+            if(val === false){ featHtml += '<li class="feature-off"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'+f.label+'</li>'; }
+            else if(val === true){ featHtml += '<li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+f.label+'</li>'; }
+            else { featHtml += '<li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+f.label+': <strong>'+val+'</strong></li>'; }
+          });
+        }
+
+        featHtml = '<li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+users+'</li>'
+                 + '<li><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+storage+' almacenamiento</li>'
+                 + featHtml;
+
+        var priceDisplay = price === 0
+          ? '<div class="price-amount"><span class="price-num">Gratis</span></div>'
+          : '<div class="price-amount"><span class="price-currency">$</span><span class="price-num" data-monthly="'+price+'" data-annual="'+priceAnn+'">'+price+'</span><span class="price-cycle">/mes</span></div>';
+
+        var trialNote = price === 0 ? 'Sin tarjeta de crédito' : '14 días de prueba gratuita · Sin tarjeta';
+        var btnClass = isPopular ? 'price-btn primary' : 'price-btn outline';
+        var btnText  = price === 0 ? 'Empezar gratis' : 'Empezar prueba gratis';
+
+        return '<div class="price-card'+(isPopular?' featured':'')+'">'+
+          (isPopular ? '<div class="price-badge">Más popular</div>' : '')+
+          '<div class="price-plan">'+p.nombre+'</div>'+
+          priceDisplay+
+          '<p class="price-desc">'+p.descripcion+'</p>'+
+          '<a href="register.html?plan='+p.id+'" class="'+btnClass+'">'+btnText+'</a>'+
+          '<ul class="price-features">'+featHtml+'</ul>'+
+          '<div class="price-note">'+trialNote+'</div>'+
+          '</div>';
+      }).join('');
+
+      grid.innerHTML = html;
+    }
+
+    window.setBilling = function(cycle){
+      billingCycle = cycle;
+      document.getElementById('billMonthly').classList.toggle('active', cycle==='monthly');
+      document.getElementById('billAnnual').classList.toggle('active', cycle==='annual');
+      document.querySelectorAll('.price-num[data-monthly]').forEach(function(el){
+        el.textContent = cycle==='annual' ? el.dataset.annual : el.dataset.monthly;
+      });
+    };
+
+    function loadPlans(){
+      fetch(SUPABASE_URL+'/rest/v1/sub_planes?select=*&activo=eq.true&order=precio.asc', {
+        headers: { 'apikey': ANON_KEY, 'Authorization': 'Bearer '+ANON_KEY }
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data){ renderPlans(data); })
+      .catch(function(){ document.getElementById('pricingGrid').innerHTML='<p style="color:#888;text-align:center;grid-column:1/-1">No se pudieron cargar los planes. Recarga la página.</p>'; });
+    }
+
+    loadPlans();
+  })();
+  </script>
+
 </body>
 </html>
