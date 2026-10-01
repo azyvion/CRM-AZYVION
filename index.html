@@ -478,7 +478,7 @@
 
     /* ─── FEATURES ────────────────────────────────── */
     .section {
-      padding: 96px 40px;
+      padding: 72px 40px;
       max-width: 1200px;
       margin: 0 auto;
     }
@@ -503,24 +503,24 @@
     }
 
     .section-desc {
-      font-size: 17px;
+      font-size: 16px;
       color: var(--text-2);
       max-width: 560px;
       line-height: 1.65;
-      margin-bottom: 56px;
+      margin-bottom: 40px;
     }
 
     .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 20px;
     }
 
     .feature-card {
       background: var(--bg);
       border: 1.5px solid var(--border);
-      border-radius: 20px;
-      padding: 32px;
+      border-radius: 16px;
+      padding: 24px;
       transition: border-color .2s, box-shadow .2s;
     }
 
@@ -530,32 +530,32 @@
     }
 
     .feature-icon {
-      width: 48px; height: 48px;
-      border-radius: 14px;
+      width: 40px; height: 40px;
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 14px;
     }
 
     .feature-icon svg { width: 22px; height: 22px; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
     .feature-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--text);
-      margin-bottom: 10px;
-      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+      letter-spacing: -0.2px;
     }
 
     .feature-desc {
-      font-size: 14.5px;
+      font-size: 13.5px;
       color: var(--text-2);
-      line-height: 1.65;
+      line-height: 1.6;
     }
 
     /* ─── IMAGE SECTION ───────────────────────────── */
     .img-split-section {
       background: var(--bg-alt);
-      padding: 96px 40px;
+      padding: 72px 40px;
     }
 
     .img-split-inner {
@@ -616,7 +616,7 @@
     /* ─── PIPELINE SECTION ────────────────────────── */
     .pipeline-section {
       background: var(--bg);
-      padding: 96px 40px;
+      padding: 72px 40px;
     }
 
     .pipeline-inner {
@@ -698,7 +698,7 @@
 
     /* ─── AI SECTION ──────────────────────────────── */
     .ai-section {
-      padding: 96px 40px;
+      padding: 72px 40px;
       background: var(--bg-alt);
     }
 
@@ -710,13 +710,13 @@
     .ai-cards {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 24px;
-      margin-top: 56px;
+      gap: 20px;
+      margin-top: 40px;
     }
 
     .ai-card {
-      border-radius: 20px;
-      padding: 36px;
+      border-radius: 18px;
+      padding: 28px;
       position: relative;
       overflow: hidden;
     }
@@ -973,13 +973,22 @@
 
     /* ─── PRICING ─────────────────────────────────── */
     .pricing-section {
-      padding: 96px 40px;
+      padding: 72px 40px;
       background: var(--bg-alt);
     }
     .pricing-inner {
       max-width: 1200px;
       margin: 0 auto;
     }
+    .pricing-scroll-hint {
+      display: none;
+      font-size: 12px;
+      color: var(--text-3);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    @media (max-width: 900px) { .pricing-scroll-hint { display: block; } }
+
     .billing-toggle {
       display: inline-flex;
       background: var(--bg);
@@ -987,7 +996,7 @@
       border-radius: 12px;
       padding: 4px;
       gap: 4px;
-      margin: 32px 0 48px;
+      margin: 24px 0 32px;
     }
     .billing-btn {
       padding: 8px 22px;
@@ -1096,7 +1105,7 @@
     /* ─── TESTIMONIALS ────────────────────────────── */
     .testimonials {
       background: var(--bg);
-      padding: 96px 40px;
+      padding: 72px 40px;
     }
 
     .testimonials-inner {
@@ -1107,8 +1116,8 @@
     .testi-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-top: 56px;
+      gap: 20px;
+      margin-top: 36px;
     }
 
     .testi-card {
@@ -1292,6 +1301,35 @@
     .footer-legal a:hover { color: rgba(255,255,255,0.7); }
 
     /* ─── RESPONSIVE ──────────────────────────────── */
+    /* ─── WHATSAPP FLOAT ──────────────────────────── */
+    .wa-float {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #25D366;
+      color: #fff;
+      border-radius: 50px;
+      padding: 12px 20px 12px 14px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 4px 20px rgba(37,211,102,0.45);
+      transition: transform .18s, box-shadow .18s;
+      white-space: nowrap;
+    }
+    .wa-float:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(37,211,102,0.55); }
+    .wa-float svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .wa-float .wa-label { display: inline; }
+
+    @media (max-width: 480px) {
+      .wa-float { padding: 12px; border-radius: 50%; bottom: 20px; right: 20px; }
+      .wa-float .wa-label { display: none; }
+    }
+
     @media (max-width: 1024px) {
       .pricing-grid { grid-template-columns: repeat(2,1fr); }
     }
@@ -1302,55 +1340,88 @@
       .nav-cta { display: none; }
       .hamburger { display: flex; }
 
-      .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 40px; }
-      .hero h1 { font-size: 36px; }
+      .hero { grid-template-columns: 1fr; padding: 100px 24px 56px; gap: 36px; }
+      .hero h1 { font-size: 34px; }
       .hero-visual { display: none; }
 
-      .logos-band { padding: 24px 20px; }
+      .logos-band { padding: 20px 20px; }
 
-      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 28px; }
       .stat-item { border-right: none; }
+      .stat-num { font-size: 34px; }
 
-      .section { padding: 64px 24px; }
-      .features-grid { grid-template-columns: 1fr; }
+      .section { padding: 52px 20px; }
+      /* 2-col features on tablet/mobile — much more compact */
+      .features-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .feature-card { padding: 18px; border-radius: 14px; }
+      .feature-icon { width: 34px; height: 34px; margin-bottom: 10px; }
+      .feature-title { font-size: 14px; margin-bottom: 6px; }
+      .feature-desc { font-size: 12.5px; }
 
-      .img-split-section { padding: 64px 24px; }
-      .img-split-inner { grid-template-columns: 1fr; gap: 40px; }
+      .section-desc { margin-bottom: 32px; }
+
+      .img-split-section { padding: 52px 20px; }
+      .img-split-inner { grid-template-columns: 1fr; gap: 32px; }
       .img-split-inner.reverse { grid-template-columns: 1fr; }
       .img-split-inner.reverse > *:first-child { order: 2; }
 
-      .pipeline-section { padding: 64px 24px; }
-      .pipeline-inner { grid-template-columns: 1fr; gap: 40px; }
+      .pipeline-section { padding: 52px 20px; }
+      .pipeline-inner { grid-template-columns: 1fr; gap: 32px; }
 
-      .ai-section { padding: 64px 24px; }
-      .ai-cards { grid-template-columns: 1fr; }
+      .ai-section { padding: 52px 20px; }
+      .ai-cards { grid-template-columns: 1fr; gap: 14px; }
+      .ai-card { padding: 22px; }
 
-      .product-preview-section { padding: 64px 24px; }
+      .product-preview-section { padding: 52px 20px; }
       .pscreen-layout { grid-template-columns: 1fr; }
       .pscreen-sidebar { display: none; }
       .pscreen-kpi-row { grid-template-columns: repeat(2,1fr); }
 
-      .pricing-section { padding: 64px 24px; }
+      /* Pricing: horizontal scroll on mobile — 1 card visible at a time */
+      .pricing-section { padding: 52px 20px; }
+      .pricing-grid {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 12px;
+        grid-template-columns: unset;
+      }
+      .pricing-grid::-webkit-scrollbar { height: 4px; }
+      .pricing-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+      .price-card {
+        min-width: 260px;
+        max-width: 280px;
+        scroll-snap-align: start;
+        flex-shrink: 0;
+      }
+      .price-skeleton { min-width: 260px; flex-shrink: 0; }
+      .billing-toggle { width: 100%; }
+      .billing-btn { flex: 1; justify-content: center; }
 
-      .testimonials { padding: 64px 24px; }
-      .testi-grid { grid-template-columns: 1fr; }
+      .testimonials { padding: 52px 20px; }
+      .testi-grid { grid-template-columns: 1fr; gap: 14px; }
 
-      .cta-band { padding: 64px 24px; }
+      .cta-band { padding: 56px 20px; }
 
-      footer { padding: 48px 24px 28px; }
-      .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+      footer { padding: 44px 20px 24px; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; }
     }
 
     @media (max-width: 600px) {
-      .stats-inner { grid-template-columns: 1fr; }
-      .footer-top { grid-template-columns: 1fr; }
+      .stats-inner { grid-template-columns: repeat(2,1fr); gap: 20px; }
+      .stat-num { font-size: 30px; }
+      .footer-top { grid-template-columns: 1fr; gap: 20px; }
       .hero-actions { flex-direction: column; align-items: flex-start; }
       .btn-hero { width: 100%; justify-content: center; }
-      .pricing-grid { grid-template-columns: 1fr; }
-      .billing-toggle { width: 100%; }
-      .billing-btn { flex: 1; justify-content: center; }
       .cta-actions { flex-direction: column; }
       .btn-cta-white, .btn-cta-outline { width: 100%; justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+      /* Single column features on very small screens */
+      .features-grid { grid-template-columns: 1fr; gap: 12px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1376,6 +1447,10 @@
       <li><a href="#clientes">Clientes</a></li>
     </ul>
     <div class="nav-cta">
+      <a href="https://wa.me/50255630559?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20Azyvion%20CRM" target="_blank" rel="noopener" class="btn-ghost" style="display:flex;align-items:center;gap:6px;color:#25D366;border-color:#25D366;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
       <a href="login.html" class="btn-ghost">Iniciar sesión</a>
       <a href="register.html" class="btn-primary-sm">Crear cuenta gratis</a>
     </div>
@@ -1396,6 +1471,10 @@
     <div class="mobile-cta">
       <a href="login.html" class="mobile-btn-ghost">Iniciar sesión</a>
       <a href="register.html" class="mobile-btn-primary">Crear cuenta gratis</a>
+      <a href="https://wa.me/50255630559?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20Azyvion%20CRM" target="_blank" rel="noopener" style="padding:13px 20px;border-radius:12px;font-size:15px;font-weight:700;color:#fff;background:#25D366;text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
     </div>
   </div>
 
@@ -1623,19 +1702,9 @@
     </div>
   </div>
 
-  <!-- ══════════════════════ PRODUCT PREVIEW ══════════════════════ -->
-  <div class="product-preview-section">
-    <div class="product-preview-inner">
-      <div class="section-tag">Vista real del producto</div>
-      <h2 class="section-title">Lo que verá tu equipo cada día</h2>
-      <p class="section-desc">Una interfaz diseñada para vendedores, no para contadores. Rápida, clara y sin curva de aprendizaje.</p>
-
-      <div class="preview-tabs">
-        <button class="preview-tab active" onclick="showPreview('overview',this)">Inicio</button>
-        <button class="preview-tab" onclick="showPreview('pipeline',this)">Pipeline</button>
-        <button class="preview-tab" onclick="showPreview('contactos',this)">Contactos</button>
-      </div>
-
+  <!-- ══════════════════════ PRODUCT PREVIEW (removed for brevity) ══════════════════════ -->
+  <div style="display:none">
+    <div>
       <div class="preview-frame-wrap">
         <div class="preview-browser-bar">
           <div class="dot-row"><span></span><span></span><span></span></div>
@@ -1746,7 +1815,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div><!-- end hidden preview -->
 
   <!-- ══════════════════════ IA ══════════════════════ -->
   <div id="ia" class="ai-section">
@@ -1801,6 +1870,7 @@
         <button class="billing-btn" onclick="setBilling('annual')" id="billAnnual">Anual <span class="save-badge">−20%</span></button>
       </div>
 
+      <p class="pricing-scroll-hint">← Desliza para ver todos los planes →</p>
       <div class="pricing-grid" id="pricingGrid">
         <div class="price-skeleton"></div>
         <div class="price-skeleton"></div>
@@ -1875,6 +1945,14 @@
       </div>
     </div>
   </div>
+
+  <!-- ══════════════════════ WHATSAPP FLOAT ══════════════════════ -->
+  <a class="wa-float" href="https://wa.me/50255630559?text=Hola%2C%20me%20interesa%20conocer%20m%C3%A1s%20sobre%20Azyvion%20CRM" target="_blank" rel="noopener" aria-label="Contactar por WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+    </svg>
+    <span class="wa-label">Contáctanos</span>
+  </a>
 
   <!-- ══════════════════════ FOOTER ══════════════════════ -->
   <footer>
