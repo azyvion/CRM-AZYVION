@@ -81,7 +81,14 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
         }
 
         async function _getResumen() {
-            const [cR,iR,eR]=await Promise.all([_sb.from('Clientes').select('*'),_sb.from('Inventario').select('*'),_sb.from('Encuestas').select('*')]);
+            // VENDEDOR: filtrar clientes propios también en el resumen
+            let cliQ = _sb.from('Clientes').select('*');
+            if (_currentUserRole === 'VENDEDOR') {
+                const sess = (function(){ try { return JSON.parse(localStorage.getItem('azyvion_session')); } catch(e){ return null; } })();
+                const nombreUsuario = sess ? (sess.usuario || sess.nombre || '') : '';
+                if (nombreUsuario) cliQ = cliQ.eq('creadoPor', nombreUsuario);
+            }
+            const [cR,iR,eR]=await Promise.all([cliQ,_sb.from('Inventario').select('*'),_sb.from('Encuestas').select('*')]);
             const pR=await _getProspectos();
             const cli=cR.data||[],pro=pR.data||[],inv=iR.data||[],enc=eR.data||[];
             inv.forEach(i=>{i.tipo=String(i.tipo||'')==='Servicio'?'Servicio':'Producto';i.estado=_estadoItem(i.tipo,i.unidades,i.stockMax);});
@@ -101,8 +108,19 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
             return {ok:true,data:data||[]};
         }
 
-        async function _getClientes(){const{data,error}=await _sb.from('Clientes').select('*').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
-        async function _addCliente(p,u){if(!p.nombre)return{ok:false,error:'El nombre es requerido.'};const C=['#0A84FF','#30D158','#FF9F0A','#BF5AF2','#FF453A','#5e5ce6','#8E8E93','#32ADE6'];const r={id:_uuid(),nombre:p.nombre,empresa:p.empresa||'',segmento:p.segmento||'Estándar',correo:p.correo||'',telefono:p.telefono||'',direccion:p.direccion||'',estado:p.estado||'Activo',valorTotal:Number(p.valorTotal)||0,color:C[Math.floor(Math.random()*C.length)],fechaReg:new Date().toISOString(),organization_id:_currentOrgId};const{error}=await _sb.from('Clientes').insert(r);if(error)return{ok:false,error:error.message};await _sb.from('Actividad').insert({id:_uuid(),tipo:'cliente',usuario:u,descripcion:'Nuevo cliente: '+p.nombre,fecha:new Date().toISOString(),organization_id:_currentOrgId});return{ok:true,id:r.id};}
+        async function _getClientes(){
+            // VENDEDOR: solo ve sus propios clientes (filtrado a nivel de BD + capa JS)
+            let q = _sb.from('Clientes').select('*').order('nombre');
+            if (_currentUserRole === 'VENDEDOR') {
+                const sess = (function(){ try { return JSON.parse(localStorage.getItem('azyvion_session')); } catch(e){ return null; } })();
+                const nombreUsuario = sess ? (sess.usuario || sess.nombre || '') : '';
+                if (nombreUsuario) q = q.eq('creadoPor', nombreUsuario);
+            }
+            const{data,error}=await q;
+            if(error)return{ok:false,error:error.message};
+            return{ok:true,data:data||[]};
+        }
+        async function _addCliente(p,u){if(!p.nombre)return{ok:false,error:'El nombre es requerido.'};const C=['#0A84FF','#30D158','#FF9F0A','#BF5AF2','#FF453A','#5e5ce6','#8E8E93','#32ADE6'];const r={id:_uuid(),nombre:p.nombre,empresa:p.empresa||'',segmento:p.segmento||'Estándar',correo:p.correo||'',telefono:p.telefono||'',direccion:p.direccion||'',estado:p.estado||'Activo',valorTotal:Number(p.valorTotal)||0,color:C[Math.floor(Math.random()*C.length)],fechaReg:new Date().toISOString(),creadoPor:u,organization_id:_currentOrgId};const{error}=await _sb.from('Clientes').insert(r);if(error)return{ok:false,error:error.message};await _sb.from('Actividad').insert({id:_uuid(),tipo:'cliente',usuario:u,descripcion:'Nuevo cliente: '+p.nombre,fecha:new Date().toISOString(),organization_id:_currentOrgId});return{ok:true,id:r.id};}
         async function _updateCliente(id,p,u){const{error}=await _sb.from('Clientes').update({nombre:p.nombre,empresa:p.empresa,segmento:p.segmento,correo:p.correo,telefono:p.telefono,direccion:p.direccion,estado:p.estado,valorTotal:Number(p.valorTotal)||0}).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteCliente(id,u){const{error}=await _sb.from('Clientes').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
@@ -127,8 +145,8 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
         async function _deleteEncuesta(id,u){const{error}=await _sb.from('Encuestas').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
         async function _getUsuarios(){const{data,error}=await _sb.from('Usuarios').select('id,usuario,nombre,rol,activo,auth_uid,correo,organization_id').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:(data||[])};}
-        async function _addUsuario(p,authU){if(!p.usuario||!p.nombre||!p.contrasena||!p.rol)return{ok:false,error:'Campos requeridos.'};if(!p.correo||!p.correo.trim())return{ok:false,error:'El correo es obligatorio para crear el usuario en Supabase Auth.'};if(!['Admin','Gerente','Agente'].includes(p.rol))return{ok:false,error:'Rol inválido.'};const{data,error}=await _sb.functions.invoke('admin-user-manager',{body:{action:'createUser',usuario:p.usuario.trim(),nombre:p.nombre.trim(),email:p.correo.trim(),password:p.contrasena,rol:p.rol,organization_id:_currentOrgId}});if(error)return{ok:false,error:error.message};if(data&&data.error)return{ok:false,error:data.error};return{ok:true};}
-        async function _updateUsuario(id,p,authU){const up={};if(p.nombre!==undefined)up.nombre=p.nombre.trim();if(p.rol!==undefined&&['Admin','Gerente','Agente'].includes(p.rol))up.rol=p.rol;if(p.activo!==undefined)up.activo=p.activo==='true'||p.activo===true;const uObj=(_usuarios||[]).find(u=>String(u.id)===String(id));const authUid=uObj&&uObj.auth_uid;if(p.nuevaContrasena&&p.nuevaContrasena.trim()){if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede restablecer la contraseña.'};const{data:pwData,error:pwError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'resetUserPassword',user_id:authUid,password:p.nuevaContrasena.trim()}});if(pwError)return{ok:false,error:pwError.message};if(pwData&&pwData.error)return{ok:false,error:pwData.error};}if(p.correo&&p.correo.trim()){const nuevoCorreo=p.correo.trim();if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede cambiar el correo.'};const{data:emData,error:emError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'updateUserEmail',user_id:authUid,email:nuevoCorreo}});if(emError)return{ok:false,error:emError.message};if(emData&&emData.error)return{ok:false,error:emData.error};up.correo=nuevoCorreo;}if(Object.keys(up).length===0)return{ok:true};const{error}=await _sb.from('Usuarios').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
+        async function _addUsuario(p,authU){if(!p.usuario||!p.nombre||!p.contrasena||!p.rol)return{ok:false,error:'Campos requeridos.'};if(!p.correo||!p.correo.trim())return{ok:false,error:'El correo es obligatorio para crear el usuario en Supabase Auth.'};if(!['Admin','Gerente','Agente','Vendedor'].includes(p.rol))return{ok:false,error:'Rol inválido.'};const{data,error}=await _sb.functions.invoke('admin-user-manager',{body:{action:'createUser',usuario:p.usuario.trim(),nombre:p.nombre.trim(),email:p.correo.trim(),password:p.contrasena,rol:p.rol,organization_id:_currentOrgId}});if(error)return{ok:false,error:error.message};if(data&&data.error)return{ok:false,error:data.error};return{ok:true};}
+        async function _updateUsuario(id,p,authU){const up={};if(p.nombre!==undefined)up.nombre=p.nombre.trim();if(p.rol!==undefined&&['Admin','Gerente','Agente','Vendedor'].includes(p.rol))up.rol=p.rol;if(p.activo!==undefined)up.activo=p.activo==='true'||p.activo===true;const uObj=(_usuarios||[]).find(u=>String(u.id)===String(id));const authUid=uObj&&uObj.auth_uid;if(p.nuevaContrasena&&p.nuevaContrasena.trim()){if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede restablecer la contraseña.'};const{data:pwData,error:pwError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'resetUserPassword',user_id:authUid,password:p.nuevaContrasena.trim()}});if(pwError)return{ok:false,error:pwError.message};if(pwData&&pwData.error)return{ok:false,error:pwData.error};}if(p.correo&&p.correo.trim()){const nuevoCorreo=p.correo.trim();if(!authUid)return{ok:false,error:'No se encontró auth_uid del usuario. No se puede cambiar el correo.'};const{data:emData,error:emError}=await _sb.functions.invoke('admin-user-manager',{body:{action:'updateUserEmail',user_id:authUid,email:nuevoCorreo}});if(emError)return{ok:false,error:emError.message};if(emData&&emData.error)return{ok:false,error:emData.error};up.correo=nuevoCorreo;}if(Object.keys(up).length===0)return{ok:true};const{error}=await _sb.from('Usuarios').update(up).eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
         async function _deleteUsuario(id,authU){const{error}=await _sb.from('Usuarios').delete().eq('id',id);if(error)return{ok:false,error:error.message};return{ok:true};}
 
         async function _getCuentasBancarias(){const{data,error}=await _sb.from('CuentasBancarias').select('*').order('nombre');if(error)return{ok:false,error:error.message};return{ok:true,data:data||[]};}
@@ -357,14 +375,61 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
         async function _uploadFotoPerfil(p,sess){if(!p.imagenBase64)return{ok:false,error:'No se recibió ninguna imagen.'};let datos=String(p.imagenBase64);const idx=datos.indexOf('base64,');if(idx!==-1)datos=datos.substring(idx+7);let bytes;try{bytes=Uint8Array.from(atob(datos),c=>c.charCodeAt(0));}catch(e){return{ok:false,error:'Imagen inválida.'};}if(!bytes.length)return{ok:false,error:'La imagen está vacía.'};if(bytes.length>2*1024*1024)return{ok:false,error:'La imagen no debe superar 2 MB.'};const mime=p.mimeType||'image/jpeg';const ext={'image/png':'.png','image/jpeg':'.jpg','image/webp':'.webp'}[mime]||'.jpg';const filename='perfil_'+(sess.usuario||sess.nombre)+'_'+Date.now()+ext;const blob=new Blob([bytes],{type:mime});const{data:up,error:upE}=await _sb.storage.from('fotos-perfil').upload(filename,blob,{upsert:true,contentType:mime});if(upE)return{ok:false,error:'No se pudo subir la foto: '+upE.message+'. Crea el bucket "fotos-perfil" como público en Supabase Storage.'};const{data:uD}=_sb.storage.from('fotos-perfil').getPublicUrl(filename);const fotoUrl=uD.publicUrl;const authUid=await _getAuthUidOrFallback();let qu=_sb.from('Usuarios').update({fotoUrl,fotoFileId:filename,fechaPerfilActualizado:new Date().toISOString()});if(authUid)qu=qu.eq('auth_uid',authUid);else qu=qu.eq('usuario',sess.usuario||sess.nombre).eq('organization_id',_currentOrgId);await qu;return{ok:true,fotoUrl};}
         async function _deleteFotoPerfil(p,sess){const authUid=await _getAuthUidOrFallback();let qr=_sb.from('Usuarios').select('fotoFileId,fotoUrl');if(authUid)qr=qr.eq('auth_uid',authUid);else qr=qr.eq('usuario',sess.usuario||sess.nombre).eq('organization_id',_currentOrgId);const{data:usr}=await qr.single();if(usr&&usr.fotoFileId)await _sb.storage.from('fotos-perfil').remove([usr.fotoFileId]);let qu=_sb.from('Usuarios').update({fotoUrl:'',fotoFileId:'',fechaPerfilActualizado:new Date().toISOString()});if(authUid)qu=qu.eq('auth_uid',authUid);else qu=qu.eq('usuario',sess.usuario||sess.nombre).eq('organization_id',_currentOrgId);await qu;return{ok:true};}
 
-        async function _getDashboardInit(p,sess){const rol=_rol;const promises=[_getResumen(),_getActividad(10),_getClientes(),_getProspectos(),_getInventario(),_getEncuestas(),_getCotizaciones({})];const esAdmin=_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN';const esCont=_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN'||_currentUserRole==='GERENTE';if(esAdmin)promises.push(_getUsuarios());if(esCont)promises.push(_getResumenContable(),_getCuentasBancarias(),_getPlanCuentas(),_getTransacciones({}));const results=await Promise.all(promises);let i=0;const resumen=results[i++],actividad=results[i++],clientes=results[i++],prospectos=results[i++],inventario=results[i++],encuestas=results[i++],cotizaciones=results[i++];const usuarios=esAdmin?results[i++]:null;let contabilidad=null;if(esCont){const rc=results[i++],cb=results[i++],plan=results[i++],trx=results[i++];contabilidad={resumenContable:rc,cuentasBancarias:cb.data,planCuentas:plan.data,transacciones:trx.data};}return{ok:true,ts:new Date().toISOString(),resumen,actividad,clientes,prospectos,inventario,encuestas,cotizaciones,usuarios,contabilidad,empresa:EMPRESA,rol,usuario:sess.usuario||sess.nombre};}
+        async function _getDashboardInit(p,sess){
+            const rol=_rol;
+            const esVendedor=_currentUserRole==='VENDEDOR';
+            const esAdmin=_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN';
+            const esCont=_currentUserRole==='ADMIN'||_currentUserRole==='SUPER_ADMIN'||_currentUserRole==='GERENTE';
+            // VENDEDOR: solo carga clientes propios; no tiene acceso a prospectos, inventario, encuestas ni contabilidad
+            const promises=[
+                _getResumen(),
+                _getActividad(10),
+                _getClientes(),
+                esVendedor ? Promise.resolve({ok:true,data:[]}) : _getProspectos(),
+                esVendedor ? Promise.resolve({ok:true,data:[]}) : _getInventario(),
+                esVendedor ? Promise.resolve({ok:true,data:[]}) : _getEncuestas(),
+                esVendedor ? Promise.resolve({ok:true,data:[]}) : _getCotizaciones({})
+            ];
+            if(esAdmin)promises.push(_getUsuarios());
+            if(esCont)promises.push(_getResumenContable(),_getCuentasBancarias(),_getPlanCuentas(),_getTransacciones({}));
+            const results=await Promise.all(promises);
+            let i=0;
+            const resumen=results[i++],actividad=results[i++],clientes=results[i++],prospectos=results[i++],inventario=results[i++],encuestas=results[i++],cotizaciones=results[i++];
+            const usuarios=esAdmin?results[i++]:null;
+            let contabilidad=null;
+            if(esCont){const rc=results[i++],cb=results[i++],plan=results[i++],trx=results[i++];contabilidad={resumenContable:rc,cuentasBancarias:cb.data,planCuentas:plan.data,transacciones:trx.data};}
+            return{ok:true,ts:new Date().toISOString(),resumen,actividad,clientes,prospectos,inventario,encuestas,cotizaciones,usuarios,contabilidad,empresa:EMPRESA,rol,usuario:sess.usuario||sess.nombre};
+        }
 
+
+        // Operaciones completamente bloqueadas para el rol VENDEDOR
+        const _VENDEDOR_BLOCKED = new Set([
+            'getProspectos','addProspecto','updateProspecto','deleteProspecto','convertirProspecto',
+            'getInventario','addInventario','updateInventario','deleteInventario',
+            'getCategorias','addCategoria','updateCategoria','deleteCategoria',
+            'getEncuestas','addEncuesta','updateEncuesta','deleteEncuesta',
+            'getUsuarios','addUsuario','updateUsuario','deleteUsuario',
+            'getCuentasBancarias','addCuentaBancaria','updateCuentaBancaria','deleteCuentaBancaria',
+            'getPlanCuentas','addCuentaContable','updateCuentaContable','deleteCuentaContable',
+            'getTransacciones','addTransaccion','deleteTransaccion','getResumenContable',
+            'getCotizaciones','getCotizacion','getCotizacionHtml','addCotizacion',
+            'updateCotizacion','updateEstadoCotizacion','deleteCotizacion','enviarCotizacion',
+            'getResumenCotizaciones','getOrgConfig','saveOrgConfig','uploadLogoOrg','deleteLogoOrg'
+        ]);
 
         async function _dispatch(name,args){
             const sess=readSession();
             const usuario=sess?(sess.usuario||sess.nombre||''):'';
             if(name==='logout')return await _logout();
             if(!sess||!sess.token)return{ok:false,error:'Sesión inválida o expirada. Por favor inicia sesión de nuevo.'};
+            // VENDEDOR: bloquear operaciones no permitidas a nivel de dispatch
+            if(_currentUserRole==='VENDEDOR' && _VENDEDOR_BLOCKED.has(name)){
+                return{ok:false,error:'Acceso denegado. El rol Vendedor no tiene permiso para esta operación.'};
+            }
+            // VENDEDOR: deleteCliente bloqueado (solo puede editar sus propios)
+            if(_currentUserRole==='VENDEDOR' && name==='deleteCliente'){
+                return{ok:false,error:'El rol Vendedor no puede eliminar clientes. Contacta a un administrador.'};
+            }
             switch(name){
                 case 'getResumen':return await _getResumen();
                 case 'getActividad':return await _getActividad(args[0]);
@@ -461,7 +526,8 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
 
     })();
 
-        function esAdmin() {return String(_rol).trim().toLowerCase() === 'admin';}
+        function esAdmin()    { return String(_rol).trim().toLowerCase() === 'admin'; }
+        window.esVendedor = function esVendedor() { return String(_rol).trim().toLowerCase() === 'vendedor'; };
 
         /* ═══════════════════════════════════════════════════════
            INICIALIZACIÓN
@@ -495,9 +561,10 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
             _usuario = sessLocal.nombre || '';
             // Fase 4B: derivar _currentUserRole desde el rol legacy
             _currentUserRole = {
-                'Admin':   'ADMIN',
-                'Gerente': 'GERENTE',
-                'Agente':  'AGENTE'
+                'Admin':    'ADMIN',
+                'Gerente':  'GERENTE',
+                'Agente':   'AGENTE',
+                'Vendedor': 'VENDEDOR'
             }[_rol] || 'AGENTE';
 
             var elName   = document.getElementById('userName');
@@ -513,6 +580,24 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
             var elNavSubSec = document.getElementById('nav-section-suscripciones');
             if (elNavSub) elNavSub.style.display = 'none';   // solo se muestra si _subInit confirma SUPER_ADMIN
             if (elNavSubSec) elNavSubSec.style.display = 'none';
+
+            // ── VENDEDOR: ocultar secciones no permitidas del sidebar ──────────
+            if (esVendedor()) {
+                var _vendedorHiddenNavs = [
+                    'nav-overview','nav-prospectos','nav-cotizaciones',
+                    'nav-inventario','nav-encuestas','nav-contabilidad',
+                    'nav-usuarios','nav-suscripciones','nav-section-suscripciones',
+                    'nav-section-contabilidad','nav-section-config'
+                ];
+                _vendedorHiddenNavs.forEach(function(id) {
+                    var el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+                // También ocultar cualquier elemento con data-rol-hide="vendedor"
+                document.querySelectorAll('[data-rol-hide~="vendedor"]').forEach(function(el) {
+                    el.style.display = 'none';
+                });
+            }
             _aplicarAvatarSidebar();
 
             // ── 3. Restaurar sesión en Supabase Auth ANTES de cargar datos ──
@@ -556,14 +641,23 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
                             })
                             .catch(function() { loadAll(); });
 
-                        // Página de inicio preferida (una sola vez, si hay preferencia cacheada distinta a Inicio)
-                        try {
-                            var prefsCacheLanding = JSON.parse(localStorage.getItem('azyvion_perfil_cache') || 'null');
-                            var landing = prefsCacheLanding && prefsCacheLanding.preferencias && prefsCacheLanding.preferencias.paginaInicio;
-                            if (landing && landing !== 'overview' && document.getElementById('page-' + landing)) {
-                                showPage(landing, document.getElementById('nav-' + landing));
-                            }
-                        } catch (e) {}
+                        // VENDEDOR: forzar página de inicio a 'clientes'
+                        if (esVendedor()) {
+                            setTimeout(function() {
+                                if (typeof showPage === 'function') {
+                                    showPage('clientes', document.getElementById('nav-clientes'));
+                                }
+                            }, 50);
+                        } else {
+                            // Página de inicio preferida (una sola vez, si hay preferencia cacheada distinta a Inicio)
+                            try {
+                                var prefsCacheLanding = JSON.parse(localStorage.getItem('azyvion_perfil_cache') || 'null');
+                                var landing = prefsCacheLanding && prefsCacheLanding.preferencias && prefsCacheLanding.preferencias.paginaInicio;
+                                if (landing && landing !== 'overview' && document.getElementById('page-' + landing)) {
+                                    showPage(landing, document.getElementById('nav-' + landing));
+                                }
+                            } catch (e) {}
+                        }
                     })
                     .catch(function(err) {
                         console.warn('[Azyvion] setSession error de red:', err);
@@ -583,14 +677,16 @@ function _hideSplash() { setTimeout(function(){ if(window._ovGreeting) window._o
             loadResumen();
             loadActividad();
             loadClientes();
-            loadProspectos();
-            loadInventario();
-            loadCategorias();
-            loadEncuestas();
-            loadCotizaciones();
+            if (!esVendedor()) {
+                loadProspectos();
+                loadInventario();
+                loadCategorias();
+                loadEncuestas();
+                loadCotizaciones();
+                _initContabilidad();
+            }
             if (esAdmin()) loadUsuarios();
             _subInit();
-            _initContabilidad();
         }
 
         function refreshCurrent() {
