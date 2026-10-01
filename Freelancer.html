@@ -619,7 +619,7 @@ textarea:focus{
           </div>
         </div>
 
-        <button class="btn-start" onclick="startTest()">
+        <button class="btn-start" onclick="showNameScreen()">
           Comenzar evaluación
           <div class="btn-start-arrow">→</div>
         </button>
@@ -668,6 +668,37 @@ textarea:focus{
   </div>
 </div>
 
+
+<!-- ═══════════════════════════════════════
+     PANTALLA DE NOMBRE
+════════════════════════════════════════ -->
+<div id="screen-name" style="display:none;min-height:100vh;background:var(--navy);display:none;align-items:center;justify-content:center;flex-direction:column;padding:40px 24px;">
+  <div style="width:100%;max-width:480px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:48px 40px;text-align:center;">
+    <div style="width:56px;height:56px;border-radius:50%;background:rgba(26,107,204,.25);border:1px solid rgba(61,155,233,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:24px;">👤</div>
+    <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:-.4px;">¿Cuál es tu nombre?</div>
+    <div style="font-size:14px;color:rgba(255,255,255,.45);margin-bottom:32px;line-height:1.6;">Antes de comenzar, ingresa tu nombre completo para que podamos identificar tu evaluación.</div>
+    <input
+      id="inputNombre"
+      type="text"
+      placeholder="Ej. María González"
+      autocomplete="name"
+      style="width:100%;padding:16px 18px;border-radius:12px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;font-size:16px;font-family:inherit;outline:none;margin-bottom:8px;transition:border-color .2s;"
+      oninput="syncNameBtn()"
+      onkeydown="if(event.key==='Enter') confirmName()"
+    />
+    <div id="nameErr" style="font-size:12.5px;color:#ff6b6b;margin-bottom:18px;min-height:18px;text-align:left;padding-left:4px;"></div>
+    <button id="btnConfirmName" onclick="confirmName()" disabled
+      style="width:100%;padding:16px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff;font-size:16px;font-weight:800;cursor:pointer;opacity:.45;transition:opacity .2s;font-family:inherit;letter-spacing:-.2px;">
+      Comenzar evaluación →
+    </button>
+  </div>
+  <div style="margin-top:24px;font-size:12px;color:rgba(255,255,255,.2);">© 2026 Azyvion · Evaluación confidencial</div>
+</div>
+
+<style>
+#inputNombre:focus{ border-color:var(--sky); background:rgba(255,255,255,.1); }
+#inputNombre::placeholder{ color:rgba(255,255,255,.25); }
+</style>
 
 <!-- ═══════════════════════════════════════
      PANTALLA DE TEST
@@ -940,6 +971,42 @@ let _encuestaId = null;
 ══════════════════════════════════════════════════════════════════ */
 let cur = 1;
 const done = new Set();
+let _nombreCandidato = '';
+
+function showNameScreen(){
+  document.getElementById('screen-intro').style.display='none';
+  const ns = document.getElementById('screen-name');
+  ns.style.display='flex';
+  setTimeout(()=>document.getElementById('inputNombre').focus(), 100);
+}
+
+function syncNameBtn(){
+  const val = document.getElementById('inputNombre').value.trim();
+  const btn = document.getElementById('btnConfirmName');
+  const err = document.getElementById('nameErr');
+  if(val.length >= 3){
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    err.textContent = '';
+  } else {
+    btn.disabled = true;
+    btn.style.opacity = '.45';
+  }
+}
+
+function confirmName(){
+  const val = document.getElementById('inputNombre').value.trim();
+  const err = document.getElementById('nameErr');
+  if(val.length < 3){
+    err.textContent = 'Por favor ingresa tu nombre completo (mínimo 3 caracteres).';
+    document.getElementById('inputNombre').focus();
+    return;
+  }
+  _nombreCandidato = val;
+  document.getElementById('screen-name').style.display='none';
+  document.getElementById('screen-test').style.display='block';
+  window.scrollTo({top:0});
+}
 
 function startTest(){
   document.getElementById('screen-intro').style.display='none';
@@ -981,9 +1048,10 @@ async function submitFromStep(){
     const { error } = await _sbFree
       .from('TestReclutamiento')
       .insert({
-        puesto:       ENCUESTA_NOMBRE,
-        respuestas:   respuestasJson,
-        submitted_at: new Date().toISOString()
+        puesto:           ENCUESTA_NOMBRE,
+        nombre_candidato: _nombreCandidato || null,
+        respuestas:       respuestasJson,
+        submitted_at:     new Date().toISOString()
       });
     if (error) console.warn('[Freelancer] TestReclutamiento insert error:', error.message);
   } catch(e){ console.warn('[Freelancer] TestReclutamiento:', e); }
@@ -993,10 +1061,11 @@ async function submitFromStep(){
     try {
       const envioId = _genUUID();
       await _sbFree.from('encuesta_envios').insert({
-        id:          envioId,
-        encuesta_id: _encuestaId,
-        puesto:      ENCUESTA_NOMBRE,
-        submitted_at: new Date().toISOString()
+        id:              envioId,
+        encuesta_id:     _encuestaId,
+        puesto:          ENCUESTA_NOMBRE,
+        nombre_candidato: _nombreCandidato || null,
+        submitted_at:    new Date().toISOString()
       });
       const filas = TITLES.map((titulo, idx) => ({
         envio_id:        envioId,
