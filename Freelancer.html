@@ -959,6 +959,13 @@ function onType(n){
   sync();
 }
 
+function _genUUID(){
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random()*16|0, v = c==='x'?r:(r&0x3|0x8);
+    return v.toString(16);
+  });
+}
+
 async function submitFromStep(){
   const btn = document.getElementById('btnSend');
   if(btn){ btn.disabled=true; btn.textContent='Enviando…'; }
@@ -966,31 +973,40 @@ async function submitFromStep(){
   const answers = {};
   for(let i=1;i<=5;i++) answers[i] = (document.getElementById(`a${i}`)?.value||'').trim();
 
+  /* 1. Guardar en TestReclutamiento (tabla dedicada, INSERT público) */
+  try {
+    const respuestasJson = {};
+    TITLES.forEach((t, idx) => { respuestasJson[idx+1] = { titulo: t, respuesta: answers[idx+1] || '' }; });
+
+    const { error } = await _sbFree
+      .from('TestReclutamiento')
+      .insert({
+        puesto:       ENCUESTA_NOMBRE,
+        respuestas:   respuestasJson,
+        submitted_at: new Date().toISOString()
+      });
+    if (error) console.warn('[Freelancer] TestReclutamiento insert error:', error.message);
+  } catch(e){ console.warn('[Freelancer] TestReclutamiento:', e); }
+
+  /* 2. Guardar también en encuesta_envios + respuestas si tenemos el ID */
   if (_encuestaId) {
     try {
-      const { data: envio, error: envErr } = await _sbFree
-        .from('encuesta_envios')
-        .insert({
-          encuesta_id:  _encuestaId,
-          puesto:       ENCUESTA_NOMBRE,
-          submitted_at: new Date().toISOString()
-        })
-        .select('id')
-        .single();
-      if (envErr) throw envErr;
-
+      const envioId = _genUUID();
+      await _sbFree.from('encuesta_envios').insert({
+        id:          envioId,
+        encuesta_id: _encuestaId,
+        puesto:      ENCUESTA_NOMBRE,
+        submitted_at: new Date().toISOString()
+      });
       const filas = TITLES.map((titulo, idx) => ({
-        envio_id:        envio.id,
+        envio_id:        envioId,
         encuesta_id:     _encuestaId,
         pregunta_orden:  idx + 1,
         pregunta_titulo: titulo,
         respuesta:       answers[idx + 1] || ''
       }));
-      const { error: respErr } = await _sbFree.from('encuesta_respuestas').insert(filas);
-      if (respErr) throw respErr;
-    } catch(err){
-      console.error('[Freelancer] submitFromStep:', err);
-    }
+      await _sbFree.from('encuesta_respuestas').insert(filas);
+    } catch(e){ console.warn('[Freelancer] encuesta_envios:', e); }
   }
 
   for(let i=1;i<=5;i++) document.getElementById(`card${i}`).classList.remove('visible');
@@ -1061,37 +1077,30 @@ async function submitTest(){
   /* ── GUARDAR EN SUPABASE ── */
   if (_encuestaId) {
     try {
-      /* 1. Crear registro de envío (un candidato que completó) */
-      const { data: envio, error: envErr } = await _sbFree
+      const envioId = _genUUID();
+
+      const { error: envErr } = await _sbFree
         .from('encuesta_envios')
         .insert({
-          encuesta_id:      _encuestaId,
-          puesto:           ENCUESTA_NOMBRE,
-          submitted_at:     new Date().toISOString()
-          /* nombre_candidato y email_candidato pueden añadirse
-             si agregas campos de identificación en el formulario */
-        })
-        .select('id')
-        .single();
-
+          id:           envioId,
+          encuesta_id:  _encuestaId,
+          puesto:       ENCUESTA_NOMBRE,
+          submitted_at: new Date().toISOString()
+        });
       if (envErr) throw envErr;
 
-      /* 2. Insertar una fila por pregunta */
       const filas = TITLES.map((titulo, idx) => ({
-        envio_id:        envio.id,
+        envio_id:        envioId,
         encuesta_id:     _encuestaId,
         pregunta_orden:  idx + 1,
         pregunta_titulo: titulo,
         respuesta:       answers[idx + 1] || ''
       }));
-
       const { error: respErr } = await _sbFree.from('encuesta_respuestas').insert(filas);
       if (respErr) throw respErr;
 
     } catch (err) {
       console.error('[Freelancer] submitTest:', err);
-      /* Si falla la DB, mostramos éxito de todas formas para no bloquear al candidato.
-         El error queda en consola para debug. */
     }
   }
 
