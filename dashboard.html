@@ -2200,25 +2200,9 @@
                 }
             }
             else if (m.type === 'encuesta') {
-                if (m.action === 'delete') {
-                    window.api.withSuccessHandler(res => {
-                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
-                        if (res.ok) {showToast('Encuesta eliminada', '#FF453A'); loadEncuestas(); loadResumen();}
-                        else showToast('Error: ' + res.error, '#FF453A');
-                    }).deleteEncuesta(m.id);
-                } else {
-                    const nombre = document.getElementById('mEncNombre').value.trim();
-                    if (!nombre) {saveBtn.disabled = false; saveBtn.textContent = 'Guardar'; showToast('El nombre es requerido', '#FF9F0A'); return;}
-                    let data = {nombre, tipo: v('mEncTipo'), pregTotal: v('mEncPregTotal')};
-                    if (m.action === 'edit') Object.assign(data, {estado: v('mEncEstado'), totalEnviadas: v('mEncEnv'), respuestas: v('mEncResp'), pregConf: v('mEncConf')});
-                    const fn = m.action === 'add'
-                        ? (cb => window.api.withSuccessHandler(cb).addEncuesta(data))
-                        : (cb => window.api.withSuccessHandler(cb).updateEncuesta(m.id, data));
-                    fn(res => {
-                        closeModal(); saveBtn.disabled = false; saveBtn.textContent = 'Guardar';
-                        if (res.ok) {showToast(m.action === 'add' ? 'Encuesta creada' : 'Encuesta actualizada', '#30D158'); loadEncuestas(); loadResumen(); loadActividad();}
-                        else showToast('Error: ' + res.error, '#FF453A');
-                    });
+                if (typeof window.handleSaveEncuesta === 'function') {
+                    window.handleSaveEncuesta(m, saveBtn);
+                    return;
                 }
             }
             else if (m.type === 'categoria') {
