@@ -2453,7 +2453,7 @@
               <div class="form-field"><label class="form-label">CONTRASEÑA *</label><input class="form-input" id="uPassword" type="password" placeholder="Mínimo 8 caracteres"/></div>
               <div class="form-row">
                 <div class="form-field"><label class="form-label">ROL</label>
-                  <select class="form-select" id="uRol"><option>Agente</option><option>Gerente</option><option>Admin</option></select>
+                  <select class="form-select" id="uRol"><option>Agente</option><option>Gerente</option><option>Admin</option><option>Vendedor</option></select>
                 </div>
                 <div class="form-field"><label class="form-label">ESTADO</label>
                   <select class="form-select" id="uActivo"><option value="true">Activo</option><option value="false">Inactivo</option></select>
@@ -2489,7 +2489,7 @@
                   ${(window._superIds && u.auth_uid && window._superIds.indexOf(u.auth_uid) !== -1)
                     ? `<select class="form-select" id="uRol" disabled style="opacity:.75"><option value="Admin" selected>Super Admin</option></select>`
                     : `<select class="form-select" id="uRol">
-                    ${['Agente','Gerente','Admin'].map(r => `<option${r===u.rol?' selected':''}>${r}</option>`).join('')}
+                    ${['Agente','Gerente','Admin','Vendedor'].map(r => `<option${r===u.rol?' selected':''}>${r}</option>`).join('')}
                   </select>`}
                 </div>
                 <div class="form-field"><label class="form-label">ESTADO</label>
